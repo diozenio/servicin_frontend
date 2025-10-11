@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Work_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -32,7 +34,11 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${workSans.variable} ${firaCode.variable} antialiased`}
       >
-        {children}
+        <div className="min-h-screen">
+          <Navbar />
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );
