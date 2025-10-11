@@ -142,15 +142,16 @@ export default function Home() {
         <div className="text-sm">
           <span className="mr-2">Populares:</span>
           <a href="#" className="underline mr-2">
-            Encanador
+            Encanador,
           </a>
-          <span className="mr-2">,</span>
           <a href="#" className="underline mr-2">
-            Eletricista
+            Eletricista,
           </a>
-          <span className="mr-2">,</span>
+          <a href="#" className="underline mr-2">
+            Pintor,
+          </a>
           <a href="#" className="underline">
-            Pintor
+            Pedreiro
           </a>
         </div>
       </div>
