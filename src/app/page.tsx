@@ -172,7 +172,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <div className="flex items-center justify-center min-h-[60vh] px-4 pt-32 md:pt-40">
+      <div className="flex items-start justify-center h-[95vh] px-4 pt-28">
         <div className="max-w-5xl mx-auto text-center">
           {/* Headline */}
           <h1 className="text-5xl md:text-6xl font-serif mb-8 leading-tight">
