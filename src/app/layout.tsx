@@ -3,6 +3,7 @@ import { Playfair_Display, Work_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { QueryProvider } from "@/components/query-provider";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -34,11 +35,13 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${workSans.variable} ${firaCode.variable} antialiased`}
       >
-        <div className="min-h-screen">
-          <Navbar />
-          <main className="pt-16">{children}</main>
-          <Footer />
-        </div>
+        <QueryProvider>
+          <div className="min-h-screen">
+            <Navbar />
+            <main className="pt-16">{children}</main>
+            <Footer />
+          </div>
+        </QueryProvider>
       </body>
     </html>
   );
