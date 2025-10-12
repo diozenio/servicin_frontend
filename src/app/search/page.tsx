@@ -6,9 +6,11 @@ import { SearchIcon, FilterIcon } from "lucide-react";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";
+import { useLocation } from "@/hooks/use-location";
 import { SearchInput } from "@/components/search-input";
 import { Location as LocationModel } from "@/core/domain/models/location";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -21,6 +23,9 @@ export default function SearchPage() {
     searchTerm: searchQuery,
     selectedLocation: locationId,
   });
+
+  const { location: selectedLocation, isLoading: isLoadingLocation } =
+    useLocation(locationId || null);
 
   const handleSearch = (search: string, location: LocationModel | null) => {
     const params = new URLSearchParams();
@@ -44,7 +49,12 @@ export default function SearchPage() {
       {/* Search Header */}
       <div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <SearchInput onSearch={handleSearch} />
+          <SearchInput
+            onSearch={handleSearch}
+            defaultSearch={searchQuery}
+            defaultLocation={selectedLocation}
+            isLoadingLocation={isLoadingLocation}
+          />
         </div>
       </div>
 
@@ -54,17 +64,35 @@ export default function SearchPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-serif font-semibold mb-2">
-              {searchQuery || locationId
-                ? `Resultados da busca${
-                    searchQuery ? ` por "${searchQuery}"` : ""
-                  }${locationId ? ` em ${locationId}` : ""}`
-                : "Todos os serviços"}
+              {isLoading ? (
+                <Skeleton className="h-8 w-64" />
+              ) : searchQuery || locationId ? (
+                `Resultados da busca${
+                  searchQuery ? ` por "${searchQuery}"` : ""
+                }${
+                  locationId
+                    ? ` em ${
+                        isLoadingLocation
+                          ? "carregando..."
+                          : selectedLocation?.label || locationId
+                      }`
+                    : ""
+                }`
+              ) : (
+                "Todos os serviços"
+              )}
             </h1>
-            <p className="text-muted-foreground">
-              {services.length} de {total} serviço
-              {total !== 1 ? "s" : ""} encontrado
-              {total !== 1 ? "s" : ""}
-            </p>
+            <div className="text-muted-foreground">
+              {isLoading ? (
+                <Skeleton className="h-4 w-32" />
+              ) : (
+                <>
+                  {services.length} de {total} serviço
+                  {total !== 1 ? "s" : ""} encontrado
+                  {total !== 1 ? "s" : ""}
+                </>
+              )}
+            </div>
           </div>
         </div>
 

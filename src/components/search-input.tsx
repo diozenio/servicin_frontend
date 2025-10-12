@@ -18,17 +18,26 @@ import {
 } from "@/components/ui/popover";
 import { SearchIcon, MapPinIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Location as LocationModel } from "@/core/domain/models/location";
 import { useLocations } from "@/hooks/use-locations";
 
 interface SearchInputProps {
   onSearch: (search: string, location: LocationModel | null) => void;
+  defaultSearch?: string;
+  defaultLocation?: LocationModel | null;
+  isLoadingLocation?: boolean;
 }
 
-export function SearchInput({ onSearch }: SearchInputProps) {
-  const [searchQuery, setSearchQuery] = React.useState("");
+export function SearchInput({
+  onSearch,
+  defaultSearch = "",
+  defaultLocation = null,
+  isLoadingLocation = false,
+}: SearchInputProps) {
+  const [searchQuery, setSearchQuery] = React.useState(defaultSearch);
   const [selectedLocation, setSelectedLocation] =
-    React.useState<LocationModel | null>(null);
+    React.useState<LocationModel | null>(defaultLocation);
   const [isLocationOpen, setIsLocationOpen] = React.useState(false);
 
   const {
@@ -52,6 +61,12 @@ export function SearchInput({ onSearch }: SearchInputProps) {
     onSearch(searchQuery, selectedLocation);
   };
 
+  React.useEffect(() => {
+    if (defaultLocation) {
+      setSelectedLocation(defaultLocation);
+    }
+  }, [defaultLocation]);
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 w-full">
       {/* Search Bar Container */}
@@ -62,7 +77,13 @@ export function SearchInput({ onSearch }: SearchInputProps) {
           <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
             <PopoverTrigger asChild>
               <button className="flex-1 text-left focus:outline-none h-full truncate">
-                {selectedLocation ? selectedLocation.label : "Localização"}
+                {isLoadingLocation ? (
+                  <Skeleton className="h-4 w-24" />
+                ) : selectedLocation ? (
+                  selectedLocation.label
+                ) : (
+                  "Localização"
+                )}
               </button>
             </PopoverTrigger>
             <PopoverContent className="p-0" side="bottom" align="start">
