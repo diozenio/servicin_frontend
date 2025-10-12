@@ -17,157 +17,24 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SearchIcon, MapPinIcon } from "lucide-react";
-import { ServiceCard, type Service } from "@/components/service-card";
-
-type Location = {
-  value: string;
-  label: string;
-};
-
-const locations: Location[] = [
-  {
-    value: "sao-paulo",
-    label: "São Paulo, SP",
-  },
-  {
-    value: "rio-de-janeiro",
-    label: "Rio de Janeiro, RJ",
-  },
-  {
-    value: "belo-horizonte",
-    label: "Belo Horizonte, MG",
-  },
-  {
-    value: "salvador",
-    label: "Salvador, BA",
-  },
-  {
-    value: "brasilia",
-    label: "Brasília, DF",
-  },
-  {
-    value: "fortaleza",
-    label: "Fortaleza, CE",
-  },
-  {
-    value: "manaus",
-    label: "Manaus, AM",
-  },
-  {
-    value: "curitiba",
-    label: "Curitiba, PR",
-  },
-];
-
-const services: Service[] = [
-  {
-    id: "1",
-    title: "Encanador Profissional",
-    company: "AquaFix Soluções",
-    type: "Urgente",
-    requirements: [
-      "Licença profissional ativa",
-      "5+ anos de experiência",
-      "Disponibilidade 24h",
-    ],
-    location: "São Paulo, SP",
-    price: "R$ 80 - 150 por hora",
-    rating: 4.8,
-    reviews: 127,
-    logo: "",
-    logoFallback: "AF",
-  },
-  {
-    id: "2",
-    title: "Eletricista Especializado",
-    company: "VoltTech Elétrica",
-    type: "Padrão",
-    requirements: [
-      "CREA ativo",
-      "3+ anos de experiência",
-      "Conhecimento em automação",
-    ],
-    location: "Rio de Janeiro, RJ",
-    price: "R$ 100 - 200 por serviço",
-    rating: 4.9,
-    reviews: 89,
-    logo: "",
-    logoFallback: "VT",
-  },
-  {
-    id: "3",
-    title: "Pintor Residencial",
-    company: "ColorCasa Pinturas",
-    type: "Orçamento",
-    requirements: [
-      "Experiência em pintura residencial",
-      "2+ anos de experiência",
-      "Materiais inclusos",
-    ],
-    location: "Belo Horizonte, MG",
-    price: "R$ 15 - 25 por m²",
-    rating: 4.7,
-    reviews: 156,
-    logo: "",
-    logoFallback: "CC",
-  },
-  {
-    id: "4",
-    title: "Pedreiro Especialista",
-    company: "Construtora Forte",
-    type: "Urgente",
-    requirements: [
-      "Experiência em alvenaria",
-      "4+ anos de experiência",
-      "Trabalho com acabamento",
-    ],
-    location: "Salvador, BA",
-    price: "R$ 120 - 180 por dia",
-    rating: 4.6,
-    reviews: 203,
-    logo: "",
-    logoFallback: "CF",
-  },
-  {
-    id: "5",
-    title: "Técnico em Ar Condicionado",
-    company: "CoolAir Refrigeração",
-    type: "Padrão",
-    requirements: [
-      "Certificação técnica",
-      "3+ anos de experiência",
-      "Manutenção preventiva",
-    ],
-    location: "Fortaleza, CE",
-    price: "R$ 90 - 140 por visita",
-    rating: 4.8,
-    reviews: 94,
-    logo: "",
-    logoFallback: "CA",
-  },
-  {
-    id: "6",
-    title: "Marceneiro Artesão",
-    company: "Madeira Nobre",
-    type: "Orçamento",
-    requirements: [
-      "Especialização em móveis sob medida",
-      "6+ anos de experiência",
-      "Trabalho com madeiras nobres",
-    ],
-    location: "Curitiba, PR",
-    price: "R$ 200 - 400 por m²",
-    rating: 4.9,
-    reviews: 67,
-    logo: "",
-    logoFallback: "MN",
-  },
-];
+import { ServiceCard } from "@/components/service/service-card";
+import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import { useLocations } from "@/hooks/use-locations";
+import { useServices } from "@/hooks/use-services";
 
 export default function Home() {
-  const [locationOpen, setLocationOpen] = React.useState(false);
-  const [selectedLocation, setSelectedLocation] =
-    React.useState<Location | null>(null);
+  const {
+    locations,
+    selectedLocation,
+    isOpen,
+    selectLocation,
+    setIsOpen,
+    searchLocations,
+    isLoading: isLoadingLocations,
+  } = useLocations();
+
+  const { services, isLoading } = useServices();
 
   return (
     <main className="min-h-screen">
@@ -175,7 +42,7 @@ export default function Home() {
       <div className="flex items-start justify-center h-[95vh] px-4 pt-28  bg-gradient-to-b from-background via-background to-primary/80 dark:to-card">
         <div className="max-w-5xl mx-auto text-center">
           {/* Headline */}
-          <h1 className="text-5xl md:text-6xl font-serif font-bold mb-8 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-8 leading-tight">
             Conecte-se com os melhores profissionais urbanos da sua região
           </h1>
 
@@ -192,7 +59,7 @@ export default function Home() {
                 {/* Location Field */}
                 <div className="w-full sm:w-48 flex items-center justify-center px-3 h-14 border-r border-foreground">
                   <MapPinIcon className="w-4 h-4 mr-2" />
-                  <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                  <Popover open={isOpen} onOpenChange={setIsOpen}>
                     <PopoverTrigger asChild>
                       <button className="flex-1 text-left focus:outline-none h-full truncate">
                         {selectedLocation
@@ -201,30 +68,42 @@ export default function Home() {
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="p-0" side="bottom" align="start">
-                      <Command>
-                        <CommandInput placeholder="Buscar cidade..." />
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Buscar cidade..."
+                          onValueChange={searchLocations}
+                        />
                         <CommandList>
-                          <CommandEmpty>
-                            Nenhuma cidade encontrada.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {locations.map((location) => (
-                              <CommandItem
-                                key={location.value}
-                                value={location.value}
-                                onSelect={(value) => {
-                                  setSelectedLocation(
-                                    locations.find(
-                                      (loc) => loc.value === value
-                                    ) || null
-                                  );
-                                  setLocationOpen(false);
-                                }}
-                              >
-                                {location.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
+                          {isLoadingLocations ? (
+                            <div className="flex items-center justify-center py-6">
+                              <Spinner />
+                              <span className="ml-2 text-sm text-muted-foreground">
+                                Carregando cidades...
+                              </span>
+                            </div>
+                          ) : (
+                            <>
+                              <CommandEmpty>
+                                Nenhuma cidade encontrada.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {locations.map((location) => (
+                                  <CommandItem
+                                    key={location.value}
+                                    value={location.value}
+                                    onSelect={(value) => {
+                                      const foundLocation = locations.find(
+                                        (loc) => loc.value === value
+                                      );
+                                      selectLocation(foundLocation || null);
+                                    }}
+                                  >
+                                    {location.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </>
+                          )}
                         </CommandList>
                       </Command>
                     </PopoverContent>
@@ -270,7 +149,7 @@ export default function Home() {
       {/* Services Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">
             Serviços Disponíveis
           </h2>
           <p className="text-lg text-muted-foreground">
@@ -279,9 +158,13 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
+          {isLoading
+            ? Array.from({ length: 6 }, (_, index) => (
+                <ServiceCardSkeleton key={`skeleton-${index}`} />
+              ))
+            : services.map((service) => (
+                <ServiceCard key={service.id} service={service} />
+              ))}
         </div>
       </div>
     </main>
