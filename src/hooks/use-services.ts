@@ -1,64 +1,40 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { services } from "@/container";
+import { container } from "@/container";
 import { Service } from "@/core/domain/models/service";
 import { ServiceListResponse } from "@/core/domain/models/service";
 
-export function useServices() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-
+export function useServices(
+  searchTerm: string = "",
+  selectedLocation: string = ""
+) {
   const {
-    data: allServicesResponse,
+    data: servicesResponse,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ["services"],
-    queryFn: () => services.serviceService.findAll(),
+    refetch,
+  } = useQuery<ServiceListResponse>({
+    queryKey: ["services", "search", searchTerm, selectedLocation],
+    queryFn: (): Promise<ServiceListResponse> =>
+      container.serviceService.findAll({
+        search: searchTerm || undefined,
+        location: selectedLocation || undefined,
+      }),
   });
 
-  const allServices = allServicesResponse?.data || [];
+  const services: Service[] = servicesResponse?.data || [];
 
-  const { data: filteredServicesResponse, isLoading: isSearching } =
-    useQuery<ServiceListResponse>({
-      queryKey: ["services", "search", searchTerm, selectedLocation],
-      queryFn: (): Promise<ServiceListResponse> =>
-        services.serviceService.findAll({
-          search: searchTerm || undefined,
-          location: selectedLocation || undefined,
-        }),
-      enabled: searchTerm.length > 0 || selectedLocation !== null,
+  const fetch = (newSearchTerm: string, newLocation: string) => {
+    return container.serviceService.findAll({
+      search: newSearchTerm || undefined,
+      location: newLocation || undefined,
     });
-
-  const filteredServices: Service[] = filteredServicesResponse?.data || [];
-
-  const displayServices =
-    searchTerm.length > 0 || selectedLocation !== null
-      ? filteredServices
-      : allServices;
-
-  const searchServicesHandler = (term: string) => {
-    setSearchTerm(term);
-  };
-
-  const filterByLocation = (location: string | null) => {
-    setSelectedLocation(location);
-  };
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSelectedLocation(null);
   };
 
   return {
-    services: displayServices,
-    allServices,
-    searchTerm,
-    selectedLocation,
-    searchServices: searchServicesHandler,
-    filterByLocation,
-    clearFilters,
-    isLoading: isLoading || isSearching,
+    services,
+    isLoading,
     error,
+    fetch,
+    refetch,
   };
 }

@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/core/types/api";
 
 export type Location = {
+  id: string;
   value: string;
   label: string;
 };

@@ -12,7 +12,7 @@ const locationService = new LocationService(locationAdapter);
 const serviceService = new ServiceService(serviceAdapter);
 
 // Export services container
-export const services = {
+export const container = {
   locationService,
   serviceService,
 };

@@ -1,40 +1,40 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { SearchIcon, MapPinIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
-import { Spinner } from "@/components/ui/spinner";
-import { useLocations } from "@/hooks/use-locations";
 import { useServices } from "@/hooks/use-services";
+import { SearchInput } from "@/components/search-input";
+import { useState, useCallback } from "react";
+import { Location as LocationModel } from "@/core/domain/models/location";
 
 export default function Home() {
-  const {
-    locations,
-    selectedLocation,
-    isOpen,
-    selectLocation,
-    setIsOpen,
-    searchLocations,
-    isLoading: isLoadingLocations,
-  } = useLocations();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] =
+    useState<LocationModel | null>(null);
 
-  const { services, isLoading } = useServices();
+  const { services, isLoading } = useServices(
+    searchQuery,
+    selectedLocation?.id
+  );
+
+  const handleSearch = useCallback(
+    (search: string, location: LocationModel | null) => {
+      const params = new URLSearchParams();
+      if (search.trim()) {
+        params.set("q", search.trim());
+      }
+      if (location) {
+        params.set("location", location.id);
+      }
+
+      const queryString = params.toString();
+      router.push(`/search${queryString ? `?${queryString}` : ""}`);
+    },
+    [router]
+  );
 
   return (
     <main className="min-h-screen">
@@ -53,95 +53,44 @@ export default function Home() {
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-8">
-            <div className="flex flex-col sm:flex-row justify-center gap-4 w-full">
-              {/* Search Bar Container */}
-              <div className="flex border border-foreground rounded-lg overflow-hidden w-full">
-                {/* Location Field */}
-                <div className="w-full sm:w-48 flex items-center justify-center px-3 h-14 border-r border-foreground">
-                  <MapPinIcon className="w-4 h-4 mr-2" />
-                  <Popover open={isOpen} onOpenChange={setIsOpen}>
-                    <PopoverTrigger asChild>
-                      <button className="flex-1 text-left focus:outline-none h-full truncate">
-                        {selectedLocation
-                          ? selectedLocation.label
-                          : "Localização"}
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0" side="bottom" align="start">
-                      <Command shouldFilter={false}>
-                        <CommandInput
-                          placeholder="Buscar cidade..."
-                          onValueChange={searchLocations}
-                        />
-                        <CommandList>
-                          {isLoadingLocations ? (
-                            <div className="flex items-center justify-center py-6">
-                              <Spinner />
-                              <span className="ml-2 text-sm text-muted-foreground">
-                                Carregando cidades...
-                              </span>
-                            </div>
-                          ) : (
-                            <>
-                              <CommandEmpty>
-                                Nenhuma cidade encontrada.
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {locations.map((location) => (
-                                  <CommandItem
-                                    key={location.value}
-                                    value={location.value}
-                                    onSelect={(value) => {
-                                      const foundLocation = locations.find(
-                                        (loc) => loc.value === value
-                                      );
-                                      selectLocation(foundLocation || null);
-                                    }}
-                                  >
-                                    {location.label}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </>
-                          )}
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                {/* Services Field */}
-                <div className="w-full flex items-center justify-center px-3 h-14">
-                  <SearchIcon className="w-4 h-4 mr-2" />
-                  <Input
-                    placeholder="Que tipo de serviço você precisa?"
-                    className="border-0 focus-visible:ring-0 p-0 bg-transparent dark:bg-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Search Button */}
-              <Button className="rounded-lg px-8 whitespace-nowrap h-14 w-full sm:w-auto">
-                Buscar
-              </Button>
-            </div>
+            <SearchInput onSearch={handleSearch} />
           </div>
 
           {/* Popular Searches */}
           <div className="text-sm">
             <span className="mr-2">Populares:</span>
-            <a href="#" className="underline mr-2">
+            <button
+              onClick={useCallback(() => {
+                handleSearch("Encanador", null);
+              }, [handleSearch])}
+              className="underline mr-2 hover:text-primary transition-colors"
+            >
               Encanador,
-            </a>
-            <a href="#" className="underline mr-2">
+            </button>
+            <button
+              onClick={useCallback(() => {
+                handleSearch("Eletricista", null);
+              }, [handleSearch])}
+              className="underline mr-2 hover:text-primary transition-colors"
+            >
               Eletricista,
-            </a>
-            <a href="#" className="underline mr-2">
+            </button>
+            <button
+              onClick={useCallback(() => {
+                handleSearch("Pintor", null);
+              }, [handleSearch])}
+              className="underline mr-2 hover:text-primary transition-colors"
+            >
               Pintor,
-            </a>
-            <a href="#" className="underline">
+            </button>
+            <button
+              onClick={useCallback(() => {
+                handleSearch("Pedreiro", null);
+              }, [handleSearch])}
+              className="underline hover:text-primary transition-colors"
+            >
               Pedreiro
-            </a>
+            </button>
           </div>
         </div>
       </div>

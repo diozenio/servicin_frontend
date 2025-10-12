@@ -1,4 +1,5 @@
 import { ApiResponse } from "@/core/types/api";
+import { Location } from "./location";
 
 export type Service = {
   id: string;
@@ -6,7 +7,7 @@ export type Service = {
   company: string;
   type: string;
   requirements: string[];
-  location: string;
+  location: Location;
   price: string;
   rating: number;
   reviews: number;

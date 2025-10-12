@@ -1,15 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { services } from "@/container";
+import { container } from "@/container";
 import { Location } from "@/core/domain/models/location";
 import { LocationListResponse } from "@/core/domain/models/location";
 import { debounce } from "@/lib/debounce";
 
 export function useLocations() {
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  );
-  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -19,24 +15,12 @@ export function useLocations() {
   } = useQuery<LocationListResponse>({
     queryKey: ["locations", searchTerm],
     queryFn: (): Promise<LocationListResponse> =>
-      services.locationService.findAll({
+      container.locationService.findAll({
         search: searchTerm || undefined,
       }),
   });
 
-  const locations: Location[] = useMemo(
-    () => locationsResponse?.data || [],
-    [locationsResponse]
-  );
-
-  const selectLocation = (location: Location | null) => {
-    setSelectedLocation(location);
-    setIsOpen(false);
-  };
-
-  const toggleOpen = () => {
-    setIsOpen(!isOpen);
-  };
+  const locations: Location[] = locationsResponse?.data || [];
 
   const searchLocations = useCallback(
     debounce((term: string) => {
@@ -51,12 +35,6 @@ export function useLocations() {
 
   return {
     locations,
-    selectedLocation,
-    isOpen,
-    searchTerm,
-    selectLocation,
-    toggleOpen,
-    setIsOpen,
     searchLocations,
     clearSearch,
     isLoading,
