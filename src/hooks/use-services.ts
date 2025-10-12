@@ -29,7 +29,7 @@ export function useServices(options: UseServicesOptions = {}) {
 
   const {
     data: servicesResponse,
-    isLoading,
+    isFetching: isLoading,
     error,
     refetch,
   } = useQuery<ServiceListResponse>({
