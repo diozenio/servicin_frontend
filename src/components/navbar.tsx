@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Wrench, Phone } from "lucide-react";
 import clsx from "clsx";
+import Link from "next/link";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -24,39 +25,35 @@ export default function Navbar() {
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 relative">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <Wrench className="size-3" />
-            <span>/</span>
-            <span className="text-sm">contato@servicin.com</span>
-          </div>
+          <Link href="/" className="flex items-center space-x-1.5">
+            <Wrench className="size-4" />
+            <span className="font-medium">Servicin</span>
+          </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-10">
-            <a href="#" className="text-sm hover:underline">
-              Serviços
-            </a>
-            <a href="#" className="text-sm hover:underline">
-              Profissionais
-            </a>
-            <a href="#" className="text-sm hover:underline">
-              Como Funciona
-            </a>
-            <a href="#" className="text-sm hover:underline">
-              Sobre
-            </a>
+          <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2">
+            <Button variant="link" asChild className="text-sm">
+              <Link href="/search">Serviços</Link>
+            </Button>
+            <Button variant="link" asChild className="text-sm">
+              <Link href="#">Profissionais</Link>
+            </Button>
+            <Button variant="link" asChild className="text-sm">
+              <Link href="#">Como Funciona</Link>
+            </Button>
+            <Button variant="link" asChild className="text-sm">
+              <Link href="#">Sobre</Link>
+            </Button>
           </nav>
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
-            <a href="#" className="text-sm hover:underline">
-              Entrar
-            </a>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Phone className="w-4 h-4" />
             </Button>
-            <Button className="rounded-lg px-6">Começar — É Grátis</Button>
+            <Button className="rounded-lg px-6">Começar</Button>
           </div>
         </div>
       </div>
