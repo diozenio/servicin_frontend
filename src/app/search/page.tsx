@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { SearchIcon, FilterIcon } from "lucide-react";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
@@ -17,7 +16,10 @@ export default function SearchPage() {
   const searchQuery = searchParams.get("q") || "";
   const locationId = searchParams.get("location") || "";
 
-  const { services, isLoading } = useServices(searchQuery, locationId);
+  const { services, isLoading } = useServices({
+    searchTerm: searchQuery,
+    selectedLocation: locationId,
+  });
 
   const handleSearch = (search: string, location: LocationModel | null) => {
     const params = new URLSearchParams();

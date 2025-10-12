@@ -11,14 +11,9 @@ import { Location as LocationModel } from "@/core/domain/models/location";
 
 export default function Home() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] =
-    useState<LocationModel | null>(null);
+  useState<LocationModel | null>(null);
 
-  const { services, isLoading } = useServices(
-    searchQuery,
-    selectedLocation?.id
-  );
+  const { services, isLoading } = useServices({ limit: 6 });
 
   const handleSearch = useCallback(
     (search: string, location: LocationModel | null) => {

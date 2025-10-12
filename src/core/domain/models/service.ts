@@ -18,6 +18,7 @@ export type Service = {
 export type ServiceQueryParams = {
   search?: string;
   location?: string;
+  limit?: number;
 };
 
 export type ServiceListResponse = ApiResponse<Service[]>;

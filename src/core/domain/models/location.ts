@@ -8,6 +8,7 @@ export type Location = {
 
 export type LocationQueryParams = {
   search?: string;
+  limit?: number;
 };
 
 export type LocationListResponse = ApiResponse<Location[]>;

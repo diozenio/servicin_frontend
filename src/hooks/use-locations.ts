@@ -5,7 +5,12 @@ import { Location } from "@/core/domain/models/location";
 import { LocationListResponse } from "@/core/domain/models/location";
 import { debounce } from "@/lib/debounce";
 
-export function useLocations() {
+interface UseLocationsOptions {
+  limit?: number;
+}
+
+export function useLocations(options: UseLocationsOptions = {}) {
+  const { limit } = options;
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -13,10 +18,11 @@ export function useLocations() {
     isLoading,
     error,
   } = useQuery<LocationListResponse>({
-    queryKey: ["locations", searchTerm],
+    queryKey: ["locations", searchTerm, limit],
     queryFn: (): Promise<LocationListResponse> =>
       container.locationService.findAll({
         search: searchTerm || undefined,
+        limit,
       }),
   });
 

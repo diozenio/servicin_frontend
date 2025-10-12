@@ -35,7 +35,7 @@ export function SearchInput({ onSearch }: SearchInputProps) {
     locations,
     searchLocations,
     isLoading: isLoadingLocations,
-  } = useLocations();
+  } = useLocations({ limit: 10 });
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

@@ -3,21 +3,27 @@ import { container } from "@/container";
 import { Service } from "@/core/domain/models/service";
 import { ServiceListResponse } from "@/core/domain/models/service";
 
-export function useServices(
-  searchTerm: string = "",
-  selectedLocation: string = ""
-) {
+interface UseServicesOptions {
+  searchTerm?: string;
+  selectedLocation?: string;
+  limit?: number;
+}
+
+export function useServices(options: UseServicesOptions = {}) {
+  const { searchTerm = "", selectedLocation = "", limit } = options;
+
   const {
     data: servicesResponse,
     isLoading,
     error,
     refetch,
   } = useQuery<ServiceListResponse>({
-    queryKey: ["services", "search", searchTerm, selectedLocation],
+    queryKey: ["services", "search", searchTerm, selectedLocation, limit],
     queryFn: (): Promise<ServiceListResponse> =>
       container.serviceService.findAll({
         search: searchTerm || undefined,
         location: selectedLocation || undefined,
+        limit,
       }),
   });
 
@@ -27,6 +33,7 @@ export function useServices(
     return container.serviceService.findAll({
       search: newSearchTerm || undefined,
       location: newLocation || undefined,
+      limit,
     });
   };
 

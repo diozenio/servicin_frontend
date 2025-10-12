@@ -30,6 +30,11 @@ export class ServiceMock extends ServiceAdapter {
         );
       }
 
+      // Apply limit if provided
+      if (params?.limit && params.limit > 0) {
+        filteredServices = filteredServices.slice(0, params.limit);
+      }
+
       return {
         data: filteredServices,
         success: true,
