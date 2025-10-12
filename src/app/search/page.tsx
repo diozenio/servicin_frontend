@@ -8,6 +8,7 @@ import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton"
 import { useServices } from "@/hooks/use-services";
 import { SearchInput } from "@/components/search-input";
 import { Location as LocationModel } from "@/core/domain/models/location";
+import { Button } from "@/components/ui/button";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function SearchPage() {
   const searchQuery = searchParams.get("q") || "";
   const locationId = searchParams.get("location") || "";
 
-  const { services, isLoading } = useServices({
+  const { services, isLoading, loadMore, limit, total, hasMore } = useServices({
     searchTerm: searchQuery,
     selectedLocation: locationId,
   });
@@ -32,6 +33,10 @@ export default function SearchPage() {
 
     const queryString = params.toString();
     router.push(`/search${queryString ? `?${queryString}` : ""}`);
+  };
+
+  const handleLoadMore = () => {
+    loadMore();
   };
 
   return (
@@ -56,9 +61,9 @@ export default function SearchPage() {
                 : "Todos os serviços"}
             </h1>
             <p className="text-muted-foreground">
-              {services.length} serviço
-              {services.length !== 1 ? "s" : ""} encontrado
-              {services.length !== 1 ? "s" : ""}
+              {services.length} de {total} serviço
+              {total !== 1 ? "s" : ""} encontrado
+              {total !== 1 ? "s" : ""}
             </p>
           </div>
         </div>
@@ -66,7 +71,7 @@ export default function SearchPage() {
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            Array.from({ length: 6 }, (_, index) => (
+            Array.from({ length: limit }, (_, index) => (
               <ServiceCardSkeleton key={`skeleton-${index}`} />
             ))
           ) : services.length > 0 ? (
@@ -88,6 +93,20 @@ export default function SearchPage() {
             </div>
           )}
         </div>
+
+        {/* Load More Button */}
+        {services.length > 0 && hasMore && (
+          <div className="flex justify-center mt-8">
+            <Button
+              variant="secondary"
+              onClick={handleLoadMore}
+              disabled={isLoading}
+              className="px-8 py-2"
+            >
+              {isLoading ? "Carregando..." : "Ver mais"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

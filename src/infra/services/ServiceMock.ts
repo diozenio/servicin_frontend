@@ -30,15 +30,22 @@ export class ServiceMock extends ServiceAdapter {
         );
       }
 
-      // Apply limit if provided
-      if (params?.limit && params.limit > 0) {
-        filteredServices = filteredServices.slice(0, params.limit);
+      // Store total before pagination
+      const total = filteredServices.length;
+
+      // Apply pagination if provided
+      const offset = params?.offset || 0;
+      const limit = params?.limit || filteredServices.length;
+
+      if (limit > 0) {
+        filteredServices = filteredServices.slice(offset, offset + limit);
       }
 
       return {
         data: filteredServices,
         success: true,
         message: "Services fetched successfully",
+        total,
       };
     } catch (error) {
       return {

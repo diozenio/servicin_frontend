@@ -128,7 +128,6 @@ const generateService = (id: string): Service => {
   };
 };
 
-export const mockServices: Service[] = Array.from(
-  { length: 1000 },
-  (_, index) => generateService((index + 1).toString())
+export const mockServices: Service[] = Array.from({ length: 60 }, (_, index) =>
+  generateService((index + 1).toString())
 );
