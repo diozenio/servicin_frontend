@@ -53,7 +53,9 @@ export default function Navbar() {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Phone className="w-4 h-4" />
             </Button>
-            <Button className="rounded-lg px-6">Começar</Button>
+            <Button variant="secondary" className="rounded-lg px-6">
+              Entrar
+            </Button>
           </div>
         </div>
       </div>
