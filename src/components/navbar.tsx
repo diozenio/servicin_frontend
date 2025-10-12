@@ -6,6 +6,7 @@ import { Wrench, Phone } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
+import Logo from "./logo";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -28,10 +29,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 relative">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-1.5">
-            <Wrench className="size-4" />
-            <span className="font-medium">Servicin</span>
-          </Link>
+          <Logo />
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2">
@@ -52,8 +50,8 @@ export default function Navbar() {
           {/* Right side */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Button variant="secondary" className="rounded-lg px-6">
-              Entrar
+            <Button asChild variant="secondary" className="rounded-lg px-6">
+              <Link href="/auth/login">Entrar</Link>
             </Button>
           </div>
         </div>

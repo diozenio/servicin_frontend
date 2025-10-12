@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Work_Sans, Fira_Code } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { QueryProvider } from "@/components/query-provider";
