@@ -19,10 +19,11 @@ export default function SearchPage() {
   const searchQuery = searchParams.get("q") || "";
   const locationId = searchParams.get("location") || "";
 
-  const { services, isLoading, loadMore, limit, total, hasMore } = useServices({
-    searchTerm: searchQuery,
-    selectedLocation: locationId,
-  });
+  const { services, isLoading, isFetching, loadMore, limit, total, hasMore } =
+    useServices({
+      searchTerm: searchQuery,
+      selectedLocation: locationId,
+    });
 
   const { location: selectedLocation, isLoading: isLoadingLocation } =
     useLocation(locationId || null);
@@ -128,10 +129,10 @@ export default function SearchPage() {
             <Button
               variant="secondary"
               onClick={handleLoadMore}
-              disabled={isLoading}
+              disabled={isLoading || isFetching}
               className="px-8 py-2"
             >
-              {isLoading ? "Carregando..." : "Ver mais"}
+              {isLoading || isFetching ? "Carregando..." : "Ver mais"}
             </Button>
           </div>
         )}

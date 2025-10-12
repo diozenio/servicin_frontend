@@ -29,7 +29,8 @@ export function useServices(options: UseServicesOptions = {}) {
 
   const {
     data: servicesResponse,
-    isFetching: isLoading,
+    isLoading,
+    isFetching,
     error,
     refetch,
   } = useQuery<ServiceListResponse>({
@@ -94,6 +95,7 @@ export function useServices(options: UseServicesOptions = {}) {
 
   return {
     services,
+    isFetching,
     isLoading,
     error,
     fetch,
