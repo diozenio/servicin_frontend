@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { QueryProvider } from "@/components/query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -31,15 +32,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${playfairDisplay.variable} ${workSans.variable} ${firaCode.variable} antialiased`}
       >
         <QueryProvider>
           <div className="min-h-screen">
-            <Navbar />
-            <main className="pt-16">{children}</main>
-            <Footer />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Navbar />
+              <main className="pt-16">{children}</main>
+              <Footer />
+            </ThemeProvider>
           </div>
         </QueryProvider>
       </body>

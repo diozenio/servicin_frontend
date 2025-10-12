@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Wrench, Phone } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -50,9 +51,7 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Phone className="w-4 h-4" />
-            </Button>
+            <ThemeToggle />
             <Button variant="secondary" className="rounded-lg px-6">
               Entrar
             </Button>
