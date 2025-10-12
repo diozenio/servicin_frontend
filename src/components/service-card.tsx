@@ -10,6 +10,7 @@ import {
   BookmarkIcon,
   DollarSignIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Service = {
   id: string;
@@ -100,20 +101,13 @@ export function ServiceCard({ service }: ServiceCardProps) {
             {Array.from({ length: 5 }, (_, i) => {
               const starIndex = i + 1;
               const isFullStar = starIndex <= Math.floor(service.rating);
-              const isHalfStar =
-                starIndex === Math.ceil(service.rating) &&
-                service.rating % 1 !== 0;
 
               return (
                 <StarIcon
                   key={i}
-                  className={`w-4 h-4 ${
-                    isFullStar
-                      ? "text-yellow-400 fill-current"
-                      : isHalfStar
-                      ? "text-yellow-400 fill-current opacity-70"
-                      : "text-gray-300"
-                  }`}
+                  className={cn("w-4 h-4 text-yellow-400", {
+                    "fill-current": isFullStar,
+                  })}
                 />
               );
             })}

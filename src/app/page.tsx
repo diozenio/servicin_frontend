@@ -172,10 +172,10 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <div className="flex items-start justify-center h-[95vh] px-4 pt-28">
+      <div className="flex items-start justify-center h-[95vh] px-4 pt-28  bg-gradient-to-b from-background via-background to-primary/80 dark:to-card">
         <div className="max-w-5xl mx-auto text-center">
           {/* Headline */}
-          <h1 className="text-5xl md:text-6xl font-serif mb-8 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-serif font-bold mb-8 leading-tight">
             Conecte-se com os melhores profissionais urbanos da sua região
           </h1>
 
@@ -188,13 +188,13 @@ export default function Home() {
           <div className="max-w-2xl mx-auto mb-8">
             <div className="flex flex-col sm:flex-row justify-center gap-4 w-full">
               {/* Search Bar Container */}
-              <div className="flex border rounded-lg overflow-hidden w-full">
+              <div className="flex border border-foreground rounded-lg overflow-hidden w-full">
                 {/* Location Field */}
-                <div className="w-full sm:w-48 flex items-center justify-center px-3 h-14 border-r">
+                <div className="w-full sm:w-48 flex items-center justify-center px-3 h-14 border-r border-foreground">
                   <MapPinIcon className="w-4 h-4 mr-2" />
                   <Popover open={locationOpen} onOpenChange={setLocationOpen}>
                     <PopoverTrigger asChild>
-                      <button className="flex-1 text-left focus:outline-none h-full">
+                      <button className="flex-1 text-left focus:outline-none h-full truncate">
                         {selectedLocation
                           ? selectedLocation.label
                           : "Localização"}
@@ -270,7 +270,7 @@ export default function Home() {
       {/* Services Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif mb-4">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
             Serviços Disponíveis
           </h2>
           <p className="text-lg text-muted-foreground">
