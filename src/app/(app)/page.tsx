@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <div className="flex items-start justify-center h-[95vh] px-4 pt-28  bg-gradient-to-b from-background via-background to-primary/80 dark:to-card">
+      <div className="flex items-start justify-center h-[95vh] px-4 pt-28  bg-gradient-to-b from-background via-background to-primary/40 dark:to-card">
         <div className="max-w-5xl mx-auto text-center">
           {/* Headline */}
           <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-8 leading-tight">
