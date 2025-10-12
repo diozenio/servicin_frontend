@@ -11,20 +11,7 @@ import {
   DollarSignIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type Service = {
-  id: string;
-  title: string;
-  company: string;
-  type: string;
-  requirements: string[];
-  location: string;
-  price: string;
-  rating: number;
-  reviews: number;
-  logo: string;
-  logoFallback: string;
-};
+import { Service } from "@/core/domain/models/service";
 
 interface ServiceCardProps {
   service: Service;
@@ -83,7 +70,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
         {service.location && (
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPinIcon className="w-4 h-4 mr-2" />
-            {service.location}
+            {service.location.label}
           </div>
         )}
         {service.price && (
@@ -128,5 +115,3 @@ export function ServiceCard({ service }: ServiceCardProps) {
     </div>
   );
 }
-
-export type { Service };
