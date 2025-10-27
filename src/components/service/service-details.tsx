@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,9 +13,12 @@ import {
   MessageCircleIcon,
   PhoneIcon,
   CheckCircleIcon,
+  CalendarIcon,
+  InfoIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Service } from "@/core/domain/models/service";
+import { ScheduleBooking } from "./schedule-booking";
 
 interface ServiceDetailsProps {
   service: Service;
@@ -29,6 +33,8 @@ export function ServiceDetails({
   onContact,
   className,
 }: ServiceDetailsProps) {
+  const [activeTab, setActiveTab] = useState<"info" | "schedule">("info");
+
   const handleWhatsAppContact = () => {
     if (service.whatsappContact) {
       const message = `Olá! Gostaria de contratar o serviço: ${service.title}`;
@@ -92,154 +98,195 @@ export function ServiceDetails({
         </div>
       </div>
 
-      {/* Rating Section */}
-      {service.rating && service.reviews && (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center">
-            {Array.from({ length: 5 }, (_, i) => {
-              const starIndex = i + 1;
-              const isFullStar = starIndex <= Math.floor(service.rating);
-
-              return (
-                <StarIcon
-                  key={i}
-                  className={cn("w-5 h-5 text-yellow-400", {
-                    "fill-current": isFullStar,
-                  })}
-                />
-              );
-            })}
-          </div>
-          <span className="text-lg font-medium text-card-foreground">
-            {service.rating}
-          </span>
-          <span className="text-muted-foreground">
-            ({service.reviews} avaliações)
-          </span>
-        </div>
-      )}
-
-      {/* Description */}
-      {service.description && (
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-card-foreground">
-            Sobre o Serviço
-          </h3>
-          <p className="text-muted-foreground leading-relaxed">
-            {service.description}
-          </p>
-        </div>
-      )}
-
-      {/* Service Information Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Price */}
-        {service.price && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <DollarSignIcon className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold text-card-foreground">Valor</h4>
-            </div>
-            <p className="text-lg font-medium text-primary">{service.price}</p>
-          </div>
-        )}
-
-        {/* Duration */}
-        {service.duration && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <ClockIcon className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold text-card-foreground">Duração</h4>
-            </div>
-            <p className="text-lg font-medium text-card-foreground">
-              {service.duration}
-            </p>
-          </div>
-        )}
-
-        {/* Location */}
-        {service.location && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <MapPinIcon className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold text-card-foreground">
-                Localização
-              </h4>
-            </div>
-            <p className="text-lg font-medium text-card-foreground">
-              {service.location.label}
-            </p>
-          </div>
-        )}
+      {/* Tab Navigation */}
+      <div className="border-b border-border">
+        <nav className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab("info")}
+            className={cn(
+              "py-2 px-1 border-b-2 font-medium text-sm transition-colors",
+              activeTab === "info"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+            )}
+          >
+            <InfoIcon className="w-4 h-4 mr-2 inline" />
+            Informações
+          </button>
+          <button
+            onClick={() => setActiveTab("schedule")}
+            className={cn(
+              "py-2 px-1 border-b-2 font-medium text-sm transition-colors",
+              activeTab === "schedule"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="w-4 h-4 mr-2 inline" />
+            Agendar
+          </button>
+        </nav>
       </div>
 
-      {/* Requirements */}
-      {service.requirements && service.requirements.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xl font-semibold text-card-foreground">
-            Requisitos
-          </h3>
-          <ul className="space-y-2">
-            {service.requirements.map((req, index) => (
-              <li
-                key={index}
-                className="flex items-start gap-3 text-muted-foreground"
+      {/* Tab Content */}
+      {activeTab === "info" && (
+        <>
+          {/* Rating Section */}
+          {service.rating && service.reviews && (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center">
+                {Array.from({ length: 5 }, (_, i) => {
+                  const starIndex = i + 1;
+                  const isFullStar = starIndex <= Math.floor(service.rating);
+
+                  return (
+                    <StarIcon
+                      key={i}
+                      className={cn("w-5 h-5 text-yellow-400", {
+                        "fill-current": isFullStar,
+                      })}
+                    />
+                  );
+                })}
+              </div>
+              <span className="text-lg font-medium text-card-foreground">
+                {service.rating}
+              </span>
+              <span className="text-muted-foreground">
+                ({service.reviews} avaliações)
+              </span>
+            </div>
+          )}
+
+          {/* Description */}
+          {service.description && (
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-card-foreground">
+                Sobre o Serviço
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {service.description}
+              </p>
+            </div>
+          )}
+
+          {/* Service Information Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Price */}
+            {service.price && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <DollarSignIcon className="w-5 h-5 text-primary" />
+                  <h4 className="font-semibold text-card-foreground">Valor</h4>
+                </div>
+                <p className="text-lg font-medium text-primary">
+                  {service.price}
+                </p>
+              </div>
+            )}
+
+            {/* Duration */}
+            {service.duration && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <ClockIcon className="w-5 h-5 text-primary" />
+                  <h4 className="font-semibold text-card-foreground">
+                    Duração
+                  </h4>
+                </div>
+                <p className="text-lg font-medium text-card-foreground">
+                  {service.duration}
+                </p>
+              </div>
+            )}
+
+            {/* Location */}
+            {service.location && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <MapPinIcon className="w-5 h-5 text-primary" />
+                  <h4 className="font-semibold text-card-foreground">
+                    Localização
+                  </h4>
+                </div>
+                <p className="text-lg font-medium text-card-foreground">
+                  {service.location.label}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Requirements */}
+          {service.requirements && service.requirements.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-xl font-semibold text-card-foreground">
+                Requisitos
+              </h3>
+              <ul className="space-y-2">
+                {service.requirements.map((req, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-3 text-muted-foreground"
+                  >
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Button className="flex-1" onClick={onHire} size="lg">
+              Contratar Serviço
+            </Button>
+
+            {service.whatsappContact ? (
+              <Button
+                variant="outline"
+                onClick={handleContact}
+                className="flex-1 sm:flex-none"
+                size="lg"
               >
-                <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>{req}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4">
-        <Button className="flex-1" onClick={onHire} size="lg">
-          Contratar Serviço
-        </Button>
-
-        {service.whatsappContact ? (
-          <Button
-            variant="outline"
-            onClick={handleContact}
-            className="flex-1 sm:flex-none"
-            size="lg"
-          >
-            <MessageCircleIcon className="w-5 h-5 mr-2" />
-            WhatsApp
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={onContact}
-            className="flex-1 sm:flex-none"
-            size="lg"
-          >
-            <PhoneIcon className="w-5 h-5 mr-2" />
-            Contatar
-          </Button>
-        )}
-      </div>
-
-      {/* Contact Information */}
-      {service.whatsappContact && (
-        <div className="bg-muted/50 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <MessageCircleIcon className="w-5 h-5 text-green-600" />
-            <h4 className="font-semibold text-card-foreground">
-              Contato WhatsApp
-            </h4>
+                <MessageCircleIcon className="w-5 h-5 mr-2" />
+                WhatsApp
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={onContact}
+                className="flex-1 sm:flex-none"
+                size="lg"
+              >
+                <PhoneIcon className="w-5 h-5 mr-2" />
+                Contatar
+              </Button>
+            )}
           </div>
-          <p className="text-muted-foreground">
-            Entre em contato diretamente via WhatsApp para mais informações ou
-            para agendar o serviço.
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {service.whatsappContact}
-          </p>
-        </div>
+
+          {/* Contact Information */}
+          {service.whatsappContact && (
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <MessageCircleIcon className="w-5 h-5 text-green-600" />
+                <h4 className="font-semibold text-card-foreground">
+                  Contato WhatsApp
+                </h4>
+              </div>
+              <p className="text-muted-foreground">
+                Entre em contato diretamente via WhatsApp para mais informações
+                ou para agendar o serviço.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {service.whatsappContact}
+              </p>
+            </div>
+          )}
+        </>
       )}
+
+      {activeTab === "schedule" && <ScheduleBooking service={service} />}
     </div>
   );
 }
