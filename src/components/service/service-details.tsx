@@ -22,18 +22,31 @@ import { ScheduleBooking } from "./schedule-booking";
 
 interface ServiceDetailsProps {
   service: Service;
-  onHire?: () => void;
   onContact?: () => void;
   className?: string;
 }
 
 export function ServiceDetails({
   service,
-  onHire,
   onContact,
   className,
 }: ServiceDetailsProps) {
   const [activeTab, setActiveTab] = useState<"info" | "schedule">("info");
+  const tabsRef = React.useRef<HTMLDivElement>(null);
+
+  const handleHire = () => {
+    setActiveTab("schedule");
+    if (tabsRef.current) {
+      const navbarHeight = 88;
+      const elementPosition = tabsRef.current.offsetTop;
+      const offsetPosition = elementPosition - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const handleWhatsAppContact = () => {
     if (service.whatsappContact) {
@@ -99,7 +112,7 @@ export function ServiceDetails({
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-border">
+      <div ref={tabsRef} className="border-b border-border">
         <nav className="flex space-x-8">
           <button
             onClick={() => setActiveTab("info")}
@@ -238,7 +251,7 @@ export function ServiceDetails({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button className="flex-1" onClick={onHire} size="lg">
+            <Button className="flex-1" onClick={handleHire} size="lg">
               Contratar Serviço
             </Button>
 

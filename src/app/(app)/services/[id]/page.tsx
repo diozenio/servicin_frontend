@@ -17,11 +17,6 @@ export default function Page({ params }: PageProps) {
   const { id } = use(params);
   const { service, isLoading, error } = useService(id);
 
-  const handleHire = () => {
-    // TODO: Implement hire service logic
-    console.log("Hiring service:", service?.id);
-  };
-
   const handleContact = () => {
     // TODO: Implement contact logic for services without WhatsApp
     console.log("Contacting service:", service?.id);
@@ -87,11 +82,7 @@ export default function Page({ params }: PageProps) {
         </div>
 
         {/* Service Details */}
-        <ServiceDetails
-          service={service}
-          onHire={handleHire}
-          onContact={handleContact}
-        />
+        <ServiceDetails service={service} onContact={handleContact} />
       </div>
     </div>
   );

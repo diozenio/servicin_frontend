@@ -8,18 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useSchedule, useCreateBooking } from "@/hooks/use-schedule";
+import { PaymentMethodSelector } from "@/components/service/payment-method-selector";
+import { PixPayment } from "@/components/service/pix-payment";
+import { CardPayment } from "@/components/service/card-payment";
+import { CashPayment } from "@/components/service/cash-payment";
+import { useSchedule } from "@/hooks/use-schedule";
+import { useCreateContract, useConfirmPayment } from "@/hooks/use-contract";
 import { Service } from "@/core/domain/models/service";
-import { DaySchedule, TimeSlot } from "@/core/domain/models/schedule";
+import { DaySchedule } from "@/core/domain/models/schedule";
+import { PaymentMethod } from "@/core/domain/models/contract";
 import { cn } from "@/lib/utils";
-import {
-  LoaderIcon,
-  CalendarIcon,
-  ClockIcon,
-  UserIcon,
-  PhoneIcon,
-  MailIcon,
-} from "lucide-react";
+import { LoaderIcon, CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 
 interface ScheduleBookingProps {
   service: Service;
@@ -35,8 +34,13 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod | null>(null);
+  const [currentStep, setCurrentStep] = useState<
+    "schedule" | "payment" | "confirmation"
+  >("schedule");
+  const [contractId, setContractId] = useState<string | null>(null);
 
-  // Use the service ID as provider ID for simplicity in this mock
   const providerId = service.id;
   const serviceId = service.id;
 
@@ -44,7 +48,8 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     providerId,
     serviceId
   );
-  const createBookingMutation = useCreateBooking();
+  const createContractMutation = useCreateContract();
+  const confirmPaymentMutation = useConfirmPayment();
 
   const availableDates = React.useMemo(() => {
     if (!schedule) return [];
@@ -61,58 +66,83 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     );
   }, [schedule, selectedDate]);
 
-  const availableTimeSlots = React.useMemo(() => {
-    if (!selectedDaySchedule) return [];
-    return selectedDaySchedule.timeSlots.filter(
-      (slot: TimeSlot) => slot.isAvailable && !slot.isBooked
-    );
-  }, [selectedDaySchedule]);
-
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
-    setSelectedTimeSlot(undefined); // Reset time slot when date changes
+    setSelectedTimeSlot(undefined);
   };
 
   const handleTimeSlotSelect = (timeSlot: string) => {
     setSelectedTimeSlot(timeSlot);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedDate || !selectedTimeSlot || !customerName || !customerPhone) {
       return;
     }
 
-    const booking = {
+    setCurrentStep("payment");
+  };
+
+  const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const handleCreateContract = async () => {
+    if (
+      !selectedDate ||
+      !selectedTimeSlot ||
+      !customerName ||
+      !customerPhone ||
+      !selectedPaymentMethod
+    ) {
+      return;
+    }
+
+    const contract = {
       serviceId,
       providerId,
-      date: selectedDate.toISOString().split("T")[0],
-      timeSlot: selectedTimeSlot,
       customerName,
       customerPhone,
       customerEmail: customerEmail || undefined,
+      date: selectedDate.toISOString().split("T")[0],
+      timeSlot: selectedTimeSlot,
       notes: notes || undefined,
+      paymentMethod: selectedPaymentMethod,
     };
 
     try {
-      const result = await createBookingMutation.mutateAsync(booking);
-      if (result.success) {
-        // Reset form
-        setSelectedDate(undefined);
-        setSelectedTimeSlot(undefined);
-        setCustomerName("");
-        setCustomerPhone("");
-        setCustomerEmail("");
-        setNotes("");
-
-        // Show success message (you could use a toast here)
-        alert("Agendamento realizado com sucesso!");
+      const result = await createContractMutation.mutateAsync(contract);
+      if (result.success && result.contractId) {
+        setContractId(result.contractId);
+        setCurrentStep("confirmation");
       } else {
         alert(`Erro: ${result.message}`);
       }
     } catch (error) {
-      alert("Erro ao realizar agendamento. Tente novamente.");
+      alert("Erro ao criar contrato. Tente novamente.");
+    }
+  };
+
+  const handlePaymentConfirmed = async () => {
+    if (!contractId) return;
+
+    try {
+      await confirmPaymentMutation.mutateAsync(contractId);
+      alert("Pagamento confirmado! Contrato criado com sucesso!");
+
+      setSelectedDate(undefined);
+      setSelectedTimeSlot(undefined);
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerEmail("");
+      setNotes("");
+      setSelectedPaymentMethod(null);
+      setCurrentStep("schedule");
+      setContractId(null);
+    } catch (error) {
+      alert("Erro ao confirmar pagamento. Tente novamente.");
     }
   };
 
@@ -144,6 +174,153 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     );
   }
 
+  if (currentStep === "payment") {
+    return (
+      <div className={cn("space-y-6", className)}>
+        <div className="text-center space-y-2">
+          <h3 className="text-2xl font-bold">Contratar Serviço</h3>
+          <p className="text-muted-foreground">
+            Escolha a forma de pagamento para finalizar a contratação
+          </p>
+        </div>
+
+        <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+          <h5 className="font-medium">Resumo do Serviço</h5>
+          <p className="text-sm text-muted-foreground">
+            <strong>Serviço:</strong> {service.title}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Cliente:</strong> {customerName}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Data:</strong> {selectedDate?.toLocaleDateString("pt-BR")}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Horário:</strong> {selectedTimeSlot}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Valor:</strong> {service.price}
+          </p>
+        </div>
+
+        <PaymentMethodSelector
+          selectedMethod={selectedPaymentMethod}
+          onMethodSelect={handlePaymentMethodSelect}
+        />
+
+        <div className="space-y-4">
+          <Button
+            onClick={handleCreateContract}
+            disabled={
+              !selectedPaymentMethod || createContractMutation.isPending
+            }
+            className="w-full"
+            size="lg"
+          >
+            {createContractMutation.isPending ? (
+              <>
+                <LoaderIcon className="w-4 h-4 mr-2 animate-spin" />
+                Criando Contrato...
+              </>
+            ) : (
+              "Continuar para Pagamento"
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep("schedule")}
+            className="w-full"
+          >
+            Voltar para Agendamento
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentStep === "confirmation") {
+    const amount = parseFloat(
+      service.price.replace("R$ ", "").replace(",", ".")
+    );
+
+    return (
+      <div className={cn("space-y-6", className)}>
+        <div className="text-center space-y-2">
+          <h3 className="text-2xl font-bold">Finalizar Pagamento</h3>
+          <p className="text-muted-foreground">
+            Complete o pagamento para confirmar a contratação
+          </p>
+        </div>
+
+        <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+          <h5 className="font-medium">Resumo do Contrato</h5>
+          <p className="text-sm text-muted-foreground">
+            <strong>Serviço:</strong> {service.title}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Cliente:</strong> {customerName}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Data:</strong> {selectedDate?.toLocaleDateString("pt-BR")}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Horário:</strong> {selectedTimeSlot}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Forma de Pagamento:</strong>{" "}
+            {selectedPaymentMethod === "pix"
+              ? "PIX"
+              : selectedPaymentMethod === "credit_card"
+              ? "Cartão de Crédito"
+              : selectedPaymentMethod === "debit_card"
+              ? "Cartão de Débito"
+              : "Dinheiro"}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong>Valor:</strong> {service.price}
+          </p>
+        </div>
+
+        {selectedPaymentMethod === "pix" && (
+          <PixPayment
+            amount={amount}
+            onPaymentConfirmed={handlePaymentConfirmed}
+          />
+        )}
+
+        {selectedPaymentMethod === "credit_card" && (
+          <CardPayment
+            amount={amount}
+            onPaymentConfirmed={handlePaymentConfirmed}
+          />
+        )}
+
+        {selectedPaymentMethod === "debit_card" && (
+          <CardPayment
+            amount={amount}
+            onPaymentConfirmed={handlePaymentConfirmed}
+          />
+        )}
+
+        {selectedPaymentMethod === "cash" && (
+          <CashPayment
+            amount={amount}
+            onPaymentConfirmed={handlePaymentConfirmed}
+          />
+        )}
+
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep("payment")}
+          className="w-full"
+        >
+          Voltar para Seleção de Pagamento
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("space-y-6", className)}>
       <div className="text-center space-y-2">
@@ -154,9 +331,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Calendar and Time Selection */}
         <div className="space-y-6">
-          {/* Calendar */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-primary" />
@@ -169,7 +344,6 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
             />
           </div>
 
-          {/* Time Slots */}
           {selectedDate && (
             <div className="space-y-4">
               <div className="flex items-center gap-2">
@@ -185,14 +359,13 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
           )}
         </div>
 
-        {/* Customer Information Form */}
         <div className="space-y-6">
           <div className="flex items-center gap-2">
             <UserIcon className="w-5 h-5 text-primary" />
             <h4 className="text-lg font-semibold">Informações do Cliente</h4>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleScheduleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="customerName">Nome Completo *</Label>
               <Input
@@ -238,7 +411,6 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
               />
             </div>
 
-            {/* Selected Date and Time Summary */}
             {(selectedDate || selectedTimeSlot) && (
               <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                 <h5 className="font-medium">Resumo do Agendamento</h5>
@@ -256,19 +428,8 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!isFormValid || createBookingMutation.isPending}
-            >
-              {createBookingMutation.isPending ? (
-                <>
-                  <LoaderIcon className="w-4 h-4 mr-2 animate-spin" />
-                  Agendando...
-                </>
-              ) : (
-                "Confirmar Agendamento"
-              )}
+            <Button type="submit" className="w-full" disabled={!isFormValid}>
+              Continuar para Contratação
             </Button>
           </form>
         </div>
