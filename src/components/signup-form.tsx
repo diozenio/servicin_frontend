@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,13 +10,43 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const { signup, isSigningUp, signupError } = useAuth();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signup(formData);
+    } catch (error) {
+      console.error("Signup failed:", error);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Crie sua conta</h1>
@@ -24,11 +56,25 @@ export function SignupForm({
         </div>
         <Field>
           <FieldLabel htmlFor="name">Nome Completo</FieldLabel>
-          <Input id="name" type="text" placeholder="João Silva" required />
+          <Input
+            id="name"
+            type="text"
+            placeholder="João Silva"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
         </Field>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
           <FieldDescription>
             Usaremos isso para entrar em contato. Não compartilharemos seu email
             com ninguém.
@@ -36,16 +82,37 @@ export function SignupForm({
         </Field>
         <Field>
           <FieldLabel htmlFor="password">Senha</FieldLabel>
-          <Input id="password" type="password" required />
+          <Input
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
           <FieldDescription>Deve ter pelo menos 8 caracteres.</FieldDescription>
         </Field>
         <Field>
-          <FieldLabel htmlFor="confirm-password">Confirmar Senha</FieldLabel>
-          <Input id="confirm-password" type="password" required />
+          <FieldLabel htmlFor="confirmPassword">Confirmar Senha</FieldLabel>
+          <Input
+            id="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
           <FieldDescription>Por favor, confirme sua senha.</FieldDescription>
         </Field>
+        {signupError && (
+          <Field>
+            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              {signupError.message}
+            </div>
+          </Field>
+        )}
         <Field>
-          <Button type="submit">Criar Conta</Button>
+          <Button type="submit" disabled={isSigningUp}>
+            {isSigningUp ? "Criando conta..." : "Criar Conta"}
+          </Button>
         </Field>
         <FieldSeparator>Ou continue com</FieldSeparator>
         <Field>

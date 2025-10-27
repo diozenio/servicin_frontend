@@ -8,6 +8,8 @@ export const STORAGE_KEYS = {
   LOCATIONS: "servicin:locations",
   SCHEDULES: "servicin:schedules",
   CONTRACTS: "servicin:contracts",
+  AUTH: "servicin:auth",
+  USERS: "servicin:users",
 } as const;
 
 /**
