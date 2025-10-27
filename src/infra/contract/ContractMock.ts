@@ -9,13 +9,16 @@ export class ContractMock implements ContractAdapter {
   private contracts: Contract[] = [];
   private nextId = 1;
 
-  async createContract(contract: ContractRequest): Promise<ContractResponse> {
+  async createContract(
+    userId: string,
+    contract: ContractRequest
+  ): Promise<ContractResponse> {
     try {
       const newContract: Contract = {
         id: `contract_${this.nextId++}`,
         serviceId: contract.serviceId,
         providerId: contract.providerId,
-        customerId: `customer_${Date.now()}`, // Mock customer ID
+        customerId: userId, // Use actual user ID
         customerName: contract.customerName,
         customerPhone: contract.customerPhone,
         customerEmail: contract.customerEmail,
@@ -46,17 +49,30 @@ export class ContractMock implements ContractAdapter {
     }
   }
 
-  async getContract(contractId: string): Promise<Contract | null> {
+  async getContract(
+    userId: string,
+    contractId: string
+  ): Promise<Contract | null> {
     return (
-      this.contracts.find((contract) => contract.id === contractId) || null
+      this.contracts.find(
+        (contract) =>
+          contract.id === contractId && contract.customerId === userId
+      ) || null
     );
   }
 
+  async getUserContracts(userId: string): Promise<Contract[]> {
+    return this.contracts.filter((contract) => contract.customerId === userId);
+  }
+
   async updatePaymentStatus(
+    userId: string,
     contractId: string,
     status: string
   ): Promise<boolean> {
-    const contract = this.contracts.find((c) => c.id === contractId);
+    const contract = this.contracts.find(
+      (c) => c.id === contractId && c.customerId === userId
+    );
     if (contract) {
       contract.paymentStatus = status as any;
       contract.updatedAt = new Date().toISOString();
@@ -66,10 +82,13 @@ export class ContractMock implements ContractAdapter {
   }
 
   async updateServiceStatus(
+    userId: string,
     contractId: string,
     status: string
   ): Promise<boolean> {
-    const contract = this.contracts.find((c) => c.id === contractId);
+    const contract = this.contracts.find(
+      (c) => c.id === contractId && c.customerId === userId
+    );
     if (contract) {
       contract.serviceStatus = status as any;
       contract.updatedAt = new Date().toISOString();
@@ -78,8 +97,14 @@ export class ContractMock implements ContractAdapter {
     return false;
   }
 
-  async cancelContract(contractId: string, reason: string): Promise<boolean> {
-    const contract = this.contracts.find((c) => c.id === contractId);
+  async cancelContract(
+    userId: string,
+    contractId: string,
+    reason: string
+  ): Promise<boolean> {
+    const contract = this.contracts.find(
+      (c) => c.id === contractId && c.customerId === userId
+    );
     if (contract) {
       if (contract.serviceStatus !== "not_started") {
         return false;

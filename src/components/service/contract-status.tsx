@@ -29,22 +29,22 @@ interface ContractStatusProps {
 const serviceStatusConfig = {
   not_started: {
     label: "Não iniciado",
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800",
     icon: ClockIcon,
   },
   in_progress: {
     label: "Em andamento",
-    color: "bg-blue-100 text-blue-800 border-blue-200",
+    color: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
     icon: ClockIcon,
   },
   completed: {
     label: "Concluído",
-    color: "bg-green-100 text-green-800 border-green-200",
+    color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
     icon: CheckCircleIcon,
   },
   cancelled: {
     label: "Cancelado",
-    color: "bg-red-100 text-red-800 border-red-200",
+    color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
     icon: XCircleIcon,
   },
 };
@@ -52,22 +52,22 @@ const serviceStatusConfig = {
 const paymentStatusConfig = {
   pending: {
     label: "Pagamento em aberto",
-    color: "bg-orange-100 text-orange-800 border-orange-200",
+    color: "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800",
     icon: AlertCircleIcon,
   },
   paid: {
     label: "Pago",
-    color: "bg-green-100 text-green-800 border-green-200",
+    color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
     icon: CheckCircleIcon,
   },
   failed: {
     label: "Falha no pagamento",
-    color: "bg-red-100 text-red-800 border-red-200",
+    color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
     icon: XCircleIcon,
   },
   refunded: {
     label: "Reembolsado",
-    color: "bg-gray-100 text-gray-800 border-gray-200",
+    color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800",
     icon: XCircleIcon,
   },
 };
@@ -76,22 +76,22 @@ const paymentMethodConfig = {
   pix: {
     label: "PIX",
     icon: QrCodeIcon,
-    color: "text-green-600",
+    color: "text-green-600 dark:text-green-400",
   },
   credit_card: {
     label: "Cartão de Crédito",
     icon: CreditCardIcon,
-    color: "text-blue-600",
+    color: "text-blue-600 dark:text-blue-400",
   },
   debit_card: {
     label: "Cartão de Débito",
     icon: CreditCardIcon,
-    color: "text-purple-600",
+    color: "text-purple-600 dark:text-purple-400",
   },
   cash: {
     label: "Dinheiro",
     icon: BanknoteIcon,
-    color: "text-orange-600",
+    color: "text-orange-600 dark:text-orange-400",
   },
 };
 
@@ -142,9 +142,9 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg border p-4 space-y-3">
+        <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <ServiceIcon className="w-5 h-5 text-gray-600" />
+            <ServiceIcon className="w-5 h-5 text-muted-foreground" />
             <h4 className="font-medium">Status do Serviço</h4>
           </div>
           <Badge className={cn("w-fit", serviceStatus.color)}>
@@ -152,9 +152,9 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
           </Badge>
         </div>
 
-        <div className="bg-white rounded-lg border p-4 space-y-3">
+        <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <PaymentIcon className="w-5 h-5 text-gray-600" />
+            <PaymentIcon className="w-5 h-5 text-muted-foreground" />
             <h4 className="font-medium">Status do Pagamento</h4>
           </div>
           <Badge className={cn("w-fit", paymentStatus.color)}>
@@ -194,7 +194,7 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
 
           <div>
             <span className="text-muted-foreground">Valor Total:</span>
-            <p className="font-semibold text-green-600">
+            <p className="font-semibold text-green-600 dark:text-green-400">
               R$ {contract.totalAmount.toFixed(2).replace(".", ",")}
             </p>
           </div>
@@ -221,7 +221,7 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
               <span className="text-sm text-muted-foreground">
                 Motivo do Cancelamento:
               </span>
-              <p className="text-sm mt-1 text-red-600">
+              <p className="text-sm mt-1 text-destructive">
                 {contract.cancellationReason}
               </p>
               {contract.cancelledAt && (

@@ -4,6 +4,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   avatarUrl: string;
   createdAt: string;
 };
@@ -16,6 +17,7 @@ export type LoginRequest = {
 export type SignupRequest = {
   name: string;
   email: string;
+  phone?: string;
   password: string;
   confirmPassword: string;
 };

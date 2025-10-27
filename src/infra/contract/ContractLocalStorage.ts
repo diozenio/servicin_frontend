@@ -7,16 +7,33 @@ import {
 import { LocalStorage, STORAGE_KEYS } from "@/lib/local-storage";
 
 export class ContractLocalStorage implements ContractAdapter {
-  private getContracts(): Contract[] {
-    return LocalStorage.get(STORAGE_KEYS.CONTRACTS, []);
+  private getContracts(userId: string): Contract[] {
+    const userKey = LocalStorage.getUserSpecificKey(
+      STORAGE_KEYS.CONTRACTS,
+      userId
+    );
+    console.log("ContractLocalStorage: Getting contracts with key", userKey);
+    const contracts = LocalStorage.get(userKey, []);
+    console.log("ContractLocalStorage: Retrieved from localStorage", contracts);
+    return contracts;
   }
 
-  private saveContracts(contracts: Contract[]) {
-    LocalStorage.set(STORAGE_KEYS.CONTRACTS, contracts);
+  private saveContracts(userId: string, contracts: Contract[]) {
+    const userKey = LocalStorage.getUserSpecificKey(
+      STORAGE_KEYS.CONTRACTS,
+      userId
+    );
+    console.log(
+      "ContractLocalStorage: Saving contracts with key",
+      userKey,
+      contracts
+    );
+    const success = LocalStorage.set(userKey, contracts);
+    console.log("ContractLocalStorage: Save result", success);
   }
 
-  private getNextId(): number {
-    const contracts = this.getContracts();
+  private getNextId(userId: string): number {
+    const contracts = this.getContracts(userId);
     if (contracts.length === 0) {
       return 1;
     }
@@ -31,16 +48,28 @@ export class ContractLocalStorage implements ContractAdapter {
     return maxId + 1;
   }
 
-  async createContract(contract: ContractRequest): Promise<ContractResponse> {
+  async createContract(
+    userId: string,
+    contract: ContractRequest
+  ): Promise<ContractResponse> {
     try {
-      const contracts = this.getContracts();
-      const nextId = this.getNextId();
+      console.log(
+        "ContractLocalStorage: Creating contract for user",
+        userId,
+        contract
+      );
+      const contracts = this.getContracts(userId);
+      console.log(
+        "ContractLocalStorage: Current contracts for user",
+        contracts
+      );
+      const nextId = this.getNextId(userId);
 
       const newContract: Contract = {
         id: `contract_${nextId}`,
         serviceId: contract.serviceId,
         providerId: contract.providerId,
-        customerId: `customer_${Date.now()}`, // Mock customer ID
+        customerId: userId, // Use actual user ID
         customerName: contract.customerName,
         customerPhone: contract.customerPhone,
         customerEmail: contract.customerEmail,
@@ -56,7 +85,8 @@ export class ContractLocalStorage implements ContractAdapter {
       };
 
       contracts.push(newContract);
-      this.saveContracts(contracts);
+      console.log("ContractLocalStorage: Saving contracts", contracts);
+      this.saveContracts(userId, contracts);
 
       return {
         success: true,
@@ -65,6 +95,7 @@ export class ContractLocalStorage implements ContractAdapter {
         contract: newContract,
       };
     } catch (error) {
+      console.error("ContractLocalStorage: Error creating contract", error);
       return {
         success: false,
         message: "Erro ao criar contrato",
@@ -72,22 +103,33 @@ export class ContractLocalStorage implements ContractAdapter {
     }
   }
 
-  async getContract(contractId: string): Promise<Contract | null> {
-    const contracts = this.getContracts();
+  async getContract(
+    userId: string,
+    contractId: string
+  ): Promise<Contract | null> {
+    const contracts = this.getContracts(userId);
     return contracts.find((contract) => contract.id === contractId) || null;
   }
 
+  async getUserContracts(userId: string): Promise<Contract[]> {
+    console.log("ContractLocalStorage: Getting contracts for user", userId);
+    const contracts = this.getContracts(userId);
+    console.log("ContractLocalStorage: Retrieved contracts", contracts);
+    return contracts;
+  }
+
   async updatePaymentStatus(
+    userId: string,
     contractId: string,
     status: string
   ): Promise<boolean> {
-    const contracts = this.getContracts();
+    const contracts = this.getContracts(userId);
     const contract = contracts.find((c) => c.id === contractId);
 
     if (contract) {
       contract.paymentStatus = status as any;
       contract.updatedAt = new Date().toISOString();
-      this.saveContracts(contracts);
+      this.saveContracts(userId, contracts);
       return true;
     }
 
@@ -95,24 +137,29 @@ export class ContractLocalStorage implements ContractAdapter {
   }
 
   async updateServiceStatus(
+    userId: string,
     contractId: string,
     status: string
   ): Promise<boolean> {
-    const contracts = this.getContracts();
+    const contracts = this.getContracts(userId);
     const contract = contracts.find((c) => c.id === contractId);
 
     if (contract) {
       contract.serviceStatus = status as any;
       contract.updatedAt = new Date().toISOString();
-      this.saveContracts(contracts);
+      this.saveContracts(userId, contracts);
       return true;
     }
 
     return false;
   }
 
-  async cancelContract(contractId: string, reason: string): Promise<boolean> {
-    const contracts = this.getContracts();
+  async cancelContract(
+    userId: string,
+    contractId: string,
+    reason: string
+  ): Promise<boolean> {
+    const contracts = this.getContracts(userId);
     const contract = contracts.find((c) => c.id === contractId);
 
     if (contract) {
@@ -129,7 +176,7 @@ export class ContractLocalStorage implements ContractAdapter {
         contract.paymentStatus = "refunded";
       }
 
-      this.saveContracts(contracts);
+      this.saveContracts(userId, contracts);
       return true;
     }
 

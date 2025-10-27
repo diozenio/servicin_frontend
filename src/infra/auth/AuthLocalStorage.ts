@@ -73,6 +73,7 @@ export class AuthLocalStorage implements AuthAdapter {
       id: userWithPassword.id,
       name: userWithPassword.name,
       email: userWithPassword.email,
+      phone: userWithPassword.phone,
       avatarUrl: userWithPassword.avatarUrl,
       createdAt: userWithPassword.createdAt,
     };
@@ -109,6 +110,7 @@ export class AuthLocalStorage implements AuthAdapter {
       id: userId,
       name: userData.name,
       email: userData.email,
+      phone: userData.phone,
       avatarUrl: this.generateAvatarUrl(userData.name),
       createdAt: new Date().toISOString(),
     };
@@ -140,16 +142,20 @@ export class AuthLocalStorage implements AuthAdapter {
 
   async getCurrentUser(): Promise<User | null> {
     const session = this.getCurrentSession();
+    console.log("AuthLocalStorage: Current session", session);
 
     if (!session) {
+      console.log("AuthLocalStorage: No session found");
       return null;
     }
 
     if (new Date(session.expiresAt) < new Date()) {
+      console.log("AuthLocalStorage: Session expired, clearing");
       this.clearSession();
       return null;
     }
 
+    console.log("AuthLocalStorage: Returning user", session.user);
     return session.user;
   }
 

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,10 +16,12 @@ import {
   CheckCircleIcon,
   CalendarIcon,
   InfoIcon,
+  LockIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Service } from "@/core/domain/models/service";
 import { ScheduleBooking } from "./schedule-booking";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ServiceDetailsProps {
   service: Service;
@@ -33,8 +36,17 @@ export function ServiceDetails({
 }: ServiceDetailsProps) {
   const [activeTab, setActiveTab] = useState<"info" | "schedule">("info");
   const tabsRef = React.useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const handleHire = () => {
+    if (!isAuthenticated) {
+      // Redirect to login with return URL
+      const returnUrl = encodeURIComponent(`/services/${service.id}`);
+      router.push(`/auth/login?returnUrl=${returnUrl}`);
+      return;
+    }
+
     setActiveTab("schedule");
     if (tabsRef.current) {
       const navbarHeight = 88;
@@ -127,7 +139,14 @@ export function ServiceDetails({
             Informações
           </button>
           <button
-            onClick={() => setActiveTab("schedule")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                const returnUrl = encodeURIComponent(`/services/${service.id}`);
+                router.push(`/auth/login?returnUrl=${returnUrl}`);
+                return;
+              }
+              setActiveTab("schedule");
+            }}
             className={cn(
               "py-2 px-1 border-b-2 font-medium text-sm transition-colors",
               activeTab === "schedule"
@@ -251,8 +270,25 @@ export function ServiceDetails({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button className="flex-1" onClick={handleHire} size="lg">
-              Contratar Serviço
+            <Button
+              className="flex-1"
+              onClick={handleHire}
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <LockIcon className="w-4 h-4 mr-2" />
+                  Verificando...
+                </>
+              ) : isAuthenticated ? (
+                "Contratar Serviço"
+              ) : (
+                <>
+                  <LockIcon className="w-4 h-4 mr-2" />
+                  Faça login para contratar
+                </>
+              )}
             </Button>
 
             {service.whatsappContact ? (
@@ -299,7 +335,9 @@ export function ServiceDetails({
         </>
       )}
 
-      {activeTab === "schedule" && <ScheduleBooking service={service} />}
+      {activeTab === "schedule" && isAuthenticated && (
+        <ScheduleBooking service={service} />
+      )}
     </div>
   );
 }

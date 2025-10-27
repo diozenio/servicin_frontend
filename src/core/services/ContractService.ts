@@ -9,26 +9,53 @@ import {
 export class ContractService implements ContractUseCase {
   constructor(private contractAdapter: ContractAdapter) {}
 
-  async createContract(contract: ContractRequest): Promise<ContractResponse> {
-    return await this.contractAdapter.createContract(contract);
+  async createContract(
+    userId: string,
+    contract: ContractRequest
+  ): Promise<ContractResponse> {
+    return await this.contractAdapter.createContract(userId, contract);
   }
 
-  async getContract(contractId: string): Promise<Contract | null> {
-    return await this.contractAdapter.getContract(contractId);
+  async getContract(
+    userId: string,
+    contractId: string
+  ): Promise<Contract | null> {
+    return await this.contractAdapter.getContract(userId, contractId);
   }
 
-  async confirmPayment(contractId: string): Promise<boolean> {
-    return await this.contractAdapter.updatePaymentStatus(contractId, "paid");
+  async getUserContracts(userId: string): Promise<Contract[]> {
+    return await this.contractAdapter.getUserContracts(userId);
+  }
+
+  async confirmPayment(userId: string, contractId: string): Promise<boolean> {
+    return await this.contractAdapter.updatePaymentStatus(
+      userId,
+      contractId,
+      "paid"
+    );
   }
 
   async updateServiceStatus(
+    userId: string,
     contractId: string,
     status: string
   ): Promise<boolean> {
-    return await this.contractAdapter.updateServiceStatus(contractId, status);
+    return await this.contractAdapter.updateServiceStatus(
+      userId,
+      contractId,
+      status
+    );
   }
 
-  async cancelContract(contractId: string, reason: string): Promise<boolean> {
-    return await this.contractAdapter.cancelContract(contractId, reason);
+  async cancelContract(
+    userId: string,
+    contractId: string,
+    reason: string
+  ): Promise<boolean> {
+    return await this.contractAdapter.cancelContract(
+      userId,
+      contractId,
+      reason
+    );
   }
 }

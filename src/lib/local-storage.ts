@@ -22,15 +22,22 @@ export class LocalStorage {
   static get<T>(key: string, defaultValue: T): T {
     try {
       if (typeof window === "undefined") {
+        console.log(
+          "LocalStorage: Window is undefined, returning default value"
+        );
         return defaultValue;
       }
 
+      console.log("LocalStorage: Getting key", key);
       const item = window.localStorage.getItem(key);
       if (item === null) {
+        console.log("LocalStorage: Key not found, returning default value");
         return defaultValue;
       }
 
-      return JSON.parse(item) as T;
+      const parsed = JSON.parse(item) as T;
+      console.log("LocalStorage: Retrieved value", parsed);
+      return parsed;
     } catch (error) {
       console.error(`Error reading from localStorage key "${key}":`, error);
       return defaultValue;
@@ -43,10 +50,13 @@ export class LocalStorage {
   static set<T>(key: string, value: T): boolean {
     try {
       if (typeof window === "undefined") {
+        console.log("LocalStorage: Window is undefined, cannot save");
         return false;
       }
 
+      console.log("LocalStorage: Setting key", key, "with value", value);
       window.localStorage.setItem(key, JSON.stringify(value));
+      console.log("LocalStorage: Successfully saved to localStorage");
       return true;
     } catch (error) {
       console.error(`Error writing to localStorage key "${key}":`, error);
@@ -125,5 +135,21 @@ export class LocalStorage {
       console.error(`Error getting keys with prefix "${prefix}":`, error);
       return [];
     }
+  }
+
+  /**
+   * Generate user-specific storage key
+   */
+  static getUserSpecificKey(userId: string, baseKey: string): string {
+    const key = `${baseKey}:${userId}`;
+    console.log(
+      "LocalStorage: Generated user-specific key",
+      key,
+      "for userId",
+      userId,
+      "baseKey",
+      baseKey
+    );
+    return key;
   }
 }

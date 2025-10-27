@@ -15,7 +15,11 @@ export function useAuth() {
     error: userError,
   } = useQuery({
     queryKey: ["auth", "user"],
-    queryFn: () => container.authService.getCurrentUser(),
+    queryFn: async () => {
+      const user = await container.authService.getCurrentUser();
+      console.log("useAuth: Current user", user);
+      return user;
+    },
     staleTime: 5 * 60 * 1000,
   });
 

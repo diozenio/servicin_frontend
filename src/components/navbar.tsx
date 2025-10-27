@@ -43,7 +43,7 @@ export default function Navbar() {
               <Link href="#">Profissionais</Link>
             </Button>
             <Button variant="link" asChild className="text-sm">
-              <Link href="#">Como Funciona</Link>
+              <Link href="/contracts">Contratos</Link>
             </Button>
             <Button variant="link" asChild className="text-sm">
               <Link href="#">Sobre</Link>

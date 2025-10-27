@@ -14,6 +14,7 @@ import { CardPayment } from "@/components/service/card-payment";
 import { CashPayment } from "@/components/service/cash-payment";
 import { useSchedule } from "@/hooks/use-schedule";
 import { useCreateContract, useConfirmPayment } from "@/hooks/use-contract";
+import { useAuth } from "@/hooks/use-auth";
 import { Service } from "@/core/domain/models/service";
 import { DaySchedule } from "@/core/domain/models/schedule";
 import { PaymentMethod } from "@/core/domain/models/contract";
@@ -26,6 +27,7 @@ interface ScheduleBookingProps {
 }
 
 export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
+  const { user, isAuthenticated } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<
     string | undefined
@@ -40,6 +42,17 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     "schedule" | "payment" | "confirmation"
   >("schedule");
   const [contractId, setContractId] = useState<string | null>(null);
+
+  // Auto-fill user information when user is available
+  React.useEffect(() => {
+    if (user && isAuthenticated) {
+      setCustomerName(user.name);
+      setCustomerEmail(user.email);
+      if (user.phone) {
+        setCustomerPhone(user.phone);
+      }
+    }
+  }, [user, isAuthenticated]);
 
   const providerId = service.id;
   const serviceId = service.id;
@@ -95,7 +108,8 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
       !selectedTimeSlot ||
       !customerName ||
       !customerPhone ||
-      !selectedPaymentMethod
+      !selectedPaymentMethod ||
+      !isAuthenticated
     ) {
       return;
     }
@@ -147,7 +161,11 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   };
 
   const isFormValid =
-    selectedDate && selectedTimeSlot && customerName && customerPhone;
+    selectedDate &&
+    selectedTimeSlot &&
+    customerName &&
+    customerPhone &&
+    isAuthenticated;
 
   if (isLoadingSchedule) {
     return (
@@ -370,34 +388,58 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
               <Label htmlFor="customerName">Nome Completo *</Label>
               <Input
                 id="customerName"
+                name="customerName"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Digite seu nome completo"
                 required
+                disabled={!!user?.name}
+                autoComplete="name"
               />
+              {user?.name && (
+                <p className="text-xs text-muted-foreground">
+                  Preenchido automaticamente com os dados do seu perfil
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="customerPhone">Telefone *</Label>
               <Input
                 id="customerPhone"
+                name="customerPhone"
                 type="tel"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 placeholder="(11) 99999-9999"
                 required
+                disabled={!!user?.phone}
+                autoComplete="tel"
               />
+              {user?.phone && (
+                <p className="text-xs text-muted-foreground">
+                  Preenchido automaticamente com os dados do seu perfil
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="customerEmail">E-mail (opcional)</Label>
               <Input
                 id="customerEmail"
+                name="customerEmail"
                 type="email"
                 value={customerEmail}
                 onChange={(e) => setCustomerEmail(e.target.value)}
                 placeholder="seu@email.com"
+                disabled={!!user?.email}
+                autoComplete="email"
               />
+              {user?.email && (
+                <p className="text-xs text-muted-foreground">
+                  Preenchido automaticamente com os dados do seu perfil
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

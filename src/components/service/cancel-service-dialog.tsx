@@ -118,7 +118,7 @@ export function CancelServiceDialog({
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 !justify-between">
             <Button
               type="button"
               variant="outline"

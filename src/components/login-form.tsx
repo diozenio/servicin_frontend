@@ -12,12 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+interface LoginFormProps extends React.ComponentProps<"form"> {
+  returnUrl?: string | null;
+}
+
+export function LoginForm({ className, returnUrl, ...props }: LoginFormProps) {
   const { login, isLoggingIn, loginError } = useAuth();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,6 +30,12 @@ export function LoginForm({
     e.preventDefault();
     try {
       await login(formData);
+      // Redirect to returnUrl if provided, otherwise redirect to home
+      if (returnUrl) {
+        router.push(decodeURIComponent(returnUrl));
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Login failed:", error);
     }

@@ -21,6 +21,7 @@ export function SignupForm({
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -78,6 +79,22 @@ export function SignupForm({
           <FieldDescription>
             Usaremos isso para entrar em contato. Não compartilharemos seu email
             com ninguém.
+          </FieldDescription>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="phone">Telefone (opcional)</FieldLabel>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="(11) 99999-9999"
+            value={formData.phone}
+            onChange={handleChange}
+            autoComplete="tel"
+          />
+          <FieldDescription>
+            Seu telefone será usado para preencher automaticamente os
+            formulários de contratação.
           </FieldDescription>
         </Field>
         <Field>
