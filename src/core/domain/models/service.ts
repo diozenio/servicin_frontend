@@ -13,6 +13,9 @@ export type Service = {
   reviews: number;
   logo: string;
   logoFallback: string;
+  description?: string;
+  duration?: string;
+  whatsappContact?: string;
 };
 
 export type ServiceQueryParams = {
@@ -25,4 +28,4 @@ export type ServiceQueryParams = {
 export type ServiceListResponse = ApiResponse<Service[]> & {
   total?: number;
 };
-export type ServiceResponse = ApiResponse<Service>;
+export type ServiceResponse = ApiResponse<Service | null>;

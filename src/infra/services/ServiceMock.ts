@@ -2,6 +2,7 @@ import { ServiceAdapter } from "@/core/interfaces/adapters/ServiceAdapter";
 import {
   ServiceListResponse,
   ServiceQueryParams,
+  ServiceResponse,
 } from "@/core/domain/models/service";
 import { search } from "@/lib/search";
 import { mockServices } from "./mock-data";
@@ -9,12 +10,10 @@ import { mockServices } from "./mock-data";
 export class ServiceMock extends ServiceAdapter {
   async findAll(params?: ServiceQueryParams): Promise<ServiceListResponse> {
     try {
-      // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       const services = mockServices;
 
-      // Apply filters if params are provided
       let filteredServices = services;
 
       if (params?.search) {
@@ -30,10 +29,8 @@ export class ServiceMock extends ServiceAdapter {
         );
       }
 
-      // Store total before pagination
       const total = filteredServices.length;
 
-      // Apply pagination if provided
       const offset = params?.offset || 0;
       const limit = params?.limit || filteredServices.length;
 
@@ -53,6 +50,35 @@ export class ServiceMock extends ServiceAdapter {
         success: false,
         message:
           error instanceof Error ? error.message : "Failed to fetch services",
+      };
+    }
+  }
+
+  async findById(id: string): Promise<ServiceResponse> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const service = mockServices.find((s) => s.id === id);
+
+      if (!service) {
+        return {
+          data: null,
+          success: false,
+          message: "Service not found",
+        };
+      }
+
+      return {
+        data: service,
+        success: true,
+        message: "Service fetched successfully",
+      };
+    } catch (error) {
+      return {
+        data: null,
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to fetch service",
       };
     }
   }

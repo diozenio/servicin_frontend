@@ -12,12 +12,19 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Service } from "@/core/domain/models/service";
+import { useRouter } from "next/navigation";
 
 interface ServiceCardProps {
   service: Service;
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
+  const router = useRouter();
+
+  const handleHireClick = () => {
+    router.push(`/services/${service.id}`);
+  };
+
   return (
     <div className="dark:bg-card bg-secondary/15 border border-border rounded-lg p-6">
       {/* Service Title and Company */}
@@ -107,7 +114,9 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <Button className="flex-1">Contratar Serviço</Button>
+        <Button className="flex-1" onClick={handleHireClick}>
+          Contratar Serviço
+        </Button>
         <Button variant="outline" className="bg-transparent" size="icon">
           <BookmarkIcon className="w-4 h-4" />
         </Button>
