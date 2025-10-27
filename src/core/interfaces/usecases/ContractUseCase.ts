@@ -9,4 +9,5 @@ export interface ContractUseCase {
   getContract(contractId: string): Promise<Contract | null>;
   confirmPayment(contractId: string): Promise<boolean>;
   updateServiceStatus(contractId: string, status: string): Promise<boolean>;
+  cancelContract(contractId: string, reason: string): Promise<boolean>;
 }

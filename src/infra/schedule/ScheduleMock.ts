@@ -33,13 +33,9 @@ export class ScheduleMock implements ScheduleAdapter {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Simulate booking creation
       const bookingId = `booking_${Date.now()}_${Math.random()
         .toString(36)
         .substr(2, 9)}`;
-
-      // In a real implementation, this would update the schedule
-      // For now, we'll just return success
 
       return {
         success: true,
@@ -81,6 +77,42 @@ export class ScheduleMock implements ScheduleAdapter {
       return slot ? slot.isAvailable && !slot.isBooked : false;
     } catch (error) {
       console.error("Error checking availability:", error);
+      return false;
+    }
+  }
+
+  async releaseTimeSlot(
+    providerId: string,
+    serviceId: string,
+    date: string,
+    timeSlot: string
+  ): Promise<boolean> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const schedule = mockProviderSchedules.find(
+        (s) => s.providerId === providerId && s.serviceId === serviceId
+      );
+
+      if (!schedule) {
+        return false;
+      }
+
+      const daySchedule = schedule.schedule.find((d) => d.date === date);
+      if (!daySchedule) {
+        return false;
+      }
+
+      const slot = daySchedule.timeSlots.find((s) => s.time === timeSlot);
+      if (slot) {
+        slot.isBooked = false;
+        slot.isAvailable = true;
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error releasing time slot:", error);
       return false;
     }
   }

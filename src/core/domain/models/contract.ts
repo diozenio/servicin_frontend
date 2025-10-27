@@ -23,6 +23,8 @@ export type Contract = {
   paymentStatus: PaymentStatus;
   serviceStatus: ServiceStatus;
   totalAmount: number;
+  cancellationReason?: string;
+  cancelledAt?: string;
   createdAt: string;
   updatedAt: string;
 };

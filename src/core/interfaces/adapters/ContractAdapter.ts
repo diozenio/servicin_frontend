@@ -9,4 +9,5 @@ export interface ContractAdapter {
   getContract(contractId: string): Promise<Contract | null>;
   updatePaymentStatus(contractId: string, status: string): Promise<boolean>;
   updateServiceStatus(contractId: string, status: string): Promise<boolean>;
+  cancelContract(contractId: string, reason: string): Promise<boolean>;
 }

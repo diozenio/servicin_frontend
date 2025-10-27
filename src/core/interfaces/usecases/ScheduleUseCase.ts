@@ -16,4 +16,10 @@ export interface ScheduleUseCase {
     date: string,
     timeSlot: string
   ): Promise<boolean>;
+  releaseTimeSlot(
+    providerId: string,
+    serviceId: string,
+    date: string,
+    timeSlot: string
+  ): Promise<boolean>;
 }

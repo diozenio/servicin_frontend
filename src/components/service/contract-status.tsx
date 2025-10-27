@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { Contract } from "@/core/domain/models/contract";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   ClockIcon,
@@ -12,7 +14,12 @@ import {
   BanknoteIcon,
   QrCodeIcon,
   AlertCircleIcon,
+  XIcon,
 } from "lucide-react";
+import { CancelServiceDialog } from "./cancel-service-dialog";
+import { useCancelContract } from "@/hooks/use-contract";
+import { ScheduleService } from "@/core/services/ScheduleService";
+import { ScheduleMock } from "@/infra/schedule/ScheduleMock";
 
 interface ContractStatusProps {
   contract: Contract;
@@ -89,6 +96,10 @@ const paymentMethodConfig = {
 };
 
 export function ContractStatus({ contract, className }: ContractStatusProps) {
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const cancelContractMutation = useCancelContract();
+  const scheduleService = new ScheduleService(new ScheduleMock());
+
   const serviceStatus = serviceStatusConfig[contract.serviceStatus];
   const paymentStatus = paymentStatusConfig[contract.paymentStatus];
   const paymentMethod = paymentMethodConfig[contract.paymentMethod];
@@ -96,6 +107,30 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
   const ServiceIcon = serviceStatus.icon;
   const PaymentIcon = paymentStatus.icon;
   const MethodIcon = paymentMethod.icon;
+
+  const canCancel = contract.serviceStatus === "not_started";
+
+  const handleCancelConfirm = async (reason: string) => {
+    try {
+      const success = await cancelContractMutation.mutateAsync({
+        contractId: contract.id,
+        reason,
+      });
+
+      if (success) {
+        await scheduleService.releaseTimeSlot(
+          contract.providerId,
+          contract.serviceId,
+          contract.date,
+          contract.timeSlot
+        );
+
+        setShowCancelDialog(false);
+      }
+    } catch (error) {
+      console.error("Error canceling contract:", error);
+    }
+  };
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -107,7 +142,6 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Service Status */}
         <div className="bg-white rounded-lg border p-4 space-y-3">
           <div className="flex items-center gap-2">
             <ServiceIcon className="w-5 h-5 text-gray-600" />
@@ -118,7 +152,6 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
           </Badge>
         </div>
 
-        {/* Payment Status */}
         <div className="bg-white rounded-lg border p-4 space-y-3">
           <div className="flex items-center gap-2">
             <PaymentIcon className="w-5 h-5 text-gray-600" />
@@ -130,7 +163,6 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
         </div>
       </div>
 
-      {/* Contract Details */}
       <div className="bg-muted/50 rounded-lg p-4 space-y-3">
         <h4 className="font-medium">Detalhes do Contrato</h4>
 
@@ -168,7 +200,6 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
           </div>
         </div>
 
-        {/* Payment Method */}
         <div className="flex items-center gap-2 pt-2 border-t">
           <MethodIcon className={cn("w-4 h-4", paymentMethod.color)} />
           <span className="text-sm text-muted-foreground">
@@ -177,16 +208,32 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
           <span className="text-sm font-medium">{paymentMethod.label}</span>
         </div>
 
-        {/* Notes */}
         {contract.notes && (
           <div className="pt-2 border-t">
             <span className="text-sm text-muted-foreground">Observações:</span>
             <p className="text-sm mt-1">{contract.notes}</p>
           </div>
         )}
+
+        {contract.serviceStatus === "cancelled" &&
+          contract.cancellationReason && (
+            <div className="pt-2 border-t">
+              <span className="text-sm text-muted-foreground">
+                Motivo do Cancelamento:
+              </span>
+              <p className="text-sm mt-1 text-red-600">
+                {contract.cancellationReason}
+              </p>
+              {contract.cancelledAt && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Cancelado em{" "}
+                  {new Date(contract.cancelledAt).toLocaleString("pt-BR")}
+                </p>
+              )}
+            </div>
+          )}
       </div>
 
-      {/* Timeline */}
       <div className="space-y-3">
         <h4 className="font-medium">Histórico</h4>
         <div className="space-y-2">
@@ -221,8 +268,40 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
               <span className="text-muted-foreground">Serviço concluído</span>
             </div>
           )}
+
+          {contract.serviceStatus === "cancelled" && (
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-muted-foreground">
+                Serviço cancelado em{" "}
+                {contract.cancelledAt &&
+                  new Date(contract.cancelledAt).toLocaleString("pt-BR")}
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
+      {canCancel && (
+        <div className="pt-4 border-t">
+          <Button
+            variant="destructive"
+            onClick={() => setShowCancelDialog(true)}
+            className="w-full"
+          >
+            <XIcon className="w-4 h-4 mr-2" />
+            Cancelar Serviço
+          </Button>
+        </div>
+      )}
+
+      <CancelServiceDialog
+        isOpen={showCancelDialog}
+        onClose={() => setShowCancelDialog(false)}
+        onConfirm={handleCancelConfirm}
+        isLoading={cancelContractMutation.isPending}
+        contractId={contract.id}
+      />
     </div>
   );
 }

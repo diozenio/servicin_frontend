@@ -53,3 +53,24 @@ export function useUpdateServiceStatus() {
     },
   });
 }
+
+export function useCancelContract() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      contractId,
+      reason,
+    }: {
+      contractId: string;
+      reason: string;
+    }) => contractService.cancelContract(contractId, reason),
+    onSuccess: (_, { contractId }) => {
+      // Invalidate contract queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["contract", contractId] });
+      queryClient.invalidateQueries({ queryKey: ["contracts"] });
+      // Also invalidate schedule queries to reflect the released time slot
+      queryClient.invalidateQueries({ queryKey: ["schedule"] });
+    },
+  });
+}

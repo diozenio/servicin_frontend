@@ -77,4 +77,25 @@ export class ContractMock implements ContractAdapter {
     }
     return false;
   }
+
+  async cancelContract(contractId: string, reason: string): Promise<boolean> {
+    const contract = this.contracts.find((c) => c.id === contractId);
+    if (contract) {
+      if (contract.serviceStatus !== "not_started") {
+        return false;
+      }
+
+      contract.serviceStatus = "cancelled";
+      contract.cancellationReason = reason;
+      contract.cancelledAt = new Date().toISOString();
+      contract.updatedAt = new Date().toISOString();
+
+      if (contract.paymentStatus === "paid") {
+        contract.paymentStatus = "refunded";
+      }
+
+      return true;
+    }
+    return false;
+  }
 }

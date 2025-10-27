@@ -27,4 +27,8 @@ export class ContractService implements ContractUseCase {
   ): Promise<boolean> {
     return await this.contractAdapter.updateServiceStatus(contractId, status);
   }
+
+  async cancelContract(contractId: string, reason: string): Promise<boolean> {
+    return await this.contractAdapter.cancelContract(contractId, reason);
+  }
 }
