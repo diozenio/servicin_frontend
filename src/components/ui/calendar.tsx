@@ -8,7 +8,7 @@ import { Button } from "./button";
 interface CalendarProps {
   selectedDate?: Date;
   onDateSelect?: (date: Date) => void;
-  availableDates?: string[]; // Array of available dates in YYYY-MM-DD format
+  availableDates?: string[];
   className?: string;
 }
 

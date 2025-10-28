@@ -5,7 +5,6 @@ import {
 } from "@/core/domain/models/schedule";
 import { faker } from "@faker-js/faker";
 
-// Generate time slots for a day (8 AM to 6 PM, 30-minute intervals)
 const generateTimeSlots = (date: string, isWorkingDay: boolean): TimeSlot[] => {
   if (!isWorkingDay) {
     return [];
@@ -69,7 +68,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "08:00",
       end: "18:00",
     },
-    workingDays: [1, 2, 3, 4, 5], // Monday to Friday
+    workingDays: [1, 2, 3, 4, 5],
     breakTime: {
       start: "12:00",
       end: "13:00",
@@ -83,7 +82,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "09:00",
       end: "17:00",
     },
-    workingDays: [1, 2, 3, 4, 5, 6], // Monday to Saturday
+    workingDays: [1, 2, 3, 4, 5, 6],
     breakTime: {
       start: "12:00",
       end: "13:00",
@@ -97,7 +96,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "07:00",
       end: "19:00",
     },
-    workingDays: [0, 1, 2, 3, 4, 5, 6], // All days
+    workingDays: [0, 1, 2, 3, 4, 5, 6],
     breakTime: {
       start: "12:00",
       end: "13:00",
@@ -109,9 +108,9 @@ export const mockProviderSchedules: ProviderSchedule[] = [
 // Add more mock schedules for other services
 for (let i = 4; i <= 60; i++) {
   const workingDays = faker.helpers.arrayElement([
-    [1, 2, 3, 4, 5], // Monday to Friday
-    [1, 2, 3, 4, 5, 6], // Monday to Saturday
-    [0, 1, 2, 3, 4, 5, 6], // All days
+    [1, 2, 3, 4, 5],
+    [1, 2, 3, 4, 5, 6],
+    [0, 1, 2, 3, 4, 5, 6],
   ]);
 
   const startHour = faker.number.int({ min: 7, max: 9 });
@@ -124,7 +123,7 @@ for (let i = 4; i <= 60; i++) {
       start: `${startHour.toString().padStart(2, "0")}:00`,
       end: `${endHour.toString().padStart(2, "0")}:00`,
     },
-    workingDays,
+    workingDays: Array.from(workingDays),
     breakTime: faker.datatype.boolean({ probability: 0.8 })
       ? {
           start: "12:00",

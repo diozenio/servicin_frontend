@@ -37,6 +37,7 @@ const eslintConfig = [
       "no-alert": "error",
       "no-unreachable": "error",
       "no-duplicate-imports": "error",
+      "no-inline-comments": "error",
     },
   },
 ];

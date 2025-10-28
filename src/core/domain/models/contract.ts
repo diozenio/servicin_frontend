@@ -16,7 +16,7 @@ export type Contract = {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
-  date: string; // Format: "YYYY-MM-DD"
+  date: string;
   timeSlot: string;
   notes?: string;
   paymentMethod: PaymentMethod;

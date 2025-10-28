@@ -52,7 +52,7 @@ export class ContractLocalStorage implements ContractAdapter {
         id: `contract_${nextId}`,
         serviceId: contract.serviceId,
         providerId: contract.providerId,
-        customerId: userId, // Use actual user ID
+        customerId: userId,
         customerName: contract.customerName,
         customerPhone: contract.customerPhone,
         customerEmail: contract.customerEmail,
@@ -62,7 +62,7 @@ export class ContractLocalStorage implements ContractAdapter {
         paymentMethod: contract.paymentMethod,
         paymentStatus: "pending",
         serviceStatus: "not_started",
-        totalAmount: 150.0, // Mock amount
+        totalAmount: 150.0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };

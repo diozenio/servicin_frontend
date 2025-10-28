@@ -1,12 +1,12 @@
 export type TimeSlot = {
   id: string;
-  time: string; // Format: "HH:MM"
+  time: string;
   isAvailable: boolean;
   isBooked: boolean;
 };
 
 export type DaySchedule = {
-  date: string; // Format: "YYYY-MM-DD"
+  date: string;
   timeSlots: TimeSlot[];
   isAvailable: boolean;
 };
@@ -15,13 +15,13 @@ export type ProviderSchedule = {
   providerId: string;
   serviceId: string;
   workingHours: {
-    start: string; // Format: "HH:MM"
-    end: string; // Format: "HH:MM"
+    start: string;
+    end: string;
   };
-  workingDays: number[]; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  workingDays: number[];
   breakTime?: {
-    start: string; // Format: "HH:MM"
-    end: string; // Format: "HH:MM"
+    start: string;
+    end: string;
   };
   schedule: DaySchedule[];
 };

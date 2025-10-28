@@ -10,7 +10,7 @@ export function useSchedule(providerId: string, serviceId: string) {
     queryKey: ["schedule", providerId, serviceId],
     queryFn: () => scheduleService.getProviderSchedule(providerId, serviceId),
     enabled: !!providerId && !!serviceId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 }
 

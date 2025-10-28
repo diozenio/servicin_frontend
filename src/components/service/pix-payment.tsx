@@ -99,7 +99,7 @@ export function PixPayment({
                 <li>• Abra o app do seu banco</li>
                 <li>• Escaneie o QR Code ou cole a chave PIX</li>
                 <li>• Confirme o pagamento</li>
-                <li>• Clique em "Confirmar Pagamento" abaixo</li>
+                <li>• Clique em &quot;Confirmar Pagamento&quot; abaixo</li>
               </ul>
             </div>
           </div>
