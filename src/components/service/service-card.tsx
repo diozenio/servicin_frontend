@@ -31,7 +31,8 @@ export function ServiceCard({ service }: ServiceCardProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  const handleHireClick = () => {
+  const handleHireClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     router.push(`/services/${service.id}`);
   };
 
