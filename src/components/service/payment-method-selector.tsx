@@ -4,12 +4,7 @@ import * as React from "react";
 import { PaymentMethod } from "@/core/domain/models/contract";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  CreditCardIcon,
-  SmartphoneIcon,
-  BanknoteIcon,
-  QrCodeIcon,
-} from "lucide-react";
+import { CreditCardIcon, BanknoteIcon, QrCodeIcon } from "lucide-react";
 
 interface PaymentMethodSelectorProps {
   selectedMethod: PaymentMethod | null;

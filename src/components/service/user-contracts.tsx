@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import {
   CalendarIcon,
   ClockIcon,
-  MapPinIcon,
   DollarSignIcon,
   XIcon,
   EyeIcon,
@@ -28,38 +27,46 @@ interface UserContractsProps {
 const serviceStatusConfig = {
   not_started: {
     label: "Não iniciado",
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800",
+    color:
+      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800",
   },
   in_progress: {
     label: "Em andamento",
-    color: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
+    color:
+      "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
   },
   completed: {
     label: "Concluído",
-    color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+    color:
+      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
   },
   cancelled: {
     label: "Cancelado",
-    color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
+    color:
+      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
   },
 };
 
 const paymentStatusConfig = {
   pending: {
     label: "Pagamento em aberto",
-    color: "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800",
+    color:
+      "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800",
   },
   paid: {
     label: "Pago",
-    color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+    color:
+      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
   },
   failed: {
     label: "Falha no pagamento",
-    color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
+    color:
+      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
   },
   refunded: {
     label: "Reembolsado",
-    color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800",
+    color:
+      "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800",
   },
 };
 
@@ -97,8 +104,8 @@ export function UserContracts({
 
         setCancelingContract(null);
       }
-    } catch (error) {
-      console.error("Error canceling contract:", error);
+    } catch {
+      // Error canceling contract - handled by mutation
     }
   };
 
@@ -238,7 +245,7 @@ export function UserContracts({
           onClose={() => setCancelingContract(null)}
           onConfirm={handleCancelConfirm}
           isLoading={cancelContractMutation.isPending}
-          contractId={cancelingContract.id}
+          serviceName={cancelingContract.serviceName}
         />
       )}
     </div>

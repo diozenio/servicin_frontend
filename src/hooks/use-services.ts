@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { container } from "@/container";
-import { Service } from "@/core/domain/models/service";
-import { ServiceListResponse } from "@/core/domain/models/service";
+import { Service, ServiceListResponse } from "@/core/domain/models/service";
 import { usePagination } from "./use-pagination";
 
 interface UseServicesOptions {
@@ -71,7 +70,7 @@ export function useServices(options: UseServicesOptions = {}) {
         return [...prev, ...newServices];
       });
     }
-  }, [currentServices, offset, isFirstLoad]);
+  }, [currentServices, isFirstLoad, setAccumulatedServices, setIsFirstLoad]);
 
   // Reset accumulation when search parameters change
   useEffect(() => {

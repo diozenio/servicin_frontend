@@ -142,20 +142,16 @@ export class AuthLocalStorage implements AuthAdapter {
 
   async getCurrentUser(): Promise<User | null> {
     const session = this.getCurrentSession();
-    console.log("AuthLocalStorage: Current session", session);
 
     if (!session) {
-      console.log("AuthLocalStorage: No session found");
       return null;
     }
 
     if (new Date(session.expiresAt) < new Date()) {
-      console.log("AuthLocalStorage: Session expired, clearing");
       this.clearSession();
       return null;
     }
 
-    console.log("AuthLocalStorage: Returning user", session.user);
     return session.user;
   }
 

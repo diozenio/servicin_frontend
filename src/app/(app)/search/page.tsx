@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SearchIcon, FilterIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";

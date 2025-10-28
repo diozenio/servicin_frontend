@@ -36,8 +36,8 @@ export function LoginForm({ className, returnUrl, ...props }: LoginFormProps) {
       } else {
         router.push("/");
       }
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch {
+      // Login failed - error is handled by useAuth hook
     }
   };
 

@@ -20,8 +20,6 @@ interface CancelServiceDialogProps {
   onClose: () => void;
   onConfirm: (reason: string) => void;
   isLoading?: boolean;
-  contractId: string;
-  serviceName?: string;
   className?: string;
 }
 
@@ -30,8 +28,6 @@ export function CancelServiceDialog({
   onClose,
   onConfirm,
   isLoading = false,
-  contractId,
-  serviceName,
   className,
 }: CancelServiceDialogProps) {
   const [reason, setReason] = useState("");
@@ -73,7 +69,7 @@ export function CancelServiceDialog({
             <div>
               <DialogTitle className="text-left">Cancelar Serviço</DialogTitle>
               <DialogDescription className="text-left">
-                {serviceName ? `Cancelar "${serviceName}"` : "Cancelar serviço"}
+                Cancelar serviço
               </DialogDescription>
             </div>
           </div>

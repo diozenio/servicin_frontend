@@ -41,7 +41,7 @@ export class ContractMock implements ContractAdapter {
         contractId: newContract.id,
         contract: newContract,
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         message: "Erro ao criar contrato",
@@ -74,7 +74,11 @@ export class ContractMock implements ContractAdapter {
       (c) => c.id === contractId && c.customerId === userId
     );
     if (contract) {
-      contract.paymentStatus = status as any;
+      contract.paymentStatus = status as
+        | "pending"
+        | "paid"
+        | "failed"
+        | "refunded";
       contract.updatedAt = new Date().toISOString();
       return true;
     }
@@ -90,7 +94,11 @@ export class ContractMock implements ContractAdapter {
       (c) => c.id === contractId && c.customerId === userId
     );
     if (contract) {
-      contract.serviceStatus = status as any;
+      contract.serviceStatus = status as
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "cancelled";
       contract.updatedAt = new Date().toISOString();
       return true;
     }

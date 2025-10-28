@@ -37,10 +37,7 @@ const generateTimeSlots = (date: string, isWorkingDay: boolean): TimeSlot[] => {
 };
 
 // Generate schedule for the next 30 days
-const generateSchedule = (
-  providerId: string,
-  serviceId: string
-): DaySchedule[] => {
+const generateSchedule = (): DaySchedule[] => {
   const schedule: DaySchedule[] = [];
   const today = new Date();
 
@@ -77,7 +74,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "12:00",
       end: "13:00",
     },
-    schedule: generateSchedule("1", "1"),
+    schedule: generateSchedule(),
   },
   {
     providerId: "2",
@@ -91,7 +88,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "12:00",
       end: "13:00",
     },
-    schedule: generateSchedule("2", "2"),
+    schedule: generateSchedule(),
   },
   {
     providerId: "3",
@@ -105,7 +102,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
       start: "12:00",
       end: "13:00",
     },
-    schedule: generateSchedule("3", "3"),
+    schedule: generateSchedule(),
   },
 ];
 
@@ -134,6 +131,6 @@ for (let i = 4; i <= 60; i++) {
           end: "13:00",
         }
       : undefined,
-    schedule: generateSchedule(i.toString(), i.toString()),
+    schedule: generateSchedule(),
   });
 }

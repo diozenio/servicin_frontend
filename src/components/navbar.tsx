@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Wrench, Phone } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";

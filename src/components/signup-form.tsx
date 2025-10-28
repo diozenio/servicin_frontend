@@ -30,8 +30,8 @@ export function SignupForm({
     e.preventDefault();
     try {
       await signup(formData);
-    } catch (error) {
-      console.error("Signup failed:", error);
+    } catch {
+      // Signup failed - error is handled by useAuth hook
     }
   };
 

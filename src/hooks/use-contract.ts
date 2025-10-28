@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ContractService } from "@/core/services/ContractService";
 import { ContractLocalStorage } from "@/infra/contract/ContractLocalStorage";
-import { Contract, ContractRequest } from "@/core/domain/models/contract";
+import { ContractRequest } from "@/core/domain/models/contract";
 import { useAuth } from "@/hooks/use-auth";
 
 const contractService = new ContractService(new ContractLocalStorage());
@@ -15,13 +15,10 @@ export function useCreateContract() {
       if (!user) {
         throw new Error("User must be authenticated to create a contract");
       }
-      console.log("Creating contract for user:", user.id, contract);
       const result = await contractService.createContract(user.id, contract);
-      console.log("Contract creation result:", result);
       return result;
     },
     onSuccess: () => {
-      console.log("Contract created successfully, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["userContracts"] });
     },
@@ -52,9 +49,7 @@ export function useUserContracts() {
       if (!user) {
         throw new Error("User must be authenticated to view contracts");
       }
-      console.log("Fetching contracts for user:", user.id);
       const contracts = await contractService.getUserContracts(user.id);
-      console.log("Retrieved contracts:", contracts);
       return contracts;
     },
     enabled: !!user,

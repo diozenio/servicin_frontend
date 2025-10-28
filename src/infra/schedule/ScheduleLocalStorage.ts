@@ -44,13 +44,12 @@ export class ScheduleLocalStorage implements ScheduleAdapter {
       }
 
       return schedule;
-    } catch (error) {
-      console.error("Error fetching provider schedule:", error);
+    } catch {
       return null;
     }
   }
 
-  async createBooking(booking: BookingRequest): Promise<BookingResponse> {
+  async createBooking(): Promise<BookingResponse> {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -97,8 +96,7 @@ export class ScheduleLocalStorage implements ScheduleAdapter {
 
       const slot = daySchedule.timeSlots.find((s) => s.time === timeSlot);
       return slot ? slot.isAvailable && !slot.isBooked : false;
-    } catch (error) {
-      console.error("Error checking availability:", error);
+    } catch {
       return false;
     }
   }
@@ -137,8 +135,7 @@ export class ScheduleLocalStorage implements ScheduleAdapter {
       }
 
       return false;
-    } catch (error) {
-      console.error("Error releasing time slot:", error);
+    } catch {
       return false;
     }
   }

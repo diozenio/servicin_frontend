@@ -1,10 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScheduleService } from "@/core/services/ScheduleService";
 import { ScheduleMock } from "@/infra/schedule/ScheduleMock";
-import {
-  ProviderSchedule,
-  BookingRequest,
-} from "@/core/domain/models/schedule";
+import { BookingRequest } from "@/core/domain/models/schedule";
 
 const scheduleService = new ScheduleService(new ScheduleMock());
 

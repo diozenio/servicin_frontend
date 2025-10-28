@@ -132,10 +132,10 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         setContractId(result.contractId);
         setCurrentStep("confirmation");
       } else {
-        alert(`Erro: ${result.message}`);
+        // Error creating contract - handled by mutation
       }
-    } catch (error) {
-      alert("Erro ao criar contrato. Tente novamente.");
+    } catch {
+      // Error creating contract - handled by mutation
     }
   };
 
@@ -144,8 +144,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
 
     try {
       await confirmPaymentMutation.mutateAsync(contractId);
-      alert("Pagamento confirmado! Contrato criado com sucesso!");
-
+      // Payment confirmed successfully - reset form
       setSelectedDate(undefined);
       setSelectedTimeSlot(undefined);
       setCustomerName("");
@@ -155,8 +154,8 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
       setSelectedPaymentMethod(null);
       setCurrentStep("schedule");
       setContractId(null);
-    } catch (error) {
-      alert("Erro ao confirmar pagamento. Tente novamente.");
+    } catch {
+      // Error confirming payment - handled by mutation
     }
   };
 

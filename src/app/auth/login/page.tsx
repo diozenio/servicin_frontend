@@ -3,6 +3,7 @@
 import { LoginForm } from "@/components/login-form";
 import Logo from "@/components/logo";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -20,9 +21,10 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="bg-muted/50 relative hidden lg:block">
-        <img
+        <Image
           src="/images/auth_background.svg"
-          alt="Image"
+          alt="Authentication background"
+          fill
           className="absolute inset-0 h-full w-full"
         />
       </div>

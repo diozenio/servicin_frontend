@@ -9,7 +9,7 @@ import { Contract } from "@/core/domain/models/contract";
 import { useUserContracts } from "@/hooks/use-contract";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, CalendarIcon, LoaderIcon } from "lucide-react";
+import { ArrowLeftIcon, LoaderIcon } from "lucide-react";
 
 export default function ContractsPage() {
   const router = useRouter();
@@ -20,12 +20,6 @@ export default function ContractsPage() {
     error,
   } = useUserContracts();
 
-  // Debug logs
-  React.useEffect(() => {
-    console.log("Contracts page - isAuthenticated:", isAuthenticated);
-    console.log("Contracts page - contracts:", contracts);
-    console.log("Contracts page - error:", error);
-  }, [isAuthenticated, contracts, error]);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(
     null
   );

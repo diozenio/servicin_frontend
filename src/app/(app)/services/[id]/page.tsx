@@ -19,7 +19,7 @@ export default function Page({ params }: PageProps) {
 
   const handleContact = () => {
     // TODO: Implement contact logic for services without WhatsApp
-    console.log("Contacting service:", service?.id);
+    // Contacting service: service?.id
   };
 
   if (isLoading) {

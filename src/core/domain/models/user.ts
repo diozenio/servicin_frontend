@@ -1,5 +1,3 @@
-import { ApiResponse } from "@/core/types/api";
-
 export type User = {
   id: string;
   name: string;
