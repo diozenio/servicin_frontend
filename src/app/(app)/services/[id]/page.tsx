@@ -17,8 +17,7 @@ export default function Page({ params }: PageProps) {
   const { id } = use(params);
   const { service, isLoading, error } = useService(id);
 
-  const handleContact = () => {
-  };
+  const handleContact = () => {};
 
   if (isLoading) {
     return (

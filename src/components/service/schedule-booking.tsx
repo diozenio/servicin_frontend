@@ -132,8 +132,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         setCurrentStep("confirmation");
       } else {
       }
-    } catch {
-    }
+    } catch {}
   };
 
   const handlePaymentConfirmed = async () => {
@@ -150,8 +149,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
       setSelectedPaymentMethod(null);
       setCurrentStep("schedule");
       setContractId(null);
-    } catch {
-    }
+    } catch {}
   };
 
   const isFormValid =
