@@ -12,7 +12,6 @@ export function useLocation(locationId: string | null) {
     queryFn: async (): Promise<Location | null> => {
       if (!locationId) return null;
 
-      // Get all locations and find the one with matching ID
       const response = await container.locationService.findAll();
       const locations = response.data || [];
       return locations.find((loc) => loc.id === locationId) || null;

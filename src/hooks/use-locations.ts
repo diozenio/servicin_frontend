@@ -1,8 +1,7 @@
 import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { container } from "@/container";
-import { Location } from "@/core/domain/models/location";
-import { LocationListResponse } from "@/core/domain/models/location";
+import { Location, LocationListResponse } from "@/core/domain/models/location";
 import { debounce } from "@/lib/debounce";
 
 interface UseLocationsOptions {

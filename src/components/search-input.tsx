@@ -69,9 +69,7 @@ export function SearchInput({
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 w-full">
-      {/* Search Bar Container */}
       <div className="flex border border-foreground rounded-lg overflow-hidden w-full">
-        {/* Location Field */}
         <div className="w-full sm:w-48 flex items-center justify-center px-3 h-12 border-r border-foreground">
           <MapPinIcon className="w-4 h-4 mr-2" />
           <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
@@ -127,7 +125,6 @@ export function SearchInput({
           </Popover>
         </div>
 
-        {/* Services Field */}
         <div className="w-full flex items-center justify-center px-3 h-12">
           <SearchIcon className="w-4 h-4 mr-2" />
           <Input
@@ -140,7 +137,6 @@ export function SearchInput({
         </div>
       </div>
 
-      {/* Search Button */}
       <Button
         onClick={handleSearch}
         className="rounded-lg px-8 whitespace-nowrap h-12 w-full sm:w-auto"

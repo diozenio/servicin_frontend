@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { container } from "@/container";
-import { Service } from "@/core/domain/models/service";
-import { ServiceListResponse } from "@/core/domain/models/service";
+import { Service, ServiceListResponse } from "@/core/domain/models/service";
 import { usePagination } from "./use-pagination";
 
 interface UseServicesOptions {
@@ -18,12 +17,10 @@ export function useServices(options: UseServicesOptions = {}) {
     limit: initialLimit,
   } = options;
 
-  // Pagination hook
   const { limit, offset, loadMore, reset } = usePagination({
     initialLimit: initialLimit || 12,
   });
 
-  // State to accumulate services
   const [accumulatedServices, setAccumulatedServices] = useState<Service[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
@@ -52,18 +49,14 @@ export function useServices(options: UseServicesOptions = {}) {
     placeholderData: (previousData) => previousData,
   });
 
-  const currentServices: Service[] = servicesResponse?.data || [];
-
-  // Handle data accumulation
   useEffect(() => {
+    const currentServices: Service[] = servicesResponse?.data || [];
+
     if (isFirstLoad) {
-      // First load or new search - replace all services
       setAccumulatedServices(currentServices);
       setIsFirstLoad(false);
     } else if (currentServices.length > 0) {
-      // Loading more - append new services
       setAccumulatedServices((prev) => {
-        // Avoid duplicates by checking if service already exists
         const existingIds = new Set(prev.map((s) => s.id));
         const newServices = currentServices.filter(
           (s) => !existingIds.has(s.id)
@@ -71,9 +64,13 @@ export function useServices(options: UseServicesOptions = {}) {
         return [...prev, ...newServices];
       });
     }
-  }, [currentServices, offset, isFirstLoad]);
+  }, [
+    servicesResponse?.data,
+    isFirstLoad,
+    setAccumulatedServices,
+    setIsFirstLoad,
+  ]);
 
-  // Reset accumulation when search parameters change
   useEffect(() => {
     setAccumulatedServices([]);
     setIsFirstLoad(true);

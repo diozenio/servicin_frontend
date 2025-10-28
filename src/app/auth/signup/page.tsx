@@ -1,5 +1,6 @@
 import { SignupForm } from "@/components/signup-form";
 import Logo from "@/components/logo";
+import Image from "next/image";
 
 export default function SignupPage() {
   return (
@@ -14,9 +15,10 @@ export default function SignupPage() {
         </div>
       </div>
       <div className="bg-muted/50 relative hidden lg:block">
-        <img
+        <Image
           src="/images/auth_background.svg"
-          alt="Image"
+          alt="Authentication background"
+          fill
           className="absolute inset-0 h-full w-full"
         />
       </div>

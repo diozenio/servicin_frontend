@@ -22,7 +22,6 @@ export class LocationMock extends LocationAdapter {
         });
       }
 
-      // Apply limit if provided
       if (params?.limit && params.limit > 0) {
         filteredLocations = filteredLocations.slice(0, params.limit);
       }

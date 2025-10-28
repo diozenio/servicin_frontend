@@ -97,6 +97,32 @@ const priceRanges = [
   "R$ 80 - 180 por m²",
 ];
 
+const durationRanges = [
+  "1-2 horas",
+  "2-4 horas",
+  "4-8 horas",
+  "1-2 dias",
+  "2-3 dias",
+  "3-5 dias",
+  "1 semana",
+  "1-2 semanas",
+  "2-4 semanas",
+  "Sob consulta",
+];
+
+const descriptions = [
+  "Serviço profissional com garantia de qualidade e pontualidade. Atendimento especializado para residências e empresas.",
+  "Especialista com anos de experiência no mercado, oferecendo soluções personalizadas e materiais de primeira qualidade.",
+  "Técnico certificado com equipamentos modernos e técnicas atualizadas. Atendimento 24h para emergências.",
+  "Profissional qualificado com foco em excelência e satisfação do cliente. Orçamento sem compromisso.",
+  "Serviço completo com mão de obra especializada e materiais inclusos. Garantia estendida disponível.",
+  "Atendimento personalizado com acompanhamento completo do projeto. Equipe técnica especializada.",
+  "Soluções inovadoras e sustentáveis para seu projeto. Profissional com certificações técnicas.",
+  "Atendimento diferenciado com foco na qualidade e prazo de entrega. Materiais de primeira linha.",
+  "Especialista em projetos complexos com equipe técnica qualificada. Garantia total do serviço.",
+  "Profissional experiente com portfólio diversificado. Atendimento personalizado e orçamento gratuito.",
+];
+
 const generateService = (id: string): Service => {
   const category = faker.helpers.arrayElement(serviceCategories);
   const companyName = faker.company.name();
@@ -125,6 +151,16 @@ const generateService = (id: string): Service => {
     reviews: faker.number.int({ min: 20, max: 500 }),
     logo: "",
     logoFallback: initials,
+    description: faker.helpers.arrayElement(descriptions),
+    duration: faker.helpers.arrayElement(durationRanges),
+    whatsappContact: faker.helpers.maybe(
+      () =>
+        `+55${faker.number.int({ min: 11, max: 99 })}${faker.number.int({
+          min: 100000000,
+          max: 999999999,
+        })}`,
+      { probability: 0.8 }
+    ),
   };
 };
 

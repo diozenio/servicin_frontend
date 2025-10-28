@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SearchIcon, FilterIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";
@@ -47,7 +47,6 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Search Header */}
       <div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <SearchInput
@@ -59,9 +58,7 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Results Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Results Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-serif font-semibold mb-2">
@@ -97,7 +94,6 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
             Array.from({ length: limit }, (_, index) => (
@@ -123,7 +119,6 @@ export default function SearchPage() {
           )}
         </div>
 
-        {/* Load More Button */}
         {services.length > 0 && hasMore && (
           <div className="flex justify-center mt-8">
             <Button

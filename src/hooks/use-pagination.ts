@@ -21,7 +21,7 @@ export function usePagination(options: UsePaginationOptions = {}) {
 
   const setPageSize = useCallback((newLimit: number) => {
     setLimit(newLimit);
-    setOffset(0); // Reset offset when changing page size
+    setOffset(0);
   }, []);
 
   return {
