@@ -1,7 +1,6 @@
 import { ScheduleAdapter } from "@/core/interfaces/adapters/ScheduleAdapter";
 import {
   ProviderSchedule,
-  BookingRequest,
   BookingResponse,
 } from "@/core/domain/models/schedule";
 import { LocalStorage, STORAGE_KEYS } from "@/lib/local-storage";

@@ -22,8 +22,16 @@ const eslintConfig = [
   },
   {
     rules: {
-      "no-unused-vars": "error",
-      "@typescript-eslint/no-unused-vars": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          args: "none",
+          ignoreRestSiblings: true,
+        },
+      ],
       "no-console": "warn",
       "no-debugger": "error",
       "no-alert": "error",

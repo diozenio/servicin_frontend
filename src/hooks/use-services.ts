@@ -51,10 +51,10 @@ export function useServices(options: UseServicesOptions = {}) {
     placeholderData: (previousData) => previousData,
   });
 
-  const currentServices: Service[] = servicesResponse?.data || [];
-
   // Handle data accumulation
   useEffect(() => {
+    const currentServices: Service[] = servicesResponse?.data || [];
+
     if (isFirstLoad) {
       // First load or new search - replace all services
       setAccumulatedServices(currentServices);
@@ -70,7 +70,12 @@ export function useServices(options: UseServicesOptions = {}) {
         return [...prev, ...newServices];
       });
     }
-  }, [currentServices, isFirstLoad, setAccumulatedServices, setIsFirstLoad]);
+  }, [
+    servicesResponse?.data,
+    isFirstLoad,
+    setAccumulatedServices,
+    setIsFirstLoad,
+  ]);
 
   // Reset accumulation when search parameters change
   useEffect(() => {
