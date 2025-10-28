@@ -1,8 +1,4 @@
-/**
- * Type-safe localStorage utility with error handling and fallback mechanisms
- */
 
-// Storage keys constants
 export const STORAGE_KEYS = {
   SERVICES: "servicin:services",
   LOCATIONS: "servicin:locations",
@@ -12,13 +8,7 @@ export const STORAGE_KEYS = {
   USERS: "servicin:users",
 } as const;
 
-/**
- * Generic localStorage operations with type safety
- */
 export class LocalStorage {
-  /**
-   * Get data from localStorage with type safety
-   */
   static get<T>(key: string, defaultValue: T): T {
     try {
       if (typeof window === "undefined") {
@@ -37,9 +27,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Set data to localStorage with error handling
-   */
   static set<T>(key: string, value: T): boolean {
     try {
       if (typeof window === "undefined") {
@@ -53,9 +40,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Remove data from localStorage
-   */
   static remove(key: string): boolean {
     try {
       if (typeof window === "undefined") {
@@ -69,9 +53,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Clear all localStorage data
-   */
   static clear(): boolean {
     try {
       if (typeof window === "undefined") {
@@ -85,9 +66,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Check if a key exists in localStorage
-   */
   static has(key: string): boolean {
     try {
       if (typeof window === "undefined") {
@@ -100,9 +78,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Get all keys that start with a prefix
-   */
   static getKeysWithPrefix(prefix: string): string[] {
     try {
       if (typeof window === "undefined") {
@@ -122,9 +97,6 @@ export class LocalStorage {
     }
   }
 
-  /**
-   * Generate user-specific storage key
-   */
   static getUserSpecificKey(userId: string, baseKey: string): string {
     const key = `${baseKey}:${userId}`;
     return key;

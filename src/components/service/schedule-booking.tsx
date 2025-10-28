@@ -43,7 +43,6 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   >("schedule");
   const [contractId, setContractId] = useState<string | null>(null);
 
-  // Auto-fill user information when user is available
   React.useEffect(() => {
     if (user && isAuthenticated) {
       setCustomerName(user.name);
@@ -132,10 +131,8 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         setContractId(result.contractId);
         setCurrentStep("confirmation");
       } else {
-        // Error creating contract - handled by mutation
       }
     } catch {
-      // Error creating contract - handled by mutation
     }
   };
 
@@ -144,7 +141,6 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
 
     try {
       await confirmPaymentMutation.mutateAsync(contractId);
-      // Payment confirmed successfully - reset form
       setSelectedDate(undefined);
       setSelectedTimeSlot(undefined);
       setCustomerName("");
@@ -155,7 +151,6 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
       setCurrentStep("schedule");
       setContractId(null);
     } catch {
-      // Error confirming payment - handled by mutation
     }
   };
 

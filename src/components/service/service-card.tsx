@@ -27,7 +27,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
   return (
     <div className="dark:bg-card bg-secondary/15 border border-border rounded-lg p-6">
-      {/* Service Title and Company */}
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-card-foreground mb-2">
           {service.title}
@@ -41,7 +40,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </div>
       </div>
 
-      {/* Service Type Tag */}
       <div className="mb-4">
         <Badge
           className="rounded-full px-3 py-1"
@@ -57,7 +55,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </Badge>
       </div>
 
-      {/* Requirements */}
       <div className="mb-4">
         <ul className="space-y-1">
           {service.requirements.map((req, index) => (
@@ -72,7 +69,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </ul>
       </div>
 
-      {/* Location and Price */}
       <div className="mb-4 space-y-2">
         {service.location && (
           <div className="flex items-center text-sm text-muted-foreground">
@@ -88,7 +84,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
         )}
       </div>
 
-      {/* Rating */}
       {service.rating && service.reviews && (
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center">
@@ -112,7 +107,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </div>
       )}
 
-      {/* Action Buttons */}
       <div className="flex gap-2">
         <Button className="flex-1" onClick={handleHireClick}>
           Contratar Serviço

@@ -116,11 +116,9 @@ export function useCancelContract() {
       return contractService.cancelContract(user.id, contractId, reason);
     },
     onSuccess: (_, { contractId }) => {
-      // Invalidate contract queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ["contract", contractId] });
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["userContracts"] });
-      // Also invalidate schedule queries to reflect the released time slot
       queryClient.invalidateQueries({ queryKey: ["schedule"] });
     },
   });

@@ -21,7 +21,6 @@ export function useCreateBooking() {
     mutationFn: (booking: BookingRequest) =>
       scheduleService.createBooking(booking),
     onSuccess: (data, variables) => {
-      // Invalidate and refetch schedule data
       queryClient.invalidateQueries({
         queryKey: ["schedule", variables.providerId, variables.serviceId],
       });

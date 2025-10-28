@@ -20,7 +20,6 @@ const generateTimeSlots = (date: string, isWorkingDay: boolean): TimeSlot[] => {
         .toString()
         .padStart(2, "0")}`;
 
-      // Randomly mark some slots as booked (20% chance)
       const isBooked = faker.datatype.boolean({ probability: 0.2 });
 
       slots.push({
@@ -35,7 +34,6 @@ const generateTimeSlots = (date: string, isWorkingDay: boolean): TimeSlot[] => {
   return slots;
 };
 
-// Generate schedule for the next 30 days
 const generateSchedule = (): DaySchedule[] => {
   const schedule: DaySchedule[] = [];
   const today = new Date();
@@ -47,7 +45,6 @@ const generateSchedule = (): DaySchedule[] => {
     const dateString = date.toISOString().split("T")[0];
     const dayOfWeek = date.getDay();
 
-    // Working days: Monday to Friday (1-5)
     const isWorkingDay = dayOfWeek >= 1 && dayOfWeek <= 5;
 
     schedule.push({
@@ -105,7 +102,6 @@ export const mockProviderSchedules: ProviderSchedule[] = [
   },
 ];
 
-// Add more mock schedules for other services
 for (let i = 4; i <= 60; i++) {
   const workingDays = faker.helpers.arrayElement([
     [1, 2, 3, 4, 5],

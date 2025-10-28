@@ -24,7 +24,6 @@ export default function ContractsPage() {
     null
   );
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
       const returnUrl = encodeURIComponent("/contracts");

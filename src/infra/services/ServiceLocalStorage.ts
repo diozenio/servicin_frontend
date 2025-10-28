@@ -12,7 +12,6 @@ export class ServiceLocalStorage extends ServiceAdapter {
   private getServices() {
     const services = LocalStorage.get(STORAGE_KEYS.SERVICES, mockServices);
 
-    // Initialize with mock data if storage is empty
     if (!LocalStorage.has(STORAGE_KEYS.SERVICES)) {
       LocalStorage.set(STORAGE_KEYS.SERVICES, mockServices);
       return mockServices;

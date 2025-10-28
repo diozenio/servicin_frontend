@@ -33,25 +33,20 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
       <div className="flex items-start justify-center h-[95vh] px-4 pt-28  bg-gradient-to-b from-background via-background to-primary/40 dark:to-card">
         <div className="max-w-5xl mx-auto text-center">
-          {/* Headline */}
           <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-8 leading-tight">
             Conecte-se com os melhores profissionais urbanos da sua região
           </h1>
 
-          {/* Sub-headline */}
           <p className="text-lg md:text-xl mb-12 leading-relaxed">
             Receba orçamentos gratuitos em poucos minutos.
           </p>
 
-          {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-8">
             <SearchInput onSearch={handleSearch} />
           </div>
 
-          {/* Popular Searches */}
           <div className="text-sm">
             <span className="mr-2">Populares:</span>
             <button
@@ -90,7 +85,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Services Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">

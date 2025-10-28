@@ -74,7 +74,6 @@ export function CardPayment({
 
     setIsProcessing(true);
 
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       setIsPaymentConfirmed(true);

@@ -31,7 +31,6 @@ export function useAuth() {
       router.push("/");
     },
     onError: () => {
-      // Login error handled by mutation
     },
   });
 
@@ -43,7 +42,6 @@ export function useAuth() {
       router.push("/");
     },
     onError: () => {
-      // Signup error handled by mutation
     },
   });
 
@@ -54,7 +52,6 @@ export function useAuth() {
       router.push("/");
     },
     onError: () => {
-      // Logout error handled by mutation
     },
   });
 

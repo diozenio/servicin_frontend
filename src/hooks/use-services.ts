@@ -17,12 +17,10 @@ export function useServices(options: UseServicesOptions = {}) {
     limit: initialLimit,
   } = options;
 
-  // Pagination hook
   const { limit, offset, loadMore, reset } = usePagination({
     initialLimit: initialLimit || 12,
   });
 
-  // State to accumulate services
   const [accumulatedServices, setAccumulatedServices] = useState<Service[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
@@ -51,18 +49,14 @@ export function useServices(options: UseServicesOptions = {}) {
     placeholderData: (previousData) => previousData,
   });
 
-  // Handle data accumulation
   useEffect(() => {
     const currentServices: Service[] = servicesResponse?.data || [];
 
     if (isFirstLoad) {
-      // First load or new search - replace all services
       setAccumulatedServices(currentServices);
       setIsFirstLoad(false);
     } else if (currentServices.length > 0) {
-      // Loading more - append new services
       setAccumulatedServices((prev) => {
-        // Avoid duplicates by checking if service already exists
         const existingIds = new Set(prev.map((s) => s.id));
         const newServices = currentServices.filter(
           (s) => !existingIds.has(s.id)
@@ -77,7 +71,6 @@ export function useServices(options: UseServicesOptions = {}) {
     setIsFirstLoad,
   ]);
 
-  // Reset accumulation when search parameters change
   useEffect(() => {
     setAccumulatedServices([]);
     setIsFirstLoad(true);

@@ -47,9 +47,8 @@
 :root {
   --radius: 0.625rem;
 
-  /* Light: canvas claro; pêssego é PRIMARY */
-  --background: #fffcf8; /* off-white quente */
-  --foreground: #1a1a1a; /* preto profundo */
+  --background: #fffcf8;
+  --foreground: #1a1a1a;
 
   --card: #ffffff;
   --card-foreground: #1a1a1a;
@@ -57,16 +56,16 @@
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
 
-  --primary: #eec1ad; /* pêssego elegante */
+  --primary: #eec1ad;
   --primary-foreground: #1a1a1a;
 
-  --secondary: #f3eee9; /* cinza/bege suave */
+  --secondary: #f3eee9;
   --secondary-foreground: #1a1a1a;
 
   --muted: #f7f1ec;
   --muted-foreground: #5e5e5e;
 
-  --accent: #efc3ae; /* realce sutil */
+  --accent: #efc3ae;
   --accent-foreground: #1a1a1a;
 
   --destructive: #c4453d;
@@ -75,14 +74,12 @@
   --input: #e9e2da;
   --ring: #cda696;
 
-  /* Gráficos */
-  --chart-1: #d8876b; /* terracota */
-  --chart-2: #4b9ca6; /* teal suave */
-  --chart-3: #596a7b; /* slate */
-  --chart-4: #a1a87a; /* olive claro */
-  --chart-5: #d7a45a; /* dourado suave */
+  --chart-1: #d8876b;
+  --chart-2: #4b9ca6;
+  --chart-3: #596a7b;
+  --chart-4: #a1a87a;
+  --chart-5: #d7a45a;
 
-  /* Sidebar */
   --sidebar: #faf5f1;
   --sidebar-foreground: #1a1a1a;
   --sidebar-primary: #eec1ad;
@@ -94,7 +91,6 @@
 }
 
 .dark {
-  /* Dark: fundo carvão; pêssego como acento/primary */
   --background: #1a1a1a;
   --foreground: #f7f2ee;
 

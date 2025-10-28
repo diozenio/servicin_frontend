@@ -1,13 +1,3 @@
-/**
- * Generic search utility for arrays of objects or strings.
- * Handles accents, case sensitivity, and partial/exact matches.
- *
- * @template T - The type of array elements
- * @param items - The array to search in
- * @param query - The search term
- * @param options - Optional search options
- * @returns Filtered array matching the query
- */
 export function search<T>(
   items: T[],
   query: string,

@@ -31,7 +31,6 @@ export function SignupForm({
     try {
       await signup(formData);
     } catch {
-      // Signup failed - error is handled by useAuth hook
     }
   };
 

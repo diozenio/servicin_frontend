@@ -30,14 +30,12 @@ export function LoginForm({ className, returnUrl, ...props }: LoginFormProps) {
     e.preventDefault();
     try {
       await login(formData);
-      // Redirect to returnUrl if provided, otherwise redirect to home
       if (returnUrl) {
         router.push(decodeURIComponent(returnUrl));
       } else {
         router.push("/");
       }
     } catch {
-      // Login failed - error is handled by useAuth hook
     }
   };
 

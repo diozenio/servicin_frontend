@@ -13,7 +13,6 @@ export class ScheduleLocalStorage implements ScheduleAdapter {
       mockProviderSchedules
     );
 
-    // Initialize with mock data if storage is empty
     if (!LocalStorage.has(STORAGE_KEYS.SCHEDULES)) {
       LocalStorage.set(STORAGE_KEYS.SCHEDULES, mockProviderSchedules);
       return mockProviderSchedules;
@@ -128,7 +127,6 @@ export class ScheduleLocalStorage implements ScheduleAdapter {
         slot.isBooked = false;
         slot.isAvailable = true;
 
-        // Save updated schedules to localStorage
         this.saveSchedules(schedules);
         return true;
       }

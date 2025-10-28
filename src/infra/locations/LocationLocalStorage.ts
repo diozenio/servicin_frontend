@@ -11,7 +11,6 @@ export class LocationLocalStorage extends LocationAdapter {
   private getLocations() {
     const locations = LocalStorage.get(STORAGE_KEYS.LOCATIONS, mockLocations);
 
-    // Initialize with mock data if storage is empty
     if (!LocalStorage.has(STORAGE_KEYS.LOCATIONS)) {
       LocalStorage.set(STORAGE_KEYS.LOCATIONS, mockLocations);
       return mockLocations;
@@ -35,7 +34,6 @@ export class LocationLocalStorage extends LocationAdapter {
         });
       }
 
-      // Apply limit if provided
       if (params?.limit && params.limit > 0) {
         filteredLocations = filteredLocations.slice(0, params.limit);
       }

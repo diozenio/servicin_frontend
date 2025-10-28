@@ -24,23 +24,19 @@ export function Calendar({
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  // Get first day of the month and number of days
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
   const startingDayOfWeek = firstDay.getDay();
 
-  // Generate array of days for the month
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Generate array of days from previous month to fill the grid
   const prevMonth = new Date(year, month - 1, 0);
   const prevMonthDays = Array.from(
     { length: startingDayOfWeek },
     (_, i) => prevMonth.getDate() - startingDayOfWeek + i + 1
   );
 
-  // Generate array of days from next month to fill the grid
   const nextMonthDays = Array.from(
     { length: 42 - (startingDayOfWeek + daysInMonth) },
     (_, i) => i + 1
@@ -110,7 +106,6 @@ export function Calendar({
 
   return (
     <div className={cn("w-full max-w-sm mx-auto", className)}>
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
@@ -135,7 +130,6 @@ export function Calendar({
         </Button>
       </div>
 
-      {/* Day names */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((day) => (
           <div
@@ -147,9 +141,7 @@ export function Calendar({
         ))}
       </div>
 
-      {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
-        {/* Previous month days */}
         {prevMonthDays.map((day) => (
           <div
             key={`prev-${day}`}
@@ -159,7 +151,6 @@ export function Calendar({
           </div>
         ))}
 
-        {/* Current month days */}
         {days.map((day) => {
           const date = new Date(year, month, day);
           const available = isDateAvailable(date);
@@ -192,7 +183,6 @@ export function Calendar({
           );
         })}
 
-        {/* Next month days */}
         {nextMonthDays.map((day) => (
           <div
             key={`next-${day}`}

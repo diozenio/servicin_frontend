@@ -30,10 +30,8 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 relative">
-          {/* Logo */}
           <Logo />
 
-          {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2">
             <Button variant="link" asChild className="text-sm">
               <Link href="/search">Serviços</Link>
@@ -49,7 +47,6 @@ export default function Navbar() {
             </Button>
           </nav>
 
-          {/* Right side */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             {isLoading ? (

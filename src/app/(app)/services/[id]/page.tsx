@@ -18,8 +18,6 @@ export default function Page({ params }: PageProps) {
   const { service, isLoading, error } = useService(id);
 
   const handleContact = () => {
-    // TODO: Implement contact logic for services without WhatsApp
-    // Contacting service: service?.id
   };
 
   if (isLoading) {
@@ -69,7 +67,6 @@ export default function Page({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -81,7 +78,6 @@ export default function Page({ params }: PageProps) {
           </Button>
         </div>
 
-        {/* Service Details */}
         <ServiceDetails service={service} onContact={handleContact} />
       </div>
     </div>

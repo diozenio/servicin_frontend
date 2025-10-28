@@ -104,9 +104,7 @@ export function UserContracts({
 
         setCancelingContract(null);
       }
-    } catch {
-      // Error canceling contract - handled by mutation
-    }
+    } catch {}
   };
 
   const canCancel = (contract: Contract) =>
@@ -245,7 +243,6 @@ export function UserContracts({
           onClose={() => setCancelingContract(null)}
           onConfirm={handleCancelConfirm}
           isLoading={cancelContractMutation.isPending}
-          serviceName={cancelingContract.serviceName}
         />
       )}
     </div>

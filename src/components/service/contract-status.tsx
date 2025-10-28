@@ -136,7 +136,6 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
         setShowCancelDialog(false);
       }
     } catch {
-      // Error canceling contract - handled by mutation
     }
   };
 
