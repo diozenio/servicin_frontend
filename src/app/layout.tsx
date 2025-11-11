@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Work_Sans, Fira_Code } from "next/font/google";
 import "@/app/globals.css";
-
 import { QueryProvider } from "@/components/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -51,3 +50,4 @@ export default function RootLayout({
     </html>
   );
 }
+
