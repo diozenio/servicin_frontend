@@ -10,7 +10,7 @@ export interface ContractUseCase {
     contract: ContractRequest
   ): Promise<ContractResponse>;
   getContract(userId: string, contractId: string): Promise<Contract | null>;
-  getUserContracts(userId: string): Promise<Contract[]>;
+  getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]>;
   confirmPayment(userId: string, contractId: string): Promise<boolean>;
   updateServiceStatus(
     userId: string,
@@ -22,4 +22,6 @@ export interface ContractUseCase {
     contractId: string,
     reason: string
   ): Promise<boolean>;
+  approveContract(userId: string, contractId: string): Promise<boolean>;
+  rejectContract(userId: string, contractId: string): Promise<boolean>;
 }

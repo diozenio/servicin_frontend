@@ -23,8 +23,8 @@ export class ContractService implements ContractUseCase {
     return await this.contractAdapter.getContract(userId, contractId);
   }
 
-  async getUserContracts(userId: string): Promise<Contract[]> {
-    return await this.contractAdapter.getUserContracts(userId);
+  async getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]> {
+    return await this.contractAdapter.getUserContracts(userId, userRole);
   }
 
   async confirmPayment(userId: string, contractId: string): Promise<boolean> {
@@ -56,6 +56,22 @@ export class ContractService implements ContractUseCase {
       userId,
       contractId,
       reason
+    );
+  }
+
+  async approveContract(userId: string, contractId: string): Promise<boolean> {
+    return await this.contractAdapter.updateApprovalStatus(
+      userId,
+      contractId,
+      "approved"
+    );
+  }
+
+  async rejectContract(userId: string, contractId: string): Promise<boolean> {
+    return await this.contractAdapter.updateApprovalStatus(
+      userId,
+      contractId,
+      "rejected"
     );
   }
 }
