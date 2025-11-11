@@ -24,15 +24,8 @@ export class AuthLocalStorage implements AuthAdapter {
   }
 
   private generateAvatarUrl(name: string): string {
-    const initials = name
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase())
-      .join("")
-      .substring(0, 2);
-
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      initials
-    )}&background=random&color=fff&size=128`;
+    const seed = encodeURIComponent(name.trim() || "user");
+    return `https://api.dicebear.com/7.x/notionists/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9&radius=50`;
   }
 
   private getUsers(): Map<string, UserWithPassword> {
