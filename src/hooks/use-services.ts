@@ -7,6 +7,7 @@ import { usePagination } from "./use-pagination";
 interface UseServicesOptions {
   searchTerm?: string;
   selectedLocation?: string;
+  providerId?: string;
   limit?: number;
 }
 
@@ -14,6 +15,7 @@ export function useServices(options: UseServicesOptions = {}) {
   const {
     searchTerm = "",
     selectedLocation = "",
+    providerId,
     limit: initialLimit,
   } = options;
 
@@ -36,6 +38,7 @@ export function useServices(options: UseServicesOptions = {}) {
       "search",
       searchTerm,
       selectedLocation,
+      providerId,
       limit,
       offset,
     ],
@@ -43,39 +46,36 @@ export function useServices(options: UseServicesOptions = {}) {
       container.serviceService.findAll({
         search: searchTerm || undefined,
         location: selectedLocation || undefined,
+        providerId: providerId || undefined,
         limit,
         offset,
       }),
-    placeholderData: (previousData) => previousData,
   });
-
-  useEffect(() => {
-    const currentServices: Service[] = servicesResponse?.data || [];
-
-    if (isFirstLoad) {
-      setAccumulatedServices(currentServices);
-      setIsFirstLoad(false);
-    } else if (currentServices.length > 0) {
-      setAccumulatedServices((prev) => {
-        const existingIds = new Set(prev.map((s) => s.id));
-        const newServices = currentServices.filter(
-          (s) => !existingIds.has(s.id)
-        );
-        return [...prev, ...newServices];
-      });
-    }
-  }, [
-    servicesResponse?.data,
-    isFirstLoad,
-    setAccumulatedServices,
-    setIsFirstLoad,
-  ]);
 
   useEffect(() => {
     setAccumulatedServices([]);
     setIsFirstLoad(true);
     reset();
-  }, [searchTerm, selectedLocation, reset]);
+  }, [searchTerm, selectedLocation, providerId, reset]);
+
+  useEffect(() => {
+    if (isFirstLoad && servicesResponse?.data !== undefined) {
+      const currentServices: Service[] = servicesResponse.data || [];
+      setAccumulatedServices(currentServices);
+      setIsFirstLoad(false);
+    } else if (!isFirstLoad && servicesResponse?.data) {
+      const currentServices: Service[] = servicesResponse.data;
+      if (currentServices.length > 0) {
+        setAccumulatedServices((prev) => {
+          const existingIds = new Set(prev.map((s) => s.id));
+          const newServices = currentServices.filter(
+            (s) => !existingIds.has(s.id)
+          );
+          return [...prev, ...newServices];
+        });
+      }
+    }
+  }, [servicesResponse?.data, isFirstLoad]);
 
   const services = accumulatedServices;
   const total = servicesResponse?.total || 0;

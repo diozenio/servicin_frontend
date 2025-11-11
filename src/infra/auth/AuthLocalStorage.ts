@@ -8,6 +8,7 @@ import {
   AuthSession,
 } from "@/core/domain/models/user";
 import { LocalStorage, STORAGE_KEYS } from "@/lib/local-storage";
+import { mockUsers } from "./mock-data";
 
 export class AuthLocalStorage implements AuthAdapter {
   private generateUserId(): string {
@@ -29,8 +30,22 @@ export class AuthLocalStorage implements AuthAdapter {
   }
 
   private getUsers(): Map<string, UserWithPassword> {
-    const usersData = LocalStorage.get(STORAGE_KEYS.USERS, {});
-    return new Map(Object.entries(usersData));
+    const usersData = LocalStorage.get<Record<string, UserWithPassword>>(
+      STORAGE_KEYS.USERS,
+      {}
+    );
+    const usersMap = new Map<string, UserWithPassword>(
+      Object.entries(usersData) as [string, UserWithPassword][]
+    );
+
+    if (usersMap.size === 0) {
+      Object.entries(mockUsers).forEach(([email, user]) => {
+        usersMap.set(email, user);
+      });
+      this.saveUsers(usersMap);
+    }
+
+    return usersMap;
   }
 
   private saveUsers(users: Map<string, UserWithPassword>): void {
@@ -68,6 +83,7 @@ export class AuthLocalStorage implements AuthAdapter {
       email: userWithPassword.email,
       phone: userWithPassword.phone,
       avatarUrl: userWithPassword.avatarUrl,
+      role: userWithPassword.role,
       createdAt: userWithPassword.createdAt,
     };
 
@@ -105,6 +121,7 @@ export class AuthLocalStorage implements AuthAdapter {
       email: userData.email,
       phone: userData.phone,
       avatarUrl: this.generateAvatarUrl(userData.name),
+      role: "customer",
       createdAt: new Date().toISOString(),
     };
 

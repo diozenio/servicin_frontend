@@ -1,6 +1,7 @@
 import { Service } from "@/core/domain/models/service";
 import { mockLocations } from "../locations/mock-data";
 import { faker } from "@faker-js/faker";
+import { mockProvider } from "../auth/mock-data";
 
 const serviceTypes = ["Urgente", "Padrão", "Orçamento"];
 const serviceCategories = [
@@ -125,7 +126,7 @@ const descriptions = [
 
 const generateService = (id: string): Service => {
   const category = faker.helpers.arrayElement(serviceCategories);
-  const companyName = faker.company.name();
+  const companyName = mockProvider.name;
   const initials = companyName
     .split(" ")
     .map((word) => word[0])
@@ -161,6 +162,7 @@ const generateService = (id: string): Service => {
         })}`,
       { probability: 0.8 }
     ),
+    providerId: mockProvider.id,
   };
 };
 

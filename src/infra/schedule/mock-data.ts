@@ -4,6 +4,7 @@ import {
   DaySchedule,
 } from "@/core/domain/models/schedule";
 import { faker } from "@faker-js/faker";
+import { mockProvider } from "../auth/mock-data";
 
 const generateTimeSlots = (date: string, isWorkingDay: boolean): TimeSlot[] => {
   if (!isWorkingDay) {
@@ -59,7 +60,7 @@ const generateSchedule = (): DaySchedule[] => {
 
 export const mockProviderSchedules: ProviderSchedule[] = [
   {
-    providerId: "1",
+    providerId: mockProvider.id,
     serviceId: "1",
     workingHours: {
       start: "08:00",
@@ -73,7 +74,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
     schedule: generateSchedule(),
   },
   {
-    providerId: "2",
+    providerId: mockProvider.id,
     serviceId: "2",
     workingHours: {
       start: "09:00",
@@ -87,7 +88,7 @@ export const mockProviderSchedules: ProviderSchedule[] = [
     schedule: generateSchedule(),
   },
   {
-    providerId: "3",
+    providerId: mockProvider.id,
     serviceId: "3",
     workingHours: {
       start: "07:00",
@@ -113,7 +114,7 @@ for (let i = 4; i <= 60; i++) {
   const endHour = faker.number.int({ min: 17, max: 20 });
 
   mockProviderSchedules.push({
-    providerId: i.toString(),
+    providerId: mockProvider.id,
     serviceId: i.toString(),
     workingHours: {
       start: `${startHour.toString().padStart(2, "0")}:00`,

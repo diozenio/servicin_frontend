@@ -29,6 +29,12 @@ export class ServiceMock extends ServiceAdapter {
         );
       }
 
+      if (params?.providerId) {
+        filteredServices = filteredServices.filter(
+          (service) => service.providerId === params.providerId
+        );
+      }
+
       const total = filteredServices.length;
 
       const offset = params?.offset || 0;

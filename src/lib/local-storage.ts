@@ -96,6 +96,25 @@ export class LocalStorage {
     }
   }
 
+  static getKeysContaining(pattern: string): string[] {
+    try {
+      if (typeof window === "undefined") {
+        return [];
+      }
+
+      const keys: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key && key.includes(pattern)) {
+          keys.push(key);
+        }
+      }
+      return keys;
+    } catch {
+      return [];
+    }
+  }
+
   static getUserSpecificKey(userId: string, baseKey: string): string {
     const key = `${baseKey}:${userId}`;
     return key;
