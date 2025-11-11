@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { TimeSlotPicker } from "@/components/ui/time-slot-picker";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ interface ScheduleBookingProps {
 }
 
 export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
+  const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<
@@ -53,7 +55,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     }
   }, [user, isAuthenticated]);
 
-  const providerId = service.id;
+  const providerId = service.providerId;
   const serviceId = service.id;
 
   const { data: schedule, isLoading: isLoadingSchedule } = useSchedule(
@@ -140,15 +142,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
 
     try {
       await confirmPaymentMutation.mutateAsync(contractId);
-      setSelectedDate(undefined);
-      setSelectedTimeSlot(undefined);
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerEmail("");
-      setNotes("");
-      setSelectedPaymentMethod(null);
-      setCurrentStep("schedule");
-      setContractId(null);
+      router.push("/contracts");
     } catch {}
   };
 

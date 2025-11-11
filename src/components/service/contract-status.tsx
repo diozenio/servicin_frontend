@@ -15,6 +15,8 @@ import {
   QrCodeIcon,
   AlertCircleIcon,
   XIcon,
+  ThumbsUpIcon,
+  ThumbsDownIcon,
 } from "lucide-react";
 import { CancelServiceDialog } from "./cancel-service-dialog";
 import { useCancelContract } from "@/hooks/use-contract";
@@ -103,6 +105,27 @@ const paymentMethodConfig = {
   },
 };
 
+const approvalStatusConfig = {
+  pending: {
+    label: "Aguardando Aprovação",
+    color:
+      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800",
+    icon: ClockIcon,
+  },
+  approved: {
+    label: "Aprovado",
+    color:
+      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+    icon: ThumbsUpIcon,
+  },
+  rejected: {
+    label: "Recusado",
+    color:
+      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
+    icon: ThumbsDownIcon,
+  },
+};
+
 export function ContractStatus({ contract, className }: ContractStatusProps) {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const cancelContractMutation = useCancelContract();
@@ -110,10 +133,12 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
 
   const serviceStatus = serviceStatusConfig[contract.serviceStatus];
   const paymentStatus = paymentStatusConfig[contract.paymentStatus];
+  const approvalStatus = approvalStatusConfig[contract.approvalStatus];
   const paymentMethod = paymentMethodConfig[contract.paymentMethod];
 
   const ServiceIcon = serviceStatus.icon;
   const PaymentIcon = paymentStatus.icon;
+  const ApprovalIcon = approvalStatus.icon;
   const MethodIcon = paymentMethod.icon;
 
   const canCancel = contract.serviceStatus === "not_started";
@@ -148,7 +173,7 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
           <div className="flex items-center gap-2">
             <ServiceIcon className="w-5 h-5 text-muted-foreground" />
@@ -166,6 +191,16 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
           </div>
           <Badge className={cn("w-fit", paymentStatus.color)}>
             {paymentStatus.label}
+          </Badge>
+        </div>
+
+        <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <ApprovalIcon className="w-5 h-5 text-muted-foreground" />
+            <h4 className="font-medium">Status de Aprovação</h4>
+          </div>
+          <Badge className={cn("w-fit", approvalStatus.color)}>
+            {approvalStatus.label}
           </Badge>
         </div>
       </div>
@@ -258,6 +293,25 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
               <span className="text-muted-foreground">
                 Pagamento confirmado em{" "}
                 {new Date(contract.updatedAt).toLocaleString("pt-BR")}
+              </span>
+            </div>
+          )}
+
+          {contract.approvalStatus === "approved" && (
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-muted-foreground">
+                Contrato aprovado pelo provedor
+              </span>
+            </div>
+          )}
+
+          {contract.approvalStatus === "rejected" && (
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-muted-foreground">
+                Contrato recusado pelo provedor
+                {contract.paymentStatus === "refunded" && " (reembolso realizado)"}
               </span>
             </div>
           )}

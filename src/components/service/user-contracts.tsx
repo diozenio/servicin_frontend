@@ -12,9 +12,18 @@ import {
   DollarSignIcon,
   XIcon,
   EyeIcon,
+  ThumbsUpIcon,
+  ThumbsDownIcon,
 } from "lucide-react";
 import { CancelServiceDialog } from "./cancel-service-dialog";
-import { useCancelContract } from "@/hooks/use-contract";
+import { ApproveContractDialog } from "./approve-contract-dialog";
+import {
+  useCancelContract,
+  useApproveContract,
+  useRejectContract,
+  useUpdateServiceStatus,
+} from "@/hooks/use-contract";
+import { useAuth } from "@/hooks/use-auth";
 import { ScheduleService } from "@/core/services/ScheduleService";
 import { ScheduleMock } from "@/infra/schedule/ScheduleMock";
 
@@ -70,16 +79,43 @@ const paymentStatusConfig = {
   },
 };
 
+const approvalStatusConfig = {
+  pending: {
+    label: "Aguardando Aprovação",
+    color:
+      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800",
+  },
+  approved: {
+    label: "Aprovado",
+    color:
+      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800",
+  },
+  rejected: {
+    label: "Recusado",
+    color:
+      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800",
+  },
+};
+
 export function UserContracts({
   contracts,
   onViewContract,
   className,
 }: UserContractsProps) {
+  const { user } = useAuth();
   const [cancelingContract, setCancelingContract] = useState<Contract | null>(
     null
   );
+  const [approvingContract, setApprovingContract] = useState<Contract | null>(
+    null
+  );
   const cancelContractMutation = useCancelContract();
+  const approveContractMutation = useApproveContract();
+  const rejectContractMutation = useRejectContract();
+  const updateServiceStatusMutation = useUpdateServiceStatus();
   const scheduleService = new ScheduleService(new ScheduleMock());
+
+  const isProvider = user?.role === "provider";
 
   const handleCancelContract = (contract: Contract) => {
     setCancelingContract(contract);
@@ -110,6 +146,46 @@ export function UserContracts({
   const canCancel = (contract: Contract) =>
     contract.serviceStatus === "not_started";
 
+  const canApproveOrReject = (contract: Contract) =>
+    isProvider &&
+    contract.paymentStatus === "paid" &&
+    contract.approvalStatus === "pending";
+
+  const handleApproveContract = (contract: Contract) => {
+    setApprovingContract(contract);
+  };
+
+  const handleApproveConfirm = async () => {
+    if (!approvingContract) return;
+
+    try {
+      await approveContractMutation.mutateAsync(approvingContract.id);
+      setApprovingContract(null);
+    } catch {}
+  };
+
+  const handleRejectConfirm = async () => {
+    if (!approvingContract) return;
+
+    try {
+      await rejectContractMutation.mutateAsync(approvingContract.id);
+
+      await updateServiceStatusMutation.mutateAsync({
+        contractId: approvingContract.id,
+        status: "cancelled",
+      });
+
+      await scheduleService.releaseTimeSlot(
+        approvingContract.providerId,
+        approvingContract.serviceId,
+        approvingContract.date,
+        approvingContract.timeSlot
+      );
+
+      setApprovingContract(null);
+    } catch {}
+  };
+
   if (contracts.length === 0) {
     return (
       <div className={cn("text-center py-12", className)}>
@@ -137,7 +213,9 @@ export function UserContracts({
         {contracts.map((contract) => {
           const serviceStatus = serviceStatusConfig[contract.serviceStatus];
           const paymentStatus = paymentStatusConfig[contract.paymentStatus];
+          const approvalStatus = approvalStatusConfig[contract.approvalStatus];
           const canCancelContract = canCancel(contract);
+          const canApproveReject = canApproveOrReject(contract);
 
           return (
             <div
@@ -154,12 +232,15 @@ export function UserContracts({
                     {contract.timeSlot}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge className={cn("text-xs", serviceStatus.color)}>
                     {serviceStatus.label}
                   </Badge>
                   <Badge className={cn("text-xs", paymentStatus.color)}>
                     {paymentStatus.label}
+                  </Badge>
+                  <Badge className={cn("text-xs", approvalStatus.color)}>
+                    {approvalStatus.label}
                   </Badge>
                 </div>
               </div>
@@ -220,7 +301,20 @@ export function UserContracts({
                     Ver Detalhes
                   </Button>
                 )}
-                {canCancelContract && (
+                {canApproveReject && (
+                  <>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleApproveContract(contract)}
+                      className="flex-1"
+                    >
+                      <ThumbsUpIcon className="w-4 h-4 mr-2" />
+                      Aprovar/Recusar
+                    </Button>
+                  </>
+                )}
+                {canCancelContract && !canApproveReject && (
                   <Button
                     variant="destructive"
                     size="sm"
@@ -243,6 +337,19 @@ export function UserContracts({
           onClose={() => setCancelingContract(null)}
           onConfirm={handleCancelConfirm}
           isLoading={cancelContractMutation.isPending}
+        />
+      )}
+
+      {approvingContract && (
+        <ApproveContractDialog
+          isOpen={!!approvingContract}
+          onClose={() => setApprovingContract(null)}
+          onApprove={handleApproveConfirm}
+          onReject={handleRejectConfirm}
+          isLoading={
+            approveContractMutation.isPending ||
+            rejectContractMutation.isPending
+          }
         />
       )}
     </div>
