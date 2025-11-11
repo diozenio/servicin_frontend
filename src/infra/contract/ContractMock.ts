@@ -28,6 +28,7 @@ export class ContractMock implements ContractAdapter {
         paymentMethod: contract.paymentMethod,
         paymentStatus: "pending",
         serviceStatus: "not_started",
+        approvalStatus: "pending",
         totalAmount: 150.0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -61,7 +62,10 @@ export class ContractMock implements ContractAdapter {
     );
   }
 
-  async getUserContracts(userId: string): Promise<Contract[]> {
+  async getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]> {
+    if (userRole === "provider") {
+      return this.contracts.filter((contract) => contract.providerId === userId);
+    }
     return this.contracts.filter((contract) => contract.customerId === userId);
   }
 
@@ -79,6 +83,11 @@ export class ContractMock implements ContractAdapter {
         | "paid"
         | "failed"
         | "refunded";
+      
+      if (status === "paid" && contract.approvalStatus !== "pending") {
+        contract.approvalStatus = "pending";
+      }
+      
       contract.updatedAt = new Date().toISOString();
       return true;
     }
@@ -130,5 +139,30 @@ export class ContractMock implements ContractAdapter {
       return true;
     }
     return false;
+  }
+
+  async updateApprovalStatus(
+    userId: string,
+    contractId: string,
+    status: string
+  ): Promise<boolean> {
+    const contract = this.contracts.find((c) => c.id === contractId);
+
+    if (!contract) {
+      return false;
+    }
+
+    if (contract.providerId !== userId) {
+      return false;
+    }
+
+    contract.approvalStatus = status as "pending" | "approved" | "rejected";
+    contract.updatedAt = new Date().toISOString();
+
+    if (status === "rejected" && contract.paymentStatus === "paid") {
+      contract.paymentStatus = "refunded";
+    }
+
+    return true;
   }
 }

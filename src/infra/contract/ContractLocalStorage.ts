@@ -62,6 +62,7 @@ export class ContractLocalStorage implements ContractAdapter {
         paymentMethod: contract.paymentMethod,
         paymentStatus: "pending",
         serviceStatus: "not_started",
+        approvalStatus: "pending",
         totalAmount: 150.0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -92,9 +93,29 @@ export class ContractLocalStorage implements ContractAdapter {
     return contracts.find((contract) => contract.id === contractId) || null;
   }
 
-  async getUserContracts(userId: string): Promise<Contract[]> {
-    const contracts = this.getContracts(userId);
-    return contracts;
+  private getAllContracts(): Contract[] {
+    const contractKeys = LocalStorage.getKeysContaining(STORAGE_KEYS.CONTRACTS);
+    const allContracts: Contract[] = [];
+
+    contractKeys.forEach((key) => {
+      const contracts = LocalStorage.get<Contract[]>(key, []);
+      allContracts.push(...contracts);
+    });
+
+    return allContracts;
+  }
+
+  async getUserContracts(
+    userId: string,
+    userRole?: "provider" | "customer"
+  ): Promise<Contract[]> {
+    const allContracts = this.getAllContracts();
+
+    if (userRole === "provider") {
+      return allContracts.filter((contract) => contract.providerId === userId);
+    }
+
+    return allContracts.filter((contract) => contract.customerId === userId);
   }
 
   async updatePaymentStatus(
@@ -102,8 +123,8 @@ export class ContractLocalStorage implements ContractAdapter {
     contractId: string,
     status: string
   ): Promise<boolean> {
-    const contracts = this.getContracts(userId);
-    const contract = contracts.find((c) => c.id === contractId);
+    const allContracts = this.getAllContracts();
+    const contract = allContracts.find((c) => c.id === contractId);
 
     if (contract) {
       contract.paymentStatus = status as
@@ -111,8 +132,25 @@ export class ContractLocalStorage implements ContractAdapter {
         | "paid"
         | "failed"
         | "refunded";
+
+      if (status === "paid" && contract.approvalStatus !== "pending") {
+        contract.approvalStatus = "pending";
+      }
+
       contract.updatedAt = new Date().toISOString();
-      this.saveContracts(userId, contracts);
+
+      const customerContracts = this.getContracts(contract.customerId);
+      const customerIndex = customerContracts.findIndex(
+        (c) => c.id === contractId
+      );
+      if (customerIndex !== -1) {
+        customerContracts[customerIndex] = contract;
+        this.saveContracts(contract.customerId, customerContracts);
+      } else {
+        customerContracts.push(contract);
+        this.saveContracts(contract.customerId, customerContracts);
+      }
+
       return true;
     }
 
@@ -146,8 +184,8 @@ export class ContractLocalStorage implements ContractAdapter {
     contractId: string,
     reason: string
   ): Promise<boolean> {
-    const contracts = this.getContracts(userId);
-    const contract = contracts.find((c) => c.id === contractId);
+    const allContracts = this.getAllContracts();
+    const contract = allContracts.find((c) => c.id === contractId);
 
     if (contract) {
       if (contract.serviceStatus !== "not_started") {
@@ -163,10 +201,56 @@ export class ContractLocalStorage implements ContractAdapter {
         contract.paymentStatus = "refunded";
       }
 
-      this.saveContracts(userId, contracts);
+      const customerContracts = this.getContracts(contract.customerId);
+      const customerIndex = customerContracts.findIndex(
+        (c) => c.id === contractId
+      );
+      if (customerIndex !== -1) {
+        customerContracts[customerIndex] = contract;
+        this.saveContracts(contract.customerId, customerContracts);
+      }
+
       return true;
     }
 
     return false;
+  }
+
+  async updateApprovalStatus(
+    userId: string,
+    contractId: string,
+    status: string
+  ): Promise<boolean> {
+    const allContracts = this.getAllContracts();
+    const contract = allContracts.find((c) => c.id === contractId);
+
+    if (!contract) {
+      return false;
+    }
+
+    if (contract.providerId !== userId) {
+      return false;
+    }
+
+    contract.approvalStatus = status as "pending" | "approved" | "rejected";
+    contract.updatedAt = new Date().toISOString();
+
+    if (status === "rejected" && contract.paymentStatus === "paid") {
+      contract.paymentStatus = "refunded";
+    }
+
+    const customerContracts = this.getContracts(contract.customerId);
+    const customerIndex = customerContracts.findIndex(
+      (c) => c.id === contractId
+    );
+    if (customerIndex !== -1) {
+      customerContracts[customerIndex] = contract;
+      this.saveContracts(contract.customerId, customerContracts);
+    } else {
+      customerContracts.push(contract);
+      this.saveContracts(contract.customerId, customerContracts);
+    }
+
+    return true;
   }
 }
