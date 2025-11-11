@@ -16,11 +16,13 @@ export type Service = {
   description?: string;
   duration?: string;
   whatsappContact?: string;
+  providerId: string;
 };
 
 export type ServiceQueryParams = {
   search?: string;
   location?: string;
+  providerId?: string;
   limit?: number;
   offset?: number;
 };

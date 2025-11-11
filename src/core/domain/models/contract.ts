@@ -8,6 +8,8 @@ export type ServiceStatus =
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
 export type Contract = {
   id: string;
   serviceId: string;
@@ -22,6 +24,7 @@ export type Contract = {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   serviceStatus: ServiceStatus;
+  approvalStatus: ApprovalStatus;
   totalAmount: number;
   cancellationReason?: string;
   cancelledAt?: string;
