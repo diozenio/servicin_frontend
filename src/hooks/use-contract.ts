@@ -44,12 +44,12 @@ export function useUserContracts() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["userContracts"],
+    queryKey: ["userContracts", user?.id, user?.role],
     queryFn: async () => {
       if (!user) {
         throw new Error("User must be authenticated to view contracts");
       }
-      const contracts = await contractService.getUserContracts(user.id);
+      const contracts = await contractService.getUserContracts(user.id, user.role);
       return contracts;
     },
     enabled: !!user,
@@ -120,6 +120,44 @@ export function useCancelContract() {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["userContracts"] });
       queryClient.invalidateQueries({ queryKey: ["schedule"] });
+    },
+  });
+}
+
+export function useApproveContract() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: (contractId: string) => {
+      if (!user) {
+        throw new Error("User must be authenticated to approve contract");
+      }
+      return contractService.approveContract(user.id, contractId);
+    },
+    onSuccess: (_, contractId) => {
+      queryClient.invalidateQueries({ queryKey: ["contract", contractId] });
+      queryClient.invalidateQueries({ queryKey: ["contracts"] });
+      queryClient.invalidateQueries({ queryKey: ["userContracts"] });
+    },
+  });
+}
+
+export function useRejectContract() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: (contractId: string) => {
+      if (!user) {
+        throw new Error("User must be authenticated to reject contract");
+      }
+      return contractService.rejectContract(user.id, contractId);
+    },
+    onSuccess: (_, contractId) => {
+      queryClient.invalidateQueries({ queryKey: ["contract", contractId] });
+      queryClient.invalidateQueries({ queryKey: ["contracts"] });
+      queryClient.invalidateQueries({ queryKey: ["userContracts"] });
     },
   });
 }
