@@ -41,7 +41,8 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: () => container.authService.logout(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.setQueryData(["auth", "user"], null);
+      queryClient.invalidateQueries({ queryKey: ["auth"], exact: false });
       router.push("/");
     },
     onError: () => {},
@@ -53,7 +54,7 @@ export function useAuth() {
     isLoading: isLoadingUser,
     login: loginMutation.mutate,
     signup: signupMutation.mutate,
-    logout: logoutMutation.mutate,
+    logout: logoutMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     isSigningUp: signupMutation.isPending,
     isLoggingOut: logoutMutation.isPending,

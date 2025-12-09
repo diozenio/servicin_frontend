@@ -31,6 +31,10 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header
       className={clsx(
@@ -107,7 +111,7 @@ export default function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => logout()}
+                    onClick={handleLogout}
                     variant="destructive"
                     className="cursor-pointer"
                   >

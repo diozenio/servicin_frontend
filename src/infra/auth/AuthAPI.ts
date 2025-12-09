@@ -18,16 +18,13 @@ export class AuthAPI implements AuthAdapter {
     throw new Error("Method not implemented.");
   }
 
-  logout(): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async logout(): Promise<boolean> {
+    const response = await client.post("/auth/logout");
+    return !!response.data.message;
   }
 
   async getCurrentUser(): Promise<User | null> {
     const response = await client.get("/auth/me");
     return response.data;
-  }
-
-  isAuthenticated(): Promise<boolean> {
-    throw new Error("Method not implemented.");
   }
 }
