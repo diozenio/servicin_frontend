@@ -12,33 +12,30 @@ import {
   Info, 
   CheckCircle2 
 } from "lucide-react";
-import { useNotifications } from "@/hooks/use-notification";
+import { 
+  useNotifications, 
+  useUnreadNotificationCount, 
+  useMarkNotificationAsRead 
+} from "@/hooks/use-notification";
 import { Notification } from "@/core/domain/models/notification";
-
 
 const getNotificationIcon = (notification: Notification) => {
   const type = notification.type?.toLowerCase();
-
   if (type === "appointment" || notification.appointmentId) return Calendar;
   if (type === "review" || notification.reviewId) return MessageSquare;
   if (type === "success") return CheckCircle2;
-  
+  if (type === "system") return BellIcon;
   return Info;
 };
 
 function NotificationInboxPopover() {
+  const { data: notifications = [] } = useNotifications();
   
-  const { data: response } = useNotifications();
+  const { data: unreadCount = 0 } = useUnreadNotificationCount();
   
- const notifications = Array.isArray(response)
-    ? response
-    : ((response as any)?.data ?? []) as Notification[];
+  const { mutate: markAsRead } = useMarkNotificationAsRead();
 
   const [tab, setTab] = useState("all");
-
-  const unreadCount = useMemo(() => {
-    return notifications.filter((n) => !n.read).length;
-  }, [notifications]);
 
   const filteredNotifications = useMemo(() => {
     if (tab === "unread") {
@@ -63,6 +60,14 @@ function NotificationInboxPopover() {
     return date.toLocaleDateString('pt-BR');
   };
 
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
+    // Aqui você pode adicionar lógica de navegação se quiser
+    // ex: router.push(`/appointments/${notification.appointmentId}`)
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -78,7 +83,6 @@ function NotificationInboxPopover() {
       
       <PopoverContent className="w-[380px] p-0" align="end">
         <Tabs value={tab} onValueChange={setTab}>
-          {/* Cabeçalho */}
           <div className="flex items-center justify-between border-b px-3 py-2 bg-muted/10">
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger 
@@ -101,7 +105,6 @@ function NotificationInboxPopover() {
             </TabsList>
           </div>
 
-          {/* Lista */}
           <div className="max-h-[400px] overflow-y-auto">
             {filteredNotifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -115,19 +118,18 @@ function NotificationInboxPopover() {
                   const serviceName = n.service?.name || n.appointment?.service?.name;
 
                   return (
-                    <div
+                    <button
                       key={n.id}
+                      onClick={() => handleNotificationClick(n)}
                       className={`
-                        flex items-start gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-muted/50
+                        flex w-full items-start gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-muted/50
                         ${!n.read ? "bg-muted/20" : "bg-background"}
                       `}
                     >
-                      {/* Ícone */}
                       <div className={`mt-1 rounded-full p-1.5 ${!n.read ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                         <Icon size={14} />
                       </div>
 
-                      {/* Conteúdo */}
                       <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <p className={`text-sm truncate pr-2 ${!n.read ? "font-medium text-foreground" : "text-muted-foreground"}`}>
@@ -156,7 +158,7 @@ function NotificationInboxPopover() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

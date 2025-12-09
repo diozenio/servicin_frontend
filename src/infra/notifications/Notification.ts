@@ -9,14 +9,10 @@ export class NotificationAPI implements NotificationAdapter {
         return data.unreadCount;
     }
 
-    // async markAsRead(userId: string, notificationId: string): Promise<boolean> {
-    //     // Implement API call to mark a notification as read
-    //     const response = await fetch(`/api/notifications/${userId}/mark-as-read/${notificationId}`, {
-    //         method: 'POST',
-    //     });
-    //     const data = await response.json();
-    //     return data.success;
-    // }
+    async markAsRead(notificationId: string): Promise<boolean> {
+        const response = await client.patch(`/notifications/${notificationId}/read`)
+        return response.status === 200;
+    }
 
     async fetchNotifications(): Promise<NotificationListResponse> {
         const response = await client.get(`/notifications`);

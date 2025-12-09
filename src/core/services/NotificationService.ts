@@ -8,6 +8,11 @@ export class NotificationService implements NotificationUseCase {
     getUnreadCount(): Promise<number> {
         return this.notificationAdapter.getUnreadCount();
     }
+
+    markAsRead(notificationId: string): Promise<boolean> {
+        return this.notificationAdapter.markAsRead(notificationId);
+    }
+    
     fetchNotifications(): Promise<NotificationListResponse> {
         return this.notificationAdapter.fetchNotifications();
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/container";
 
 export function useNotifications() {
@@ -20,5 +20,18 @@ export function useUnreadNotificationCount() {
       const count = await container.notificationService.getUnreadCount();
       return count ?? 0;
     }
+  });
+}
+
+export function useMarkNotificationAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (notificationId: string) => {
+      return await container.notificationService.markAsRead(notificationId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
   });
 }
