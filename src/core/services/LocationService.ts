@@ -1,16 +1,17 @@
-import { LocationUseCase } from "@/core/interfaces/usecases/LocationUseCase";
 import { LocationAdapter } from "@/core/interfaces/adapters/LocationAdapter";
 import {
-  LocationListResponse,
-  LocationQueryParams,
+  StateListResponse,
+  CityListResponse,
 } from "@/core/domain/models/location";
 
-export class LocationService extends LocationUseCase {
-  constructor(private locationAdapter: LocationAdapter) {
-    super();
+export class LocationService {
+  constructor(private locationAdapter: LocationAdapter) {}
+
+  async getStates(): Promise<StateListResponse> {
+    return await this.locationAdapter.getStates();
   }
 
-  async findAll(params?: LocationQueryParams): Promise<LocationListResponse> {
-    return await this.locationAdapter.findAll(params);
+  async getCitiesByState(stateId: string): Promise<CityListResponse> {
+    return await this.locationAdapter.getCitiesByState(stateId);
   }
 }

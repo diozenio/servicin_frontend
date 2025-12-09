@@ -1,27 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { container } from "@/container";
 import { Location } from "@/core/domain/models/location";
 
 export function useLocation(locationId: string | null) {
-  const {
-    data: location,
-    isLoading,
-    error,
-  } = useQuery<Location | null>({
-    queryKey: ["location", locationId],
-    queryFn: async (): Promise<Location | null> => {
-      if (!locationId) return null;
-
-      const response = await container.locationService.findAll();
-      const locations = response.data || [];
-      return locations.find((loc) => loc.id === locationId) || null;
-    },
-    enabled: !!locationId,
-  });
-
   return {
-    location,
-    isLoading,
-    error,
+    location: null as Location | null,
+    isLoading: false,
+    error: null,
   };
 }

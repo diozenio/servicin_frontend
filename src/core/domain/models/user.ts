@@ -59,12 +59,30 @@ export type LoginRequest = {
   password: string;
 };
 
+export type SignupAddressRequest = {
+  street: string;
+  cityId: string;
+  stateId: string;
+  zipCode: string;
+  neighborhood: string;
+  number: string;
+};
+
+export type SignupContactRequest = {
+  type: ContactType;
+  value: string;
+};
+
 export type SignupRequest = {
-  name: string;
   email: string;
-  phone?: string;
   password: string;
-  confirmPassword: string;
+  userType: UserType;
+  photoUrl: string | null;
+  address: SignupAddressRequest;
+  contacts: SignupContactRequest[];
+  fullName: string;
+  cpf: string;
+  birthDate: string;
 };
 
 export type AuthResponse = {

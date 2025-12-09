@@ -103,10 +103,6 @@ export class AuthLocalStorage implements AuthAdapter {
   }
 
   async signup(userData: SignupRequest): Promise<AuthResponse> {
-    if (userData.password !== userData.confirmPassword) {
-      throw new Error("As senhas não coincidem");
-    }
-
     if (userData.password.length < 8) {
       throw new Error("A senha deve ter pelo menos 8 caracteres");
     }
