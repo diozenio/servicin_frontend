@@ -21,6 +21,7 @@ import { DaySchedule } from "@/core/domain/models/schedule";
 import { PaymentMethod } from "@/core/domain/models/contract";
 import { cn } from "@/lib/utils";
 import { LoaderIcon, CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
+import { getUserContactPhone, getUserDisplayName } from "@/utils/user";
 
 interface ScheduleBookingProps {
   service: Service;
@@ -45,12 +46,15 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   >("schedule");
   const [contractId, setContractId] = useState<string | null>(null);
 
+  const userName = getUserDisplayName(user!);
+  const userContactPhone = getUserContactPhone(user!);
+
   React.useEffect(() => {
     if (user && isAuthenticated) {
-      setCustomerName(user.name);
+      setCustomerName(userName);
       setCustomerEmail(user.email);
-      if (user.phone) {
-        setCustomerPhone(user.phone);
+      if (user.contacts) {
+        setCustomerPhone(userContactPhone || "(00) 00000-0000");
       }
     }
   }, [user, isAuthenticated]);
@@ -379,10 +383,10 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Digite seu nome completo"
                 required
-                disabled={!!user?.name}
+                disabled={!!userName}
                 autoComplete="name"
               />
-              {user?.name && (
+              {userName && (
                 <p className="text-xs text-muted-foreground">
                   Preenchido automaticamente com os dados do seu perfil
                 </p>
@@ -399,10 +403,10 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 placeholder="(11) 99999-9999"
                 required
-                disabled={!!user?.phone}
+                disabled={!!userContactPhone}
                 autoComplete="tel"
               />
-              {user?.phone && (
+              {userContactPhone && (
                 <p className="text-xs text-muted-foreground">
                   Preenchido automaticamente com os dados do seu perfil
                 </p>

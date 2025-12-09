@@ -10,5 +10,4 @@ export interface AuthUseCase {
   signup(userData: SignupRequest): Promise<AuthResponse>;
   logout(): Promise<boolean>;
   getCurrentUser(): Promise<User | null>;
-  isAuthenticated(): Promise<boolean>;
 }

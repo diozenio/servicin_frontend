@@ -25,8 +25,4 @@ export class AuthService implements AuthUseCase {
   async getCurrentUser(): Promise<User | null> {
     return await this.authAdapter.getCurrentUser();
   }
-
-  async isAuthenticated(): Promise<boolean> {
-    return await this.authAdapter.isAuthenticated();
-  }
 }

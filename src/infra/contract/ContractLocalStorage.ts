@@ -5,6 +5,7 @@ import {
   ContractResponse,
 } from "@/core/domain/models/contract";
 import { LocalStorage, STORAGE_KEYS } from "@/lib/local-storage";
+import { UserRole } from "@/core/domain/models/user";
 
 export class ContractLocalStorage implements ContractAdapter {
   private getContracts(userId: string): Contract[] {
@@ -107,11 +108,11 @@ export class ContractLocalStorage implements ContractAdapter {
 
   async getUserContracts(
     userId: string,
-    userRole?: "provider" | "customer"
+    userRole?: UserRole
   ): Promise<Contract[]> {
     const allContracts = this.getAllContracts();
 
-    if (userRole === "provider") {
+    if (userRole === "PROVIDER") {
       return allContracts.filter((contract) => contract.providerId === userId);
     }
 

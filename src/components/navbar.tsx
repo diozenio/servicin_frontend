@@ -17,10 +17,13 @@ import { ThemeToggle } from "./theme-toggle";
 import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, User, Settings } from "lucide-react";
+import { getUserDisplayName } from "@/utils/user";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+
+  const userName = getUserDisplayName(user!);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 0);
@@ -65,9 +68,9 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button className="outline-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
                     <Avatar className="w-8 h-8 cursor-pointer">
-                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarImage src={user.photoUrl} alt={userName} />
                       <AvatarFallback>
-                        {user.name
+                        {userName
                           .split(" ")
                           .map((word) => word.charAt(0).toUpperCase())
                           .join("")
@@ -80,7 +83,7 @@ export default function Navbar() {
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none line-clamp-1">
-                        {user.name}
+                        {userName}
                       </p>
                       {user.email && (
                         <p className="text-xs leading-none text-muted-foreground">

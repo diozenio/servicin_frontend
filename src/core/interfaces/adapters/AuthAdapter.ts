@@ -10,5 +10,4 @@ export abstract class AuthAdapter {
   abstract signup(userData: SignupRequest): Promise<AuthResponse>;
   abstract logout(): Promise<boolean>;
   abstract getCurrentUser(): Promise<User | null>;
-  abstract isAuthenticated(): Promise<boolean>;
 }

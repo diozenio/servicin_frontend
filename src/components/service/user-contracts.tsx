@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { Contract } from "@/core/domain/models/contract";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +12,6 @@ import {
   XIcon,
   EyeIcon,
   ThumbsUpIcon,
-  ThumbsDownIcon,
 } from "lucide-react";
 import { CancelServiceDialog } from "./cancel-service-dialog";
 import { ApproveContractDialog } from "./approve-contract-dialog";
@@ -115,7 +113,7 @@ export function UserContracts({
   const updateServiceStatusMutation = useUpdateServiceStatus();
   const scheduleService = new ScheduleService(new ScheduleMock());
 
-  const isProvider = user?.role === "provider";
+  const isProvider = user?.role === "PROVIDER";
 
   const handleCancelContract = (contract: Contract) => {
     setCancelingContract(contract);
