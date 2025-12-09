@@ -4,13 +4,13 @@ import { ScheduleService } from "@/core/services/ScheduleService";
 import { ContractService } from "@/core/services/ContractService";
 import { AuthService } from "@/core/services/AuthService";
 import { LocationAPI } from "@/infra/locations/LocationAPI";
-import { ServiceLocalStorage } from "@/infra/services/ServiceLocalStorage";
 import { ScheduleLocalStorage } from "@/infra/schedule/ScheduleLocalStorage";
 import { ContractLocalStorage } from "@/infra/contract/ContractLocalStorage";
 import { AuthAPI } from "@/infra/auth/AuthAPI";
+import { ServiceApi } from "@/infra/services/ServiceApi";
 
 const locationAdapter = new LocationAPI();
-const serviceAdapter = new ServiceLocalStorage();
+const serviceAdapter = new ServiceApi();
 const scheduleAdapter = new ScheduleLocalStorage();
 const contractAdapter = new ContractLocalStorage();
 const authAdapter = new AuthAPI();
