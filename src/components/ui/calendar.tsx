@@ -10,6 +10,7 @@ interface CalendarProps {
   onDateSelect?: (date: Date) => void;
   availableDates?: string[];
   className?: string;
+  allowPastDates?: boolean;
 }
 
 export function Calendar({
@@ -17,6 +18,7 @@ export function Calendar({
   onDateSelect,
   availableDates = [],
   className,
+  allowPastDates = false,
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
@@ -91,7 +93,11 @@ export function Calendar({
     if (!isCurrentMonth) return;
 
     const date = new Date(year, month, day);
-    if (isDateAvailable(date) && !isPastDate(date)) {
+    const canSelect = allowPastDates
+      ? availableDates.length === 0 || isDateAvailable(date)
+      : isDateAvailable(date) && !isPastDate(date);
+    
+    if (canSelect) {
       onDateSelect?.(date);
     }
   };
@@ -162,7 +168,7 @@ export function Calendar({
             <button
               key={day}
               onClick={() => handleDateClick(day, true)}
-              disabled={!available || past}
+              disabled={!allowPastDates && (!available || past)}
               className={cn(
                 "h-10 w-10 flex items-center justify-center text-sm rounded-md transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
@@ -172,9 +178,9 @@ export function Calendar({
                   "bg-primary text-primary-foreground hover:bg-primary/90":
                     selected,
                   "bg-accent text-accent-foreground": today && !selected,
-                  "text-muted-foreground": !available || past,
-                  "cursor-pointer": available && !past,
-                  "cursor-not-allowed": !available || past,
+                  "text-muted-foreground": !allowPastDates && (!available || past),
+                  "cursor-pointer": allowPastDates || (available && !past),
+                  "cursor-not-allowed": !allowPastDates && (!available || past),
                 }
               )}
             >

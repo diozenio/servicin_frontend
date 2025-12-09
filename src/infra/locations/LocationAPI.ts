@@ -3,13 +3,14 @@ import {
   StateListResponse,
   CityListResponse,
 } from "@/core/domain/models/location";
+import { client } from "@/lib/client";
 
-export class LocationLocalStorage extends LocationAdapter {
+export class LocationAPI extends LocationAdapter {
   async getStates(): Promise<StateListResponse> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await client.get("/locations/states");
       return {
-        data: [],
+        data: response.data,
         success: true,
         message: "States fetched successfully",
       };
@@ -25,9 +26,9 @@ export class LocationLocalStorage extends LocationAdapter {
 
   async getCitiesByState(stateId: string): Promise<CityListResponse> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await client.get(`/locations/states/${stateId}/cities`);
       return {
-        data: [],
+        data: response.data,
         success: true,
         message: "Cities fetched successfully",
       };
@@ -41,3 +42,4 @@ export class LocationLocalStorage extends LocationAdapter {
     }
   }
 }
+

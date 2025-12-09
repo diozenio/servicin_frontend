@@ -1,5 +1,15 @@
 import { ApiResponse } from "@/core/types/api";
 
+export type State = {
+  id: string;
+  name: string;
+};
+
+export type City = {
+  id: string;
+  name: string;
+};
+
 export type Location = {
   id: string;
   value: string;
@@ -12,3 +22,5 @@ export type LocationQueryParams = {
 };
 
 export type LocationListResponse = ApiResponse<Location[]>;
+export type StateListResponse = ApiResponse<State[]>;
+export type CityListResponse = ApiResponse<City[]>;

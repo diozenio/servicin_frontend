@@ -1,42 +1,42 @@
 import { LocationAdapter } from "@/core/interfaces/adapters/LocationAdapter";
 import {
-  LocationListResponse,
-  LocationQueryParams,
+  StateListResponse,
+  CityListResponse,
 } from "@/core/domain/models/location";
-import { search } from "@/lib/search";
-import { mockLocations } from "./mock-data";
 
 export class LocationMock extends LocationAdapter {
-  async findAll(params?: LocationQueryParams): Promise<LocationListResponse> {
+  async getStates(): Promise<StateListResponse> {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const locations = mockLocations;
-
-      let filteredLocations = locations;
-
-      if (params?.search) {
-        filteredLocations = search(locations, params.search, {
-          keys: ["label"],
-          caseSensitive: false,
-        });
-      }
-
-      if (params?.limit && params.limit > 0) {
-        filteredLocations = filteredLocations.slice(0, params.limit);
-      }
-
       return {
-        data: filteredLocations,
+        data: [],
         success: true,
-        message: "Locations fetched successfully",
+        message: "States fetched successfully",
       };
     } catch (error) {
       return {
         data: [],
         success: false,
         message:
-          error instanceof Error ? error.message : "Failed to fetch locations",
+          error instanceof Error ? error.message : "Failed to fetch states",
+      };
+    }
+  }
+
+  async getCitiesByState(stateId: string): Promise<CityListResponse> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return {
+        data: [],
+        success: true,
+        message: "Cities fetched successfully",
+      };
+    } catch (error) {
+      return {
+        data: [],
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to fetch cities",
       };
     }
   }

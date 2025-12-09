@@ -14,8 +14,9 @@ export class AuthAPI implements AuthAdapter {
     return response.data;
   }
 
-  signup(userData: SignupRequest): Promise<AuthResponse> {
-    throw new Error("Method not implemented.");
+  async signup(userData: SignupRequest): Promise<AuthResponse> {
+    const response = await client.post("/auth/signup", userData);
+    return response.data;
   }
 
   async logout(): Promise<boolean> {

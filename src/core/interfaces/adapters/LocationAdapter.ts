@@ -1,8 +1,9 @@
 import {
-  LocationListResponse,
-  LocationQueryParams,
+  StateListResponse,
+  CityListResponse,
 } from "@/core/domain/models/location";
 
 export abstract class LocationAdapter {
-  abstract findAll(params?: LocationQueryParams): Promise<LocationListResponse>;
+  abstract getStates(): Promise<StateListResponse>;
+  abstract getCitiesByState(stateId: string): Promise<CityListResponse>;
 }

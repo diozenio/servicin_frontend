@@ -32,11 +32,8 @@ export function LoginForm({ className, returnUrl, ...props }: LoginFormProps) {
       await login(formData);
       if (returnUrl) {
         router.push(decodeURIComponent(returnUrl));
-      } else {
-        router.push("/");
       }
-    } catch {
-    }
+    } catch {}
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
