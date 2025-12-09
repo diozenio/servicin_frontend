@@ -18,11 +18,17 @@ import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, User, Settings } from "lucide-react";
 import { getUserDisplayName } from "@/utils/user";
+import NotificationButton from "@/components/ui/notification-button"
+import { useNotifications, useUnreadNotificationCount } from "@/hooks/use-notification";
+import { NotificationInboxPopover } from "@/components/notification-inbox-popover";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
+  const { data: notifications } = useNotifications();
+  const { data: unreadCount } = useUnreadNotificationCount();
   const userName = getUserDisplayName(user!);
 
   React.useEffect(() => {
@@ -65,9 +71,12 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-4">
             <ThemeToggle />
+
+            <NotificationInboxPopover />
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isAuthenticated && user ? (
+              <>  
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="outline-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
@@ -96,7 +105,8 @@ export default function Navbar() {
                       )}
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+
+
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
@@ -120,6 +130,7 @@ export default function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             ) : (
               <Button asChild variant="secondary" className="rounded-lg px-6">
                 <Link href="/auth/login">Entrar</Link>
