@@ -6,13 +6,13 @@ import {
   Field,
   FieldGroup,
   FieldLabel,
-  FieldDescription,
 } from "@/components/ui/field";
 import { RatingGroup } from "@ark-ui/react/rating-group";
-import { StarIcon, AlertCircle } from "lucide-react"; 
+import { StarIcon, AlertCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { useCreateReview } from "@/hooks/use-review"; 
+import { useCreateReview } from "@/hooks/use-review";
 import { CreateReviewRequest } from "@/core/domain/models/review";
+import { useRouter } from "next/navigation";
 
 interface ServiceReviewFormProps extends React.ComponentProps<"form"> {
   appointmentId: string;
@@ -27,10 +27,12 @@ export function ServiceReviewForm({
   onSuccessReview,
   ...props
 }: ServiceReviewFormProps) {
+  const router = useRouter();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { mutate: createReview, isPending } = useCreateReview();
 
@@ -39,8 +41,9 @@ export function ServiceReviewForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) return;
-    
+
     setErrorMessage(null);
+    setSuccessMessage(null);
 
     const reviewRequest: CreateReviewRequest = {
       appointmentId,
@@ -50,13 +53,17 @@ export function ServiceReviewForm({
 
     createReview(reviewRequest, {
       onSuccess: () => {
+        setSuccessMessage("Avaliação enviada com sucesso! Redirecionando...");
         setRating(0);
         setComment("");
-        onSuccessReview?.();
+        
+        setTimeout(() => {
+          onSuccessReview?.();
+          router.push("/"); 
+        }, 2000);
       },
       onError: (error: any) => {
         const backendMessage = error.response?.data?.message || "Ocorreu um erro ao enviar a avaliação.";
-        
         setErrorMessage(backendMessage);
       }
     });
@@ -76,6 +83,13 @@ export function ServiceReviewForm({
           </p>
         </div>
 
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md flex items-center gap-2 text-sm animate-in fade-in slide-in-from-top-1">
+            <CheckCircle className="w-4 h-4" />
+            <span>{successMessage}</span>
+          </div>
+        )}
+
         {errorMessage && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-center gap-2 text-sm animate-in fade-in slide-in-from-top-1">
             <AlertCircle className="w-4 h-4" />
@@ -89,12 +103,13 @@ export function ServiceReviewForm({
             value={rating}
             onValueChange={(details) => setRating(details.value)}
             allowHalf
+            disabled={!!successMessage} 
             className="flex flex-col items-center gap-2"
           >
              <RatingGroup.Control className="inline-flex gap-1">
                <RatingGroup.Context>
                  {({ items }) => items.map((item) => (
-                    <RatingGroup.Item key={item} index={item} className="group transition-transform hover:scale-110 focus:outline-none">
+                    <RatingGroup.Item key={item} index={item} className="group transition-transform hover:scale-110 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
                       <RatingGroup.ItemContext>
                         {({ half, highlighted }) => (
                           <div className="relative">
@@ -125,6 +140,7 @@ export function ServiceReviewForm({
           <FieldLabel htmlFor="comment">Comentário (Opcional)</FieldLabel>
           <textarea
             id="comment"
+            disabled={!!successMessage}
             placeholder="Conte-nos mais detalhes..."
             className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             value={comment}
@@ -133,8 +149,16 @@ export function ServiceReviewForm({
         </Field>
 
         <Field>
-          <Button type="submit" disabled={isPending || rating === 0} className="w-full">
-            {isPending ? "Enviando..." : "Enviar Avaliação"}
+          <Button 
+            type="submit" 
+            disabled={isPending || rating === 0 || !!successMessage} 
+            className="w-full"
+          >
+            {successMessage 
+              ? "Enviado!" 
+              : isPending 
+                ? "Enviando..." 
+                : "Enviar Avaliação"}
           </Button>
         </Field>
       </FieldGroup>
