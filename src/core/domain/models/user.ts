@@ -1,5 +1,7 @@
 export type UserType = "COMPANY" | "INDIVIDUAL";
 
+export type UserRole = "PROVIDER" | "CUSTOMER";
+
 export type ContactType = "EMAIL" | "PHONE";
 
 export type Contact = {
@@ -21,6 +23,10 @@ export type Address = {
   street: string;
   zipCode: string;
   number: string;
+};
+
+export type ServiceProviderInfo = {
+  userId: string;
 };
 
 export type Company = {
@@ -45,6 +51,7 @@ export type User = {
   contacts: Contact[];
   individual: Individual | null;
   company: Company | null;
+  role: UserRole;
 };
 
 export type LoginRequest = {

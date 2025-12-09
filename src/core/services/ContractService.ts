@@ -5,6 +5,7 @@ import {
   ContractRequest,
   ContractResponse,
 } from "@/core/domain/models/contract";
+import { UserRole } from "../domain/models/user";
 
 export class ContractService implements ContractUseCase {
   constructor(private contractAdapter: ContractAdapter) {}
@@ -23,7 +24,10 @@ export class ContractService implements ContractUseCase {
     return await this.contractAdapter.getContract(userId, contractId);
   }
 
-  async getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]> {
+  async getUserContracts(
+    userId: string,
+    userRole?: UserRole
+  ): Promise<Contract[]> {
     return await this.contractAdapter.getUserContracts(userId, userRole);
   }
 

@@ -18,11 +18,6 @@ export function useAuth() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: isAuthenticated, isLoading: isLoadingAuth } = useQuery({
-    queryKey: ["auth", "isAuthenticated"],
-    queryFn: () => container.authService.isAuthenticated(),
-    staleTime: 5 * 60 * 1000,
-  });
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginRequest) =>
       container.authService.login(credentials),
@@ -30,8 +25,7 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       router.push("/");
     },
-    onError: () => {
-    },
+    onError: () => {},
   });
 
   const signupMutation = useMutation({
@@ -41,8 +35,7 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       router.push("/");
     },
-    onError: () => {
-    },
+    onError: () => {},
   });
 
   const logoutMutation = useMutation({
@@ -51,14 +44,13 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       router.push("/");
     },
-    onError: () => {
-    },
+    onError: () => {},
   });
 
   return {
     user,
-    isAuthenticated: isAuthenticated || false,
-    isLoading: isLoadingUser || isLoadingAuth,
+    isAuthenticated: !!user,
+    isLoading: isLoadingUser,
     login: loginMutation.mutate,
     signup: signupMutation.mutate,
     logout: logoutMutation.mutate,

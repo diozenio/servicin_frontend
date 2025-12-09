@@ -22,8 +22,9 @@ export class AuthAPI implements AuthAdapter {
     throw new Error("Method not implemented.");
   }
 
-  getCurrentUser(): Promise<User | null> {
-    throw new Error("Method not implemented.");
+  async getCurrentUser(): Promise<User | null> {
+    const response = await client.get("/auth/me");
+    return response.data;
   }
 
   isAuthenticated(): Promise<boolean> {

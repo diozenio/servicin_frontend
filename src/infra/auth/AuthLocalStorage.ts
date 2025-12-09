@@ -79,12 +79,15 @@ export class AuthLocalStorage implements AuthAdapter {
 
     const user: User = {
       id: userWithPassword.id,
-      name: userWithPassword.name,
       email: userWithPassword.email,
-      phone: userWithPassword.phone,
-      avatarUrl: userWithPassword.avatarUrl,
-      role: userWithPassword.role,
+      userType: userWithPassword.userType,
+      photoUrl: userWithPassword.photoUrl,
       createdAt: userWithPassword.createdAt,
+      address: userWithPassword.address,
+      contacts: userWithPassword.contacts,
+      individual: userWithPassword.individual,
+      company: userWithPassword.company,
+      role: userWithPassword.role,
     };
 
     const token = this.generateToken(user.id);
@@ -117,12 +120,35 @@ export class AuthLocalStorage implements AuthAdapter {
     const userId = this.generateUserId();
     const user: User = {
       id: userId,
-      name: userData.name,
       email: userData.email,
-      phone: userData.phone,
-      avatarUrl: this.generateAvatarUrl(userData.name),
-      role: "customer",
+      userType: "INDIVIDUAL",
+      photoUrl: this.generateAvatarUrl(userData.name),
       createdAt: new Date().toISOString(),
+      address: {
+        id: `addr_${userId}`,
+        country: { name: "" },
+        state: { name: "" },
+        city: { name: "" },
+        neighborhood: "",
+        street: "",
+        zipCode: "",
+        number: "",
+      },
+      contacts: [
+        { id: `ct_email_${userId}`, type: "EMAIL", value: userData.email },
+        ...(userData.phone
+          ? ([
+              {
+                id: `ct_phone_${userId}`,
+                type: "PHONE",
+                value: userData.phone,
+              },
+            ] as const)
+          : []),
+      ],
+      individual: { fullName: userData.name, cpf: "", birthDate: "" },
+      company: null,
+      role: "CUSTOMER",
     };
 
     const userWithPassword: UserWithPassword = {
@@ -163,10 +189,5 @@ export class AuthLocalStorage implements AuthAdapter {
     }
 
     return session.user;
-  }
-
-  async isAuthenticated(): Promise<boolean> {
-    const user = await this.getCurrentUser();
-    return user !== null;
   }
 }

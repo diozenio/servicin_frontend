@@ -4,6 +4,7 @@ import {
   ContractRequest,
   ContractResponse,
 } from "@/core/domain/models/contract";
+import { UserRole } from "@/core/domain/models/user";
 
 export class ContractMock implements ContractAdapter {
   private contracts: Contract[] = [];
@@ -62,9 +63,14 @@ export class ContractMock implements ContractAdapter {
     );
   }
 
-  async getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]> {
-    if (userRole === "provider") {
-      return this.contracts.filter((contract) => contract.providerId === userId);
+  async getUserContracts(
+    userId: string,
+    userRole?: UserRole
+  ): Promise<Contract[]> {
+    if (userRole === "PROVIDER") {
+      return this.contracts.filter(
+        (contract) => contract.providerId === userId
+      );
     }
     return this.contracts.filter((contract) => contract.customerId === userId);
   }
@@ -83,11 +89,11 @@ export class ContractMock implements ContractAdapter {
         | "paid"
         | "failed"
         | "refunded";
-      
+
       if (status === "paid" && contract.approvalStatus !== "pending") {
         contract.approvalStatus = "pending";
       }
-      
+
       contract.updatedAt = new Date().toISOString();
       return true;
     }

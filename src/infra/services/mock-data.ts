@@ -126,7 +126,7 @@ const descriptions = [
 
 const generateService = (id: string): Service => {
   const category = faker.helpers.arrayElement(serviceCategories);
-  const companyName = mockProvider.name;
+  const companyName = mockProvider.company?.corporateName || "Acme Ltda";
   const initials = companyName
     .split(" ")
     .map((word) => word[0])

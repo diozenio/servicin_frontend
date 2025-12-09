@@ -3,6 +3,7 @@ import {
   ContractRequest,
   ContractResponse,
 } from "@/core/domain/models/contract";
+import { UserRole } from "@/core/domain/models/user";
 
 export interface ContractAdapter {
   createContract(
@@ -10,7 +11,7 @@ export interface ContractAdapter {
     contract: ContractRequest
   ): Promise<ContractResponse>;
   getContract(userId: string, contractId: string): Promise<Contract | null>;
-  getUserContracts(userId: string, userRole?: "provider" | "customer"): Promise<Contract[]>;
+  getUserContracts(userId: string, userRole?: UserRole): Promise<Contract[]>;
   updatePaymentStatus(
     userId: string,
     contractId: string,
