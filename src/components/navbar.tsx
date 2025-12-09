@@ -16,7 +16,7 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Hammer } from "lucide-react";
 import { getUserDisplayName } from "@/utils/user";
 
 export default function Navbar() {
@@ -103,6 +103,17 @@ export default function Navbar() {
                       <span>Perfil</span>
                     </Link>
                   </DropdownMenuItem>
+                  {user.role === "CUSTOMER" && (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/provider/signup"
+                        className="flex items-center"
+                      >
+                        <Hammer className="mr-2 h-4 w-4" />
+                        <span>Torne-se provedor</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/settings" className="flex items-center">
                       <Settings className="mr-2 h-4 w-4" />
