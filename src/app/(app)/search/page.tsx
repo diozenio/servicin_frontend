@@ -6,35 +6,159 @@ import { SearchIcon } from "lucide-react";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";
-import { useLocation } from "@/hooks/use-location";
 import { SearchInput } from "@/components/search-input";
-import { Location as LocationModel } from "@/core/domain/models/location";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { ServiceFilters } from "@/core/domain/models/filters";
+import { useStates, useCitiesByState } from "@/hooks/use-locations";
 
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const searchQuery = searchParams.get("q") || "";
-  const locationId = searchParams.get("location") || "";
+  const defaultFilters = React.useMemo<ServiceFilters>(
+    () => ({
+      page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
+      pageSize: searchParams.get("pageSize")
+        ? Number(searchParams.get("pageSize"))
+        : 12,
+      q: searchParams.get("q") || "",
+      providerName: searchParams.get("providerName") || "",
+      category: searchParams.get("category") || "",
+      minPrice: searchParams.get("minPrice")
+        ? Number(searchParams.get("minPrice"))
+        : undefined,
+      maxPrice: searchParams.get("maxPrice")
+        ? Number(searchParams.get("maxPrice"))
+        : undefined,
+      minRating: searchParams.get("minRating")
+        ? Number(searchParams.get("minRating"))
+        : undefined,
+      stateId: searchParams.get("state") || "",
+      cityId: searchParams.get("city") || "",
+    }),
+    [
+      searchParams.get("page"),
+      searchParams.get("pageSize"),
+      searchParams.get("q"),
+      searchParams.get("providerName"),
+      searchParams.get("category"),
+      searchParams.get("minPrice"),
+      searchParams.get("maxPrice"),
+      searchParams.get("minRating"),
+      searchParams.get("state"),
+      searchParams.get("city"),
+    ]
+  );
 
   const { services, isLoading, isFetching, loadMore, limit, total, hasMore } =
     useServices({
-      searchTerm: searchQuery,
-      selectedLocation: locationId,
+      filters: defaultFilters,
     });
 
-  const { location: selectedLocation, isLoading: isLoadingLocation } =
-    useLocation(locationId || null);
+  const { data: states = [] } = useStates();
+  const { data: cities = [] } = useCitiesByState(
+    defaultFilters.stateId || null
+  );
 
-  const handleSearch = (search: string, location: LocationModel | null) => {
-    const params = new URLSearchParams();
-    if (search.trim()) {
-      params.set("q", search.trim());
+  const selectedState = states.find((s) => s.id === defaultFilters.stateId);
+  const selectedCity = cities.find((c) => c.id === defaultFilters.cityId);
+
+  const activeFilters = React.useMemo(() => {
+    const filters: Array<{
+      key: keyof ServiceFilters;
+      label: string;
+      value: string;
+    }> = [];
+
+    if (defaultFilters.q) {
+      filters.push({ key: "q", label: "Busca", value: defaultFilters.q });
     }
-    if (location) {
-      params.set("location", location.id);
+    if (defaultFilters.providerName) {
+      filters.push({
+        key: "providerName",
+        label: "Prestador",
+        value: defaultFilters.providerName,
+      });
+    }
+    if (defaultFilters.category) {
+      filters.push({
+        key: "category",
+        label: "Categoria",
+        value: defaultFilters.category,
+      });
+    }
+    if (defaultFilters.stateId && selectedState) {
+      filters.push({
+        key: "stateId",
+        label: "Estado",
+        value: selectedState.name,
+      });
+    }
+    if (defaultFilters.cityId && selectedCity) {
+      filters.push({
+        key: "cityId",
+        label: "Cidade",
+        value: selectedCity.name,
+      });
+    }
+    if (defaultFilters.minPrice !== undefined) {
+      filters.push({
+        key: "minPrice",
+        label: "Preço Mín.",
+        value: `R$ ${defaultFilters.minPrice.toFixed(2)}`,
+      });
+    }
+    if (defaultFilters.maxPrice !== undefined) {
+      filters.push({
+        key: "maxPrice",
+        label: "Preço Máx.",
+        value: `R$ ${defaultFilters.maxPrice.toFixed(2)}`,
+      });
+    }
+    if (defaultFilters.minRating !== undefined) {
+      filters.push({
+        key: "minRating",
+        label: "Avaliação Mín.",
+        value: `${defaultFilters.minRating.toFixed(1)} ⭐`,
+      });
+    }
+
+    return filters;
+  }, [defaultFilters, selectedState, selectedCity]);
+
+  const handleSearch = (filters: ServiceFilters) => {
+    const params = new URLSearchParams();
+    if (filters.q?.trim()) {
+      params.set("q", filters.q.trim());
+    }
+    if (filters.stateId) {
+      params.set("state", filters.stateId);
+    }
+    if (filters.cityId) {
+      params.set("city", filters.cityId);
+    }
+    if (filters.providerName) {
+      params.set("providerName", filters.providerName);
+    }
+    if (filters.category) {
+      params.set("category", filters.category);
+    }
+    if (filters.minPrice !== undefined) {
+      params.set("minPrice", filters.minPrice.toString());
+    }
+    if (filters.maxPrice !== undefined) {
+      params.set("maxPrice", filters.maxPrice.toString());
+    }
+    if (filters.minRating !== undefined) {
+      params.set("minRating", filters.minRating.toString());
+    }
+    if (filters.page) {
+      params.set("page", filters.page.toString());
+    }
+    if (filters.pageSize) {
+      params.set("pageSize", filters.pageSize.toString());
     }
 
     const queryString = params.toString();
@@ -51,29 +175,25 @@ export default function SearchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <SearchInput
             onSearch={handleSearch}
-            defaultSearch={searchQuery}
-            defaultLocation={selectedLocation}
-            isLoadingLocation={isLoadingLocation}
+            defaultFilters={defaultFilters}
           />
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-serif font-semibold mb-2">
               {isLoading ? (
                 <Skeleton className="h-8 w-64" />
-              ) : searchQuery || locationId ? (
+              ) : defaultFilters.q ||
+                defaultFilters.stateId ||
+                defaultFilters.cityId ? (
                 `Resultados da busca${
-                  searchQuery ? ` por "${searchQuery}"` : ""
+                  defaultFilters.q ? ` por "${defaultFilters.q}"` : ""
                 }${
-                  locationId
-                    ? ` em ${
-                        isLoadingLocation
-                          ? "carregando..."
-                          : selectedLocation?.label || locationId
-                      }`
+                  defaultFilters.stateId || defaultFilters.cityId
+                    ? ` em ${defaultFilters.cityId ? "cidade" : "estado"}`
                     : ""
                 }`
               ) : (
@@ -93,6 +213,27 @@ export default function SearchPage() {
             </div>
           </div>
         </div>
+
+        {activeFilters.length > 0 && (
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm text-muted-foreground">
+                Filtros ativos:
+              </span>
+              {activeFilters.map((filter) => (
+                <Badge
+                  key={filter.key}
+                  variant="secondary"
+                  className="px-3 py-1"
+                >
+                  <span className="text-xs font-medium">
+                    {filter.label}: {filter.value}
+                  </span>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (

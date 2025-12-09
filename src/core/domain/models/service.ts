@@ -20,6 +20,16 @@ export type Service = {
 };
 
 export type ServiceQueryParams = {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  providerName?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  stateId?: string;
+  cityId?: string;
   search?: string;
   location?: string;
   providerId?: string;

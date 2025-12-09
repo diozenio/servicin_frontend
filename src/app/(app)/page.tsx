@@ -6,23 +6,46 @@ import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";
 import { SearchInput } from "@/components/search-input";
-import { useState, useCallback } from "react";
-import { Location as LocationModel } from "@/core/domain/models/location";
+import { useCallback } from "react";
+import { ServiceFilters } from "@/core/domain/models/filters";
 
 export default function Home() {
   const router = useRouter();
-  useState<LocationModel | null>(null);
 
   const { services, isLoading } = useServices({ limit: 6 });
 
   const handleSearch = useCallback(
-    (search: string, location: LocationModel | null) => {
+    (filters: ServiceFilters) => {
       const params = new URLSearchParams();
-      if (search.trim()) {
-        params.set("q", search.trim());
+      if (filters.q?.trim()) {
+        params.set("q", filters.q.trim());
       }
-      if (location) {
-        params.set("location", location.id);
+      if (filters.stateId) {
+        params.set("state", filters.stateId);
+      }
+      if (filters.cityId) {
+        params.set("city", filters.cityId);
+      }
+      if (filters.providerName) {
+        params.set("providerName", filters.providerName);
+      }
+      if (filters.category) {
+        params.set("category", filters.category);
+      }
+      if (filters.minPrice !== undefined) {
+        params.set("minPrice", filters.minPrice.toString());
+      }
+      if (filters.maxPrice !== undefined) {
+        params.set("maxPrice", filters.maxPrice.toString());
+      }
+      if (filters.minRating !== undefined) {
+        params.set("minRating", filters.minRating.toString());
+      }
+      if (filters.page) {
+        params.set("page", filters.page.toString());
+      }
+      if (filters.pageSize) {
+        params.set("pageSize", filters.pageSize.toString());
       }
 
       const queryString = params.toString();
@@ -51,7 +74,7 @@ export default function Home() {
             <span className="mr-2">Populares:</span>
             <button
               onClick={useCallback(() => {
-                handleSearch("Encanador", null);
+                handleSearch({ q: "Encanador" });
               }, [handleSearch])}
               className="underline mr-2 hover:text-primary transition-colors"
             >
@@ -59,7 +82,7 @@ export default function Home() {
             </button>
             <button
               onClick={useCallback(() => {
-                handleSearch("Eletricista", null);
+                handleSearch({ q: "Eletricista" });
               }, [handleSearch])}
               className="underline mr-2 hover:text-primary transition-colors"
             >
@@ -67,7 +90,7 @@ export default function Home() {
             </button>
             <button
               onClick={useCallback(() => {
-                handleSearch("Pintor", null);
+                handleSearch({ q: "Pintor" });
               }, [handleSearch])}
               className="underline mr-2 hover:text-primary transition-colors"
             >
@@ -75,7 +98,7 @@ export default function Home() {
             </button>
             <button
               onClick={useCallback(() => {
-                handleSearch("Pedreiro", null);
+                handleSearch({ q: "Pedreiro" });
               }, [handleSearch])}
               className="underline hover:text-primary transition-colors"
             >

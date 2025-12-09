@@ -1,14 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { container } from "@/container";
-import { Service, ServiceListResponse } from "@/core/domain/models/service";
+import {
+  Service,
+  ServiceListResponse,
+  ServiceQueryParams,
+} from "@/core/domain/models/service";
 import { usePagination } from "./use-pagination";
+import { ServiceFilters } from "@/core/domain/models/filters";
 
 interface UseServicesOptions {
   searchTerm?: string;
   selectedLocation?: string;
   providerId?: string;
   limit?: number;
+  filters?: ServiceFilters;
 }
 
 export function useServices(options: UseServicesOptions = {}) {
@@ -17,14 +23,34 @@ export function useServices(options: UseServicesOptions = {}) {
     selectedLocation = "",
     providerId,
     limit: initialLimit,
+    filters,
   } = options;
 
   const { limit, offset, loadMore, reset } = usePagination({
-    initialLimit: initialLimit || 12,
+    initialLimit: initialLimit || filters?.pageSize || 12,
   });
 
   const [accumulatedServices, setAccumulatedServices] = useState<Service[]>([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+  const queryParams: ServiceQueryParams = {
+    page: filters?.page || 1,
+    pageSize: filters?.pageSize || limit,
+    q: filters?.q || searchTerm || undefined,
+    providerName: filters?.providerName,
+    category: filters?.category,
+    minPrice: filters?.minPrice,
+    maxPrice: filters?.maxPrice,
+    minRating: filters?.minRating,
+    stateId: filters?.stateId,
+    cityId: filters?.cityId,
+    search: searchTerm || filters?.q || undefined,
+    location:
+      selectedLocation || filters?.cityId || filters?.stateId || undefined,
+    providerId: providerId || undefined,
+    limit,
+    offset,
+  };
 
   const {
     data: servicesResponse,
@@ -33,30 +59,16 @@ export function useServices(options: UseServicesOptions = {}) {
     error,
     refetch,
   } = useQuery<ServiceListResponse>({
-    queryKey: [
-      "services",
-      "search",
-      searchTerm,
-      selectedLocation,
-      providerId,
-      limit,
-      offset,
-    ],
+    queryKey: ["services", "search", queryParams],
     queryFn: (): Promise<ServiceListResponse> =>
-      container.serviceService.findAll({
-        search: searchTerm || undefined,
-        location: selectedLocation || undefined,
-        providerId: providerId || undefined,
-        limit,
-        offset,
-      }),
+      container.serviceService.findAll(queryParams),
   });
 
   useEffect(() => {
     setAccumulatedServices([]);
     setIsFirstLoad(true);
     reset();
-  }, [searchTerm, selectedLocation, providerId, reset]);
+  }, [searchTerm, selectedLocation, providerId, filters, reset]);
 
   useEffect(() => {
     if (isFirstLoad && servicesResponse?.data !== undefined) {
