@@ -18,17 +18,13 @@ import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, User, Settings } from "lucide-react";
 import { getUserDisplayName } from "@/utils/user";
-import NotificationButton from "@/components/ui/notification-button"
-import { useNotifications, useUnreadNotificationCount } from "@/hooks/use-notification";
-import { NotificationInboxPopover } from "@/components/notification-inbox-popover";
 
+import { NotificationInboxPopover } from "@/components/notification-inbox-popover";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
-  const { data: notifications } = useNotifications();
-  const { data: unreadCount } = useUnreadNotificationCount();
   const userName = getUserDisplayName(user!);
 
   React.useEffect(() => {
@@ -72,64 +68,63 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             <ThemeToggle />
 
-            <NotificationInboxPopover />
+            {isAuthenticated && user && <NotificationInboxPopover />}
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isAuthenticated && user ? (
-              <>  
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="outline-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
-                    <Avatar className="w-8 h-8 cursor-pointer">
-                      <AvatarImage src={user.photoUrl} alt={userName} />
-                      <AvatarFallback>
-                        {userName
-                          .split(" ")
-                          .map((word) => word.charAt(0).toUpperCase())
-                          .join("")
-                          .substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none line-clamp-1">
-                        {userName}
-                      </p>
-                      {user.email && (
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="outline-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
+                      <Avatar className="w-8 h-8 cursor-pointer">
+                        <AvatarImage src={user.photoUrl} alt={userName} />
+                        <AvatarFallback>
+                          {userName
+                            .split(" ")
+                            .map((word) => word.charAt(0).toUpperCase())
+                            .join("")
+                            .substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none line-clamp-1">
+                          {userName}
                         </p>
-                      )}
-                    </div>
-                  </DropdownMenuLabel>
+                        {user.email && (
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                          </p>
+                        )}
+                      </div>
+                    </DropdownMenuLabel>
 
-
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Perfil</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Configurações</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    variant="destructive"
-                    className="cursor-pointer"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Perfil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Configurações</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      variant="destructive"
+                      className="cursor-pointer"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sair</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <Button asChild variant="secondary" className="rounded-lg px-6">
