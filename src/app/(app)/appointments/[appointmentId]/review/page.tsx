@@ -1,17 +1,16 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react"; 
+import { Loader2 } from "lucide-react";
 import { ServiceReviewForm } from "@/components/review-form";
 import { useAppointmentDetails } from "@/hooks/use-appointment";
 
 export default function ReviewPage() {
   const params = useParams();
   const router = useRouter();
-  
+
   const appointmentId = params.appointmentId as string;
 
-  // 2. Use o hook para buscar os detalhes do agendamento
   const { data: appointment, isLoading } = useAppointmentDetails(appointmentId);
 
   if (isLoading) {
@@ -26,8 +25,12 @@ export default function ReviewPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Agendamento não encontrado</h1>
-          <p className="text-muted-foreground">O agendamento {appointmentId} não existe ou você não tem acesso.</p>
+          <h1 className="text-2xl font-bold mb-2">
+            Agendamento não encontrado
+          </h1>
+          <p className="text-muted-foreground">
+            O agendamento {appointmentId} não existe ou você não tem acesso.
+          </p>
         </div>
         <button
           onClick={() => router.push("/appointments")}
@@ -39,7 +42,6 @@ export default function ReviewPage() {
     );
   }
 
-  // 3. Acesso seguro ao nome do serviço baseado no nosso Model
   const serviceName = appointment.service?.name || "Serviço contratado";
 
   return (
@@ -53,15 +55,15 @@ export default function ReviewPage() {
             <span>←</span> Voltar
           </button>
         </div>
-        
+
         <div className="bg-card rounded-xl border shadow-sm p-6 md:p-8">
-            <ServiceReviewForm
-              appointmentId={appointmentId}
-              serviceName={serviceName}
-              onSuccessReview={() => {
-                  router.push("/appointments");
-              }}
-            />
+          <ServiceReviewForm
+            appointmentId={appointmentId}
+            serviceName={serviceName}
+            onSuccessReview={() => {
+              router.push("/appointments");
+            }}
+          />
         </div>
       </div>
     </div>
