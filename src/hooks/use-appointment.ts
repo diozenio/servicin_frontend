@@ -2,16 +2,30 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/container";
-import { Appointment } from "@/core/domain/models/appointment";
+import {
+  Appointment,
+  CreateAppointmentPayload,
+} from "@/core/domain/models/appointment";
 
-export function useAppointments(userId: string) {
+export function useAppointments() {
   return useQuery({
-    queryKey: ["appointments", userId],
+    queryKey: ["appointments"],
     queryFn: async () => {
-      const response = await container.appointmentService.fetchAppointmentsForUser(userId);
+      const response =
+        await container.appointmentService.fetchAppointmentsForUser();
       return response.data;
     },
-    enabled: !!userId,
+  });
+}
+
+export function useReceivedAppointments() {
+  return useQuery({
+    queryKey: ["appointments", "received"],
+    queryFn: async () => {
+      const response =
+        await container.appointmentService.fetchReceivedAppointments();
+      return response.data;
+    },
   });
 }
 
@@ -20,7 +34,9 @@ export function useAppointmentDetails(appointmentId: string) {
     queryKey: ["appointment", appointmentId],
     queryFn: async () => {
       if (!appointmentId || appointmentId === "undefined") return null;
-      const response = await container.appointmentService.fetchAppointmentById(appointmentId);
+      const response = await container.appointmentService.fetchAppointmentById(
+        appointmentId
+      );
       return response.data;
     },
     enabled: !!appointmentId && appointmentId !== "undefined",
@@ -31,7 +47,7 @@ export function useCreateAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: Partial<Appointment>) => {
+    mutationFn: async (payload: CreateAppointmentPayload) => {
       return container.appointmentService.createAppointment(payload);
     },
     onSuccess: () => {
@@ -44,12 +60,26 @@ export function useUpdateAppointmentStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: Appointment["status"] }) => {
-      return container.appointmentService.updateAppointmentStatus(id, status);
+    mutationFn: async ({
+      appointmentId,
+      status,
+      reason,
+    }: {
+      appointmentId: string;
+      status: Appointment["status"];
+      reason?: string;
+    }) => {
+      return container.appointmentService.updateAppointmentStatus(
+        appointmentId,
+        status,
+        reason
+      );
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
-      queryClient.invalidateQueries({ queryKey: ["appointment", variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["appointment", variables.appointmentId],
+      });
     },
   });
 }
@@ -58,12 +88,55 @@ export function useCancelAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
-      return container.appointmentService.cancelAppointment(id, reason);
+    mutationFn: async ({
+      appointmentId,
+      reason,
+    }: {
+      appointmentId: string;
+      reason: string;
+    }) => {
+      return container.appointmentService.cancelAppointment(
+        appointmentId,
+        reason
+      );
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
-      queryClient.invalidateQueries({ queryKey: ["appointment", variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["appointment", variables.appointmentId],
+      });
+    },
+  });
+}
+
+export function useCompleteService() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      return container.appointmentService.completeService(appointmentId);
+    },
+    onSuccess: (_, appointmentId) => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({
+        queryKey: ["appointment", appointmentId],
+      });
+    },
+  });
+}
+
+export function useConfirmPayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      return container.appointmentService.confirmPayment(appointmentId);
+    },
+    onSuccess: (_, appointmentId) => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({
+        queryKey: ["appointment", appointmentId],
+      });
     },
   });
 }

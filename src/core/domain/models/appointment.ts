@@ -1,8 +1,9 @@
 export type AppointmentStatus =
   | "PENDING"
-  | "CONFIRMED"
-  | "COMPLETED"
-  | "CANCELLED";
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELED"
+  | "COMPLETED";
 
 export type PaymentMethod = "CREDIT_CARD" | "DEBIT_CARD" | "PIX" | "CASH";
 
@@ -47,6 +48,13 @@ export type Category = {
   name: string;
 };
 
+export type Client = {
+  id: string;
+  individual?: IndividualInfo;
+  company?: CompanyInfo;
+  contacts: Contact[];
+};
+
 export type Service = {
   id: string;
   name: string;
@@ -54,7 +62,7 @@ export type Service = {
   price: number;
   rating: number;
   photos: ServicePhoto[];
-  provider: Provider;
+  provider?: Provider;
   category: Category;
 };
 
@@ -71,8 +79,52 @@ export type Appointment = {
   createdAt: string;
   updatedAt: string;
   service: Service;
+  client?: Client;
 };
 
 export type AppointmentsResponse = {
   appointments: Appointment[];
+};
+
+export type CreateAppointmentPayload = {
+  description: string;
+  paymentMethod: PaymentMethod;
+  scheduledEndTime: string;
+  scheduledStartTime: string;
+  serviceId: string;
+};
+
+export type CreateAppointmentResponse = {
+  message: string;
+  appointmentId: string;
+  status: string;
+};
+
+export type UpdateAppointmentStatusPayload = {
+  reason?: string;
+  status: AppointmentStatus;
+};
+
+export type UpdateAppointmentStatusResponse = {
+  id: string;
+  status: AppointmentStatus;
+};
+
+export type CancelAppointmentPayload = {
+  reason: string;
+};
+
+export type CancelAppointmentResponse = {
+  id: string;
+  status: AppointmentStatus;
+};
+
+export type CompleteServiceResponse = {
+  id: string;
+  status: AppointmentStatus;
+};
+
+export type ConfirmPaymentResponse = {
+  id: string;
+  status: AppointmentStatus;
 };

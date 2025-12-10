@@ -1,15 +1,25 @@
 import { AppointmentAdapter } from "@/core/interfaces/adapters/AppointmentAdapter";
 import { AppointmentUseCase } from "@/core/interfaces/usecases/AppointmentUseCase";
-import { Appointment } from "@/core/domain/models/appointment";
+import {
+  Appointment,
+  CreateAppointmentPayload,
+  CreateAppointmentResponse,
+  UpdateAppointmentStatusResponse,
+  CancelAppointmentResponse,
+  CompleteServiceResponse,
+  ConfirmPaymentResponse,
+} from "@/core/domain/models/appointment";
 import { ApiResponse } from "@/core/types/api";
 
 export class AppointmentService implements AppointmentUseCase {
   constructor(private appointmentAdapter: AppointmentAdapter) {}
 
-  async fetchAppointmentsForUser(
-    userId: string
-  ): Promise<ApiResponse<Appointment[]>> {
-    return await this.appointmentAdapter.fetchAppointmentsForUser(userId);
+  async fetchAppointmentsForUser(): Promise<ApiResponse<Appointment[]>> {
+    return await this.appointmentAdapter.fetchAppointmentsForUser();
+  }
+
+  async fetchReceivedAppointments(): Promise<ApiResponse<Appointment[]>> {
+    return await this.appointmentAdapter.fetchReceivedAppointments();
   }
 
   async fetchAppointmentById(
@@ -19,22 +29,42 @@ export class AppointmentService implements AppointmentUseCase {
   }
 
   async createAppointment(
-    payload: Partial<Appointment>
-  ): Promise<ApiResponse<{ appointment: Appointment }>> {
+    payload: CreateAppointmentPayload
+  ): Promise<ApiResponse<CreateAppointmentResponse>> {
     return await this.appointmentAdapter.createAppointment(payload);
   }
 
   async updateAppointmentStatus(
-    id: string,
-    status: Appointment['status']
-  ): Promise<ApiResponse<{ success: boolean }>> {
-    return await this.appointmentAdapter.updateAppointmentStatus(id, status);
+    appointmentId: string,
+    status: Appointment["status"],
+    reason?: string
+  ): Promise<ApiResponse<UpdateAppointmentStatusResponse>> {
+    return await this.appointmentAdapter.updateAppointmentStatus(
+      appointmentId,
+      status,
+      reason
+    );
   }
 
   async cancelAppointment(
-    id: string,
-    reason?: string
-  ): Promise<ApiResponse<{ success: boolean }>> {
-    return await this.appointmentAdapter.cancelAppointment(id, reason);
+    appointmentId: string,
+    reason: string
+  ): Promise<ApiResponse<CancelAppointmentResponse>> {
+    return await this.appointmentAdapter.cancelAppointment(
+      appointmentId,
+      reason
+    );
+  }
+
+  async completeService(
+    appointmentId: string
+  ): Promise<ApiResponse<CompleteServiceResponse>> {
+    return await this.appointmentAdapter.completeService(appointmentId);
+  }
+
+  async confirmPayment(
+    appointmentId: string
+  ): Promise<ApiResponse<ConfirmPaymentResponse>> {
+    return await this.appointmentAdapter.confirmPayment(appointmentId);
   }
 }
