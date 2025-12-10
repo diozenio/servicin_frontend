@@ -1,7 +1,14 @@
-import { NotificationListResponse } from "@/core/domain/models/notification";
+import {
+  Notification,
+  MarkAsReadResponse,
+  MarkAllAsReadResponse,
+} from "@/core/domain/models/notification";
+import { ApiResponse } from "@/core/types/api";
 
 export interface NotificationUseCase {
-    fetchUnreadNotifications(): Promise<NotificationListResponse>;
-    markAsRead(userId: string, notificationId: string): Promise<boolean>;
-    fetchNotifications(): Promise<NotificationListResponse>;
+  fetchNotifications(): Promise<ApiResponse<Notification[]>>;
+  fetchUnreadNotifications(): Promise<ApiResponse<Notification[]>>;
+  fetchNotificationById(id: string): Promise<ApiResponse<Notification | null>>;
+  markAsRead(notificationId: string): Promise<ApiResponse<MarkAsReadResponse>>;
+  markAllAsRead(): Promise<ApiResponse<MarkAllAsReadResponse>>;
 }

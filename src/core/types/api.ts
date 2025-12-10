@@ -3,5 +3,3 @@ export type ApiResponse<T> = {
   success: boolean;
   message?: string;
 };
-
-export type NotificationType = "appointment" | "review" | "success" | "alert" | string;

@@ -1,6 +1,9 @@
-import { ApiResponse } from "@/core/types/api";
-
-export type NotificationType = "string"; 
+export type NotificationType =
+  | "appointment"
+  | "review"
+  | "success"
+  | "alert"
+  | string;
 
 export type Service = {
   id: string;
@@ -33,18 +36,18 @@ export type Notification = {
   service?: Service;
 };
 
-export type NotificationResponse = {
+export type NotificationListResponse = {
   notifications: Notification[];
 };
 
-export type NotificationListResponse = NotificationResponse;
+export type NotificationResponse = {
+  notification: Notification;
+};
 
-export type NotificationRequest = {
-  userId: string;
-  title: string;
+export type MarkAsReadResponse = {
   message: string;
-  type: NotificationType;
-  appointmentId?: string | null;
-  reviewId?: string | null;
-  serviceId?: string | null;
+};
+
+export type MarkAllAsReadResponse = {
+  message: string;
 };

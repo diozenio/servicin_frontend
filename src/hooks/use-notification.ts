@@ -8,7 +8,7 @@ export function useNotifications() {
     queryKey: ["notifications"],
     queryFn: async () => {
       const response = await container.notificationService.fetchNotifications();
-      return response.notifications || [];
+      return response.data || [];
     },
   });
 }
@@ -19,8 +19,21 @@ export function useUnreadNotifications() {
     queryFn: async () => {
       const response =
         await container.notificationService.fetchUnreadNotifications();
-      return response.notifications || [];
+      return response.data || [];
     },
+  });
+}
+
+export function useNotification(id: string | undefined) {
+  return useQuery({
+    queryKey: ["notifications", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const response =
+        await container.notificationService.fetchNotificationById(id);
+      return response.data;
+    },
+    enabled: !!id,
   });
 }
 
@@ -30,6 +43,20 @@ export function useMarkNotificationAsRead() {
   return useMutation({
     mutationFn: async (notificationId: string) => {
       return await container.notificationService.markAsRead(notificationId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", "unread"] });
+    },
+  });
+}
+
+export function useMarkAllNotificationsAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      return await container.notificationService.markAllAsRead();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });

@@ -1,20 +1,36 @@
-import { NotificationListResponse } from "../domain/models/notification";
+import {
+  Notification,
+  MarkAsReadResponse,
+  MarkAllAsReadResponse,
+} from "../domain/models/notification";
 import { NotificationAdapter } from "../interfaces/adapters/NotificationAdapter";
 import { NotificationUseCase } from "../interfaces/usecases/NotificationUseCase";
+import { ApiResponse } from "@/core/types/api";
 
 export class NotificationService implements NotificationUseCase {
-    constructor(private notificationAdapter: NotificationAdapter) {}
+  constructor(private notificationAdapter: NotificationAdapter) {}
 
-    fetchUnreadNotifications(): Promise<NotificationListResponse> {
-        return this.notificationAdapter.fetchUnreadNotifications();
-    }
+  async fetchNotifications(): Promise<ApiResponse<Notification[]>> {
+    return await this.notificationAdapter.fetchNotifications();
+  }
 
-    markAsRead(notificationId: string): Promise<boolean> {
-        return this.notificationAdapter.markAsRead(notificationId);
-    }
-    
-    fetchNotifications(): Promise<NotificationListResponse> {
-        return this.notificationAdapter.fetchNotifications();
-    }
+  async fetchUnreadNotifications(): Promise<ApiResponse<Notification[]>> {
+    return await this.notificationAdapter.fetchUnreadNotifications();
+  }
 
+  async fetchNotificationById(
+    id: string
+  ): Promise<ApiResponse<Notification | null>> {
+    return await this.notificationAdapter.fetchNotificationById(id);
+  }
+
+  async markAsRead(
+    notificationId: string
+  ): Promise<ApiResponse<MarkAsReadResponse>> {
+    return await this.notificationAdapter.markAsRead(notificationId);
+  }
+
+  async markAllAsRead(): Promise<ApiResponse<MarkAllAsReadResponse>> {
+    return await this.notificationAdapter.markAllAsRead();
+  }
 }

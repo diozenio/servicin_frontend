@@ -1,24 +1,65 @@
-import { NotificationListResponse } from "@/core/domain/models/notification";
+import {
+  Notification,
+  MarkAsReadResponse,
+  MarkAllAsReadResponse,
+} from "@/core/domain/models/notification";
 import { NotificationAdapter } from "@/core/interfaces/adapters/NotificationAdapter";
+import { ApiResponse } from "@/core/types/api";
 import { client } from "@/lib/client";
 
 export class NotificationAPI implements NotificationAdapter {
-  async fetchUnreadNotifications(): Promise<NotificationListResponse> {
-    const response = await client.get(`/notifications/unread`);
-    const data = response.data;
-    return data as NotificationListResponse;
+  async fetchNotifications(): Promise<ApiResponse<Notification[]>> {
+    const response = await client.get("/notifications/");
+    return {
+      success: true,
+      data: response.data.notifications,
+    };
   }
 
-  async markAsRead(notificationId: string): Promise<boolean> {
-    const response = await client.patch(
-      `/notifications/${notificationId}/read`
-    );
-    return response.status === 200;
+  async fetchUnreadNotifications(): Promise<ApiResponse<Notification[]>> {
+    const response = await client.get("/notifications/unread");
+    return {
+      success: true,
+      data: response.data.notifications,
+    };
   }
 
-  async fetchNotifications(): Promise<NotificationListResponse> {
-    const response = await client.get(`/notifications`);
-    const data = response.data;
-    return data as NotificationListResponse;
+  async fetchNotificationById(
+    id: string
+  ): Promise<ApiResponse<Notification | null>> {
+    if (!id) {
+      return { success: false, data: null };
+    }
+
+    try {
+      const response = await client.get(`/notifications/${id}`);
+      return {
+        success: true,
+        data: response.data.notification,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+      };
+    }
+  }
+
+  async markAsRead(
+    notificationId: string
+  ): Promise<ApiResponse<MarkAsReadResponse>> {
+    const response = await client.patch(`/notifications/${notificationId}/read`);
+    return {
+      success: true,
+      data: response.data,
+    };
+  }
+
+  async markAllAsRead(): Promise<ApiResponse<MarkAllAsReadResponse>> {
+    const response = await client.patch("/notifications/read-all");
+    return {
+      success: true,
+      data: response.data,
+    };
   }
 }
