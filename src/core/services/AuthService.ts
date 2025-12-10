@@ -3,26 +3,29 @@ import { AuthAdapter } from "@/core/interfaces/adapters/AuthAdapter";
 import {
   LoginRequest,
   SignupRequest,
-  AuthResponse,
-  User,
+  LoginResponse,
+  SignupResponse,
+  LogoutResponse,
+  GetCurrentUserResponse,
 } from "@/core/domain/models/user";
+import { ApiResponse } from "@/core/types/api";
 
 export class AuthService implements AuthUseCase {
   constructor(private authAdapter: AuthAdapter) {}
 
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
+  async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     return await this.authAdapter.login(credentials);
   }
 
-  async signup(userData: SignupRequest): Promise<AuthResponse> {
+  async signup(userData: SignupRequest): Promise<ApiResponse<SignupResponse>> {
     return await this.authAdapter.signup(userData);
   }
 
-  async logout(): Promise<boolean> {
+  async logout(): Promise<ApiResponse<LogoutResponse>> {
     return await this.authAdapter.logout();
   }
 
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<ApiResponse<GetCurrentUserResponse>> {
     return await this.authAdapter.getCurrentUser();
   }
 }

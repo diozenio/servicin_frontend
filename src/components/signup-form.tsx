@@ -39,7 +39,6 @@ export function SignupForm({
     email: "",
     password: "",
     userType: "INDIVIDUAL",
-    photoUrl: null,
     address: {
       street: "",
       cityId: "",
@@ -56,7 +55,7 @@ export function SignupForm({
     ],
     fullName: "",
     cpf: "",
-    birthDate: "",
+    birthDate: null,
   });
 
   const { data: states = [], isLoading: isLoadingStates } = useStates();
@@ -260,11 +259,11 @@ export function SignupForm({
             <FieldLabel htmlFor="birthDate">Data de Nascimento</FieldLabel>
             <DatePicker
               id="birthDate"
-              value={formData.birthDate}
+              value={formData.birthDate || ""}
               onChange={(date) => {
                 setFormData((prev) => ({
                   ...prev,
-                  birthDate: date,
+                  birthDate: date || null,
                 }));
               }}
               placeholder="Selecione sua data de nascimento"

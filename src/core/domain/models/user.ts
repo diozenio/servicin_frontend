@@ -22,7 +22,7 @@ export type Address = {
   neighborhood: string;
   street: string;
   zipCode: string;
-  number: string;
+  number: string | null;
 };
 
 export type ServiceProviderInfo = {
@@ -32,20 +32,20 @@ export type ServiceProviderInfo = {
 export type Company = {
   corporateName: string;
   cnpj: string;
-  tradeName: string;
+  tradeName: string | null;
 };
 
 export type Individual = {
   fullName: string;
   cpf: string;
-  birthDate: string;
+  birthDate: string | null;
 };
 
 export type User = {
   id: string;
   email: string;
   userType: UserType;
-  photoUrl: string;
+  photoUrl: string | null;
   createdAt: string;
   address: Address;
   contacts: Contact[];
@@ -76,31 +76,25 @@ export type SignupContactRequest = {
 export type SignupRequest = {
   email: string;
   password: string;
-  userType: UserType;
-  photoUrl: string | null;
-  address: SignupAddressRequest;
-  contacts: SignupContactRequest[];
   fullName: string;
   cpf: string;
-  birthDate: string;
+  birthDate: string | null;
+  userType: "INDIVIDUAL";
+  photoUrl?: string;
+  address: SignupAddressRequest;
+  contacts: SignupContactRequest[];
 };
 
-export type AuthResponse = {
-  user: User;
+export type LoginResponse = {
   token: string;
 };
 
-export type AuthError = {
-  message: string;
-  field?: string;
-};
-
-export type UserWithPassword = User & {
-  password: string;
-};
-
-export type AuthSession = {
+export type SignupResponse = {
   token: string;
-  user: User;
-  expiresAt: string;
 };
+
+export type LogoutResponse = null;
+
+export type GetCurrentUserResponse = User | null;
+
+export type DeleteAccountResponse = null;

@@ -77,7 +77,10 @@ export default function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <button className="outline-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
                       <Avatar className="w-8 h-8 cursor-pointer">
-                        <AvatarImage src={user.photoUrl} alt={userName} />
+                        <AvatarImage
+                          src={user.photoUrl || undefined}
+                          alt={userName}
+                        />
                         <AvatarFallback>
                           {userName
                             .split(" ")

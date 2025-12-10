@@ -1,31 +1,50 @@
 import {
   LoginRequest,
-  AuthResponse,
   SignupRequest,
-  User,
+  LoginResponse,
+  SignupResponse,
+  LogoutResponse,
+  GetCurrentUserResponse,
 } from "@/core/domain/models/user";
 import { AuthAdapter } from "@/core/interfaces/adapters/AuthAdapter";
+import { ApiResponse } from "@/core/types/api";
 import { client } from "@/lib/client";
 
 export class AuthAPI implements AuthAdapter {
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
+  async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     const { email, password } = credentials;
     const response = await client.post("/auth/login", { email, password });
-    return response.data;
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+    };
   }
 
-  async signup(userData: SignupRequest): Promise<AuthResponse> {
+  async signup(userData: SignupRequest): Promise<ApiResponse<SignupResponse>> {
     const response = await client.post("/auth/signup", userData);
-    return response.data;
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+    };
   }
 
-  async logout(): Promise<boolean> {
+  async logout(): Promise<ApiResponse<LogoutResponse>> {
     const response = await client.post("/auth/logout");
-    return !!response.data.message;
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+    };
   }
 
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<ApiResponse<GetCurrentUserResponse>> {
     const response = await client.get("/auth/me");
-    return response.data;
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+    };
   }
 }

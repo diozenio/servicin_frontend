@@ -12,8 +12,8 @@ export function useAuth() {
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ["auth", "user"],
     queryFn: async () => {
-      const user = await container.authService.getCurrentUser();
-      return user;
+      const response = await container.authService.getCurrentUser();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000,
   });

@@ -1,13 +1,16 @@
 import {
   LoginRequest,
   SignupRequest,
-  AuthResponse,
-  User,
+  LoginResponse,
+  SignupResponse,
+  LogoutResponse,
+  GetCurrentUserResponse,
 } from "@/core/domain/models/user";
+import { ApiResponse } from "@/core/types/api";
 
-export abstract class AuthAdapter {
-  abstract login(credentials: LoginRequest): Promise<AuthResponse>;
-  abstract signup(userData: SignupRequest): Promise<AuthResponse>;
-  abstract logout(): Promise<boolean>;
-  abstract getCurrentUser(): Promise<User | null>;
+export interface AuthAdapter {
+  login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>>;
+  signup(userData: SignupRequest): Promise<ApiResponse<SignupResponse>>;
+  logout(): Promise<ApiResponse<LogoutResponse>>;
+  getCurrentUser(): Promise<ApiResponse<GetCurrentUserResponse>>;
 }
