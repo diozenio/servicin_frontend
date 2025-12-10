@@ -59,7 +59,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     }
   }, [user, isAuthenticated]);
 
-  const providerId = service.provider[0].userId;
+  const providerId = service.provider.user.id;
   const serviceId = service.id;
 
   const { data: schedule, isLoading: isLoadingSchedule } = useSchedule(

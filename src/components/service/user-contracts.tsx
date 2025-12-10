@@ -24,8 +24,7 @@ import {
   useUpdateServiceStatus,
 } from "@/hooks/use-contract";
 import { useAuth } from "@/hooks/use-auth";
-import { ScheduleService } from "@/core/services/ScheduleService";
-import { ScheduleMock } from "@/infra/schedule/ScheduleMock";
+import { container } from "@/container";
 
 interface UserContractsProps {
   contracts: Contract[];
@@ -113,7 +112,6 @@ export function UserContracts({
   const approveContractMutation = useApproveContract();
   const rejectContractMutation = useRejectContract();
   const updateServiceStatusMutation = useUpdateServiceStatus();
-  const scheduleService = new ScheduleService(new ScheduleMock());
 
   const isProvider = user?.role === "PROVIDER";
 
@@ -131,7 +129,7 @@ export function UserContracts({
       });
 
       if (success) {
-        await scheduleService.releaseTimeSlot(
+        await container.scheduleService.releaseTimeSlot(
           cancelingContract.providerId,
           cancelingContract.serviceId,
           cancelingContract.date,
@@ -178,7 +176,7 @@ export function UserContracts({
         status: "cancelled",
       });
 
-      await scheduleService.releaseTimeSlot(
+      await container.scheduleService.releaseTimeSlot(
         approvingContract.providerId,
         approvingContract.serviceId,
         approvingContract.date,
@@ -306,7 +304,10 @@ export function UserContracts({
                   </Button>
                 )}
                 {canReviewContract && (
-                  <Link href={`/appointments/${contract.id}/review`} className="flex-1">
+                  <Link
+                    href={`/appointments/${contract.id}/review`}
+                    className="flex-1"
+                  >
                     <Button variant="default" size="sm" className="w-full">
                       <StarIcon className="w-4 h-4 mr-2" />
                       Deixar Avaliação

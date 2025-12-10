@@ -27,7 +27,7 @@ export type Service = {
   category: Category;
   unavaliableTimeSlots: UnavaliableTimeSlots[];
   adress: AdressService;
-  reviews: Reviews;
+  reviews: Reviews[];
 };
 
 export type ServiceResponse = ApiResponse<Service | null>;
@@ -81,24 +81,24 @@ export type AdressService = {
     id: string;
     name: string;
   };
-}
+};
 
 export type Reviews = {
   id: string;
   rating: string;
-  comment: null;
+  comment: string | null;
   createdAt: string;
   client: {
     id: string;
     individual: {
       fullname: string;
     } | null;
-  company: {
-    corporateName: string
-  } | null;
-  photoUrl: null;
-  }
-}
+    company: {
+      corporateName: string;
+    } | null;
+    photoUrl: null;
+  };
+};
 
 export type ServiceListResponse = {
   total: number;

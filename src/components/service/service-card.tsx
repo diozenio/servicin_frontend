@@ -2,43 +2,22 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { 
-  StarIcon, 
-  MapPinIcon, 
-  PhoneIcon,
-  ImageIcon
-} from "lucide-react";
+import { StarIcon, MapPinIcon, PhoneIcon, ImageIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-
-export type ServiceData = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  rating: string;
-  photos: { id: string; photoUrl: string }[];
-  provider: {
-    user: {
-      photoUrl: string | null;
-      individual?: { fullName: string };
-      company?: { corporateName: string };
-      contacts: { type: string; value: string }[];
-    };
-  };
-  category: { name: string };
-  address: {
-    state: { name: string };
-    city: { name: string };
-  };
-  reviews: any[];
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Service } from "@/core/domain/models/service";
 
 interface ServiceCardProps {
-  service: ServiceData;
+  service: Service;
 }
 
 const formatCurrency = (value: string | number) => {
@@ -52,24 +31,27 @@ const formatCurrency = (value: string | number) => {
 export function ServiceCard({ service }: ServiceCardProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const servicePhoto = service.photos && service.photos.length > 0 
-    ? service.photos[0].photoUrl 
-    : null;
+  const servicePhoto =
+    service.photos && service.photos.length > 0
+      ? service.photos[0].photoUrl
+      : null;
   const providerUser = service.provider?.user;
-  const providerName = 
-    providerUser?.individual?.fullName || 
-    providerUser?.company?.corporateName || 
+  const providerName =
+    providerUser?.individual?.fullName ||
+    providerUser?.company?.corporateName ||
     "Prestador";
   const providerAvatar = providerUser?.photoUrl || undefined;
-  const contact = providerUser?.contacts?.find(c => c.type === "PHONE") || providerUser?.contacts?.[0];
+  const contact =
+    providerUser?.contacts?.find((c) => c.type === "PHONE") ||
+    providerUser?.contacts?.[0];
   const contactValue = contact?.value;
-  const city = service.address?.city?.name;
-  const state = service.address?.state?.name; 
+  const city = service.adress?.city?.name;
+  const state = service.adress?.state?.name;
 
   const locationShort = city && state ? `${city}` : city;
   const locationFull = city && state ? `${city} - ${state}` : city;
 
-  const ratingValue = parseFloat(service.rating);
+  const ratingValue = service.rating;
   const reviewCount = service.reviews?.length || 0;
 
   const handleHire = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -116,14 +98,15 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-auto">
             <StarIcon size={14} className="text-yellow-500 fill-yellow-500" />
-            <span className="font-medium text-foreground">{ratingValue.toFixed(1)}</span>
+            <span className="font-medium text-foreground">
+              {ratingValue.toFixed(1)}
+            </span>
             <span className="text-xs text-muted-foreground">
-              ({reviewCount} {reviewCount === 1 ? 'avaliação' : 'avaliações'})
+              ({reviewCount} {reviewCount === 1 ? "avaliação" : "avaliações"})
             </span>
           </div>
 
           <div className="flex items-center justify-between pt-3 border-t mt-1 gap-2">
-
             <div className="flex items-center gap-2 overflow-hidden max-w-[60%]">
               <Avatar className="h-7 w-7 border shrink-0">
                 <AvatarImage src={providerAvatar} alt={providerName} />
@@ -132,7 +115,10 @@ export function ServiceCard({ service }: ServiceCardProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col overflow-hidden">
-                <span className="text-xs font-semibold truncate leading-none" title={providerName}>
+                <span
+                  className="text-xs font-semibold truncate leading-none"
+                  title={providerName}
+                >
                   {providerName}
                 </span>
                 <span className="text-[10px] text-muted-foreground truncate mt-0.5">
@@ -142,7 +128,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
             </div>
 
             {locationShort && (
-              <div 
+              <div
                 className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 bg-secondary px-2 py-1 rounded-full max-w-[40%]"
                 title={locationFull}
               >
@@ -172,28 +158,45 @@ export function ServiceCard({ service }: ServiceCardProps) {
           <div className="space-y-5">
             <div className="aspect-video w-full rounded-lg overflow-hidden bg-muted border">
               {servicePhoto ? (
-                <img src={servicePhoto} alt={service.name} className="w-full h-full object-cover" />
+                <img
+                  src={servicePhoto}
+                  alt={service.name}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="flex h-full items-center justify-center text-muted-foreground">
-                  <span className="flex items-center gap-2"><ImageIcon /> Sem imagem disponível</span>
+                  <span className="flex items-center gap-2">
+                    <ImageIcon /> Sem imagem disponível
+                  </span>
                 </div>
               )}
             </div>
 
             <div className="space-y-1">
               <h4 className="text-sm font-semibold">Descrição</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {service.description}
+              </p>
             </div>
 
             <div className="flex items-center justify-between bg-secondary/20 p-4 rounded-lg border">
               <div>
-                <span className="text-xs font-medium text-muted-foreground uppercase">Valor do serviço</span>
-                <p className="text-xl font-bold text-primary">{formatCurrency(service.price)}</p>
+                <span className="text-xs font-medium text-muted-foreground uppercase">
+                  Valor do serviço
+                </span>
+                <p className="text-xl font-bold text-primary">
+                  {formatCurrency(service.price)}
+                </p>
               </div>
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-1 bg-background px-2 py-1 rounded border shadow-sm">
-                  <StarIcon size={16} className="text-yellow-500 fill-yellow-500" />
-                  <span className="font-bold text-sm">{ratingValue.toFixed(1)}</span>
+                  <StarIcon
+                    size={16}
+                    className="text-yellow-500 fill-yellow-500"
+                  />
+                  <span className="font-bold text-sm">
+                    {ratingValue.toFixed(1)}
+                  </span>
                 </div>
                 <span className="text-[10px] text-muted-foreground mt-1">
                   Baseado em {reviewCount} avaliações
@@ -210,22 +213,28 @@ export function ServiceCard({ service }: ServiceCardProps) {
                 </Avatar>
                 <div className="flex-1 overflow-hidden">
                   <p className="font-medium text-sm">{providerName}</p>
-                  
+
                   {contactValue && (
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
                       <PhoneIcon size={12} />
                       <span>{contactValue}</span>
                     </div>
                   )}
-                  
+
                   <p className="text-[10px] text-muted-foreground mt-1">
-                   {service.provider.user.individual ? "Pessoa Física" : "Empresa"}
+                    {service.provider.user.individual
+                      ? "Pessoa Física"
+                      : "Empresa"}
                   </p>
                 </div>
               </div>
             </div>
 
-            <Button className="w-full" size="lg" onClick={() => router.push(`/services/${service.id}`)}>
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => router.push(`/services/${service.id}`)}
+            >
               Contratar agora
             </Button>
           </div>

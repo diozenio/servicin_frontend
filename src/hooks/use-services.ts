@@ -44,12 +44,6 @@ export function useServices(options: UseServicesOptions = {}) {
     minRating: filters?.minRating,
     stateId: filters?.stateId,
     cityId: filters?.cityId,
-    search: searchTerm || filters?.q || undefined,
-    location:
-      selectedLocation || filters?.cityId || filters?.stateId || undefined,
-    providerId: providerId || undefined,
-    limit,
-    offset,
   };
 
   const {
@@ -93,12 +87,15 @@ export function useServices(options: UseServicesOptions = {}) {
   const total = servicesResponse?.total || 0;
   const hasMore = accumulatedServices.length < total;
 
-  const fetch = (newSearchTerm: string, newLocation: string) => {
+  const fetch = (
+    newSearchTerm: string,
+    newStateId: string,
+    newCityId: string
+  ) => {
     return container.serviceService.findAll({
-      search: newSearchTerm || undefined,
-      location: newLocation || undefined,
-      limit,
-      offset,
+      q: newSearchTerm || undefined,
+      stateId: newStateId || undefined,
+      cityId: newCityId || undefined,
     });
   };
 

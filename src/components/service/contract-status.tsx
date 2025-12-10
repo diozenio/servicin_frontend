@@ -21,7 +21,7 @@ import {
 import { CancelServiceDialog } from "./cancel-service-dialog";
 import { useCancelContract } from "@/hooks/use-contract";
 import { ScheduleService } from "@/core/services/ScheduleService";
-import { ScheduleMock } from "@/infra/schedule/ScheduleMock";
+import { container } from "@/container";
 
 interface ContractStatusProps {
   contract: Contract;
@@ -129,7 +129,6 @@ const approvalStatusConfig = {
 export function ContractStatus({ contract, className }: ContractStatusProps) {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const cancelContractMutation = useCancelContract();
-  const scheduleService = new ScheduleService(new ScheduleMock());
 
   const serviceStatus = serviceStatusConfig[contract.serviceStatus];
   const paymentStatus = paymentStatusConfig[contract.paymentStatus];
@@ -151,7 +150,7 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
       });
 
       if (success) {
-        await scheduleService.releaseTimeSlot(
+        await container.scheduleService.releaseTimeSlot(
           contract.providerId,
           contract.serviceId,
           contract.date,
@@ -160,8 +159,7 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
 
         setShowCancelDialog(false);
       }
-    } catch {
-    }
+    } catch {}
   };
 
   return (
@@ -311,7 +309,8 @@ export function ContractStatus({ contract, className }: ContractStatusProps) {
               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
               <span className="text-muted-foreground">
                 Contrato recusado pelo provedor
-                {contract.paymentStatus === "refunded" && " (reembolso realizado)"}
+                {contract.paymentStatus === "refunded" &&
+                  " (reembolso realizado)"}
               </span>
             </div>
           )}
