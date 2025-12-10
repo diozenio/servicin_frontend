@@ -11,6 +11,8 @@ import { AppointmentService } from "@/core/services/AppointmentService";
 import { NotificationAPI } from "@/infra/notifications/NotificationAPI";
 import { NotificationService } from "@/core/services/NotificationService";
 import { ServiceApi } from "@/infra/services/ServiceApi";
+import { CategoryAPI } from "@/infra/categories/CategoryAPI";
+import { CategoryService } from "@/core/services/CategoryService";
 
 const locationAdapter = new LocationAPI();
 const serviceAdapter = new ServiceApi();
@@ -19,6 +21,7 @@ const authAdapter = new AuthAPI();
 const reviewAdapter = new ReviewAPI();
 const appointmentAdapter = new AppointmentAPI();
 const notificationAdapter = new NotificationAPI();
+const categoryAdapter = new CategoryAPI();
 
 const locationService = new LocationService(locationAdapter);
 const serviceService = new ServiceService(serviceAdapter);
@@ -27,6 +30,7 @@ const authService = new AuthService(authAdapter);
 const reviewService = new ReviewService(reviewAdapter);
 const appointmentService = new AppointmentService(appointmentAdapter);
 const notificationService = new NotificationService(notificationAdapter);
+const categoryService = new CategoryService(categoryAdapter);
 
 export const container = {
   locationService,
@@ -35,4 +39,5 @@ export const container = {
   reviewService,
   appointmentService,
   notificationService,
+  categoryService,
 };

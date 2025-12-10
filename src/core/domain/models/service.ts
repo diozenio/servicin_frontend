@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/core/types/api";
 import { Address, User } from "./user";
 import { City, State } from "./location";
+import { Category } from "./category";
 
 export type ServiceQueryParams = {
   page?: number;
@@ -60,12 +61,6 @@ export type Provider = {
 export type Contact = {
   type: string;
   value: string;
-};
-
-export type Category = {
-  id: number;
-  name: string;
-  description: string;
 };
 
 export type UnavailableTimeSlot = {

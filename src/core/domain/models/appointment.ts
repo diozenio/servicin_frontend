@@ -38,14 +38,11 @@ export type Provider = {
   user: UserInfo;
 };
 
+import { Category } from "./category";
+
 export type ServicePhoto = {
   id: string;
   photoUrl: string;
-};
-
-export type Category = {
-  id: number;
-  name: string;
 };
 
 export type Client = {
