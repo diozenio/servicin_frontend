@@ -1,265 +1,234 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { 
+  StarIcon, 
+  MapPinIcon, 
+  PhoneIcon,
+  ImageIcon
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  MapPinIcon,
-  StarIcon,
-  BookmarkIcon,
-  DollarSignIcon,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Service } from "@/core/domain/models/service";
-import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { FaWhatsapp } from "react-icons/fa";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+export type ServiceData = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  rating: string;
+  photos: { id: string; photoUrl: string }[];
+  provider: {
+    user: {
+      photoUrl: string | null;
+      individual?: { fullName: string };
+      company?: { corporateName: string };
+      contacts: { type: string; value: string }[];
+    };
+  };
+  category: { name: string };
+  address: {
+    state: { name: string };
+    city: { name: string };
+  };
+  reviews: any[];
+};
 
 interface ServiceCardProps {
-  service: Service;
+  service: ServiceData;
 }
+
+const formatCurrency = (value: string | number) => {
+  const numberValue = typeof value === "string" ? parseFloat(value) : value;
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(numberValue);
+};
 
 export function ServiceCard({ service }: ServiceCardProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const servicePhoto = service.photos && service.photos.length > 0 
+    ? service.photos[0].photoUrl 
+    : null;
+  const providerUser = service.provider?.user;
+  const providerName = 
+    providerUser?.individual?.fullName || 
+    providerUser?.company?.corporateName || 
+    "Prestador";
+  const providerAvatar = providerUser?.photoUrl || undefined;
+  const contact = providerUser?.contacts?.find(c => c.type === "PHONE") || providerUser?.contacts?.[0];
+  const contactValue = contact?.value;
+  const city = service.address?.city?.name;
+  const state = service.address?.state?.name; 
 
-  const handleHireClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
+  const locationShort = city && state ? `${city}` : city;
+  const locationFull = city && state ? `${city} - ${state}` : city;
+
+  const ratingValue = parseFloat(service.rating);
+  const reviewCount = service.reviews?.length || 0;
+
+  const handleHire = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     router.push(`/services/${service.id}`);
-  };
-
-  const handleCardClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
   };
 
   return (
     <>
       <div
-        onClick={handleCardClick}
-        className="dark:bg-card bg-secondary/15 border border-border rounded-lg p-6 cursor-pointer transition-all duration-450 hover:shadow-lg hover:scale-[1.05] hover:border-primary/50"
+        onClick={() => setIsModalOpen(true)}
+        className="group cursor-pointer flex flex-col rounded-xl border bg-card shadow-sm hover:shadow-md transition-all overflow-hidden h-full"
       >
-        <div className="mb-4">
-          <h3 className="text-xl font-semibold text-card-foreground mb-2">
-            {service.title}
-          </h3>
-          <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10">
-              <AvatarImage src={service.logo} alt={service.company} />
-              <AvatarFallback>{service.logoFallback}</AvatarFallback>
-            </Avatar>
-            <span className="text-muted-foreground">{service.company}</span>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <Badge
-            className="rounded-full px-3 py-1"
-            variant={
-              service.type === "Urgente"
-                ? "destructive"
-                : service.type === "Padrão"
-                ? "default"
-                : "secondary"
-            }
-          >
-            {service.type}
-          </Badge>
-        </div>
-
-        <div className="mb-4">
-          <ul className="space-y-1">
-            {service.requirements.map((req, index) => (
-              <li
-                key={index}
-                className="text-sm text-muted-foreground flex items-start"
-              >
-                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                {req}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mb-4 space-y-2">
-          {service.location && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <MapPinIcon className="w-4 h-4 mr-2" />
-              {service.location.label}
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
+          {servicePhoto ? (
+            <img
+              src={servicePhoto}
+              alt={service.name}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex flex-col h-full items-center justify-center text-muted-foreground bg-secondary/50">
+              <ImageIcon size={32} className="opacity-20 mb-1" />
+              <span className="text-xs font-medium">Sem foto</span>
             </div>
           )}
-          {service.price && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <DollarSignIcon className="w-4 h-4 mr-2" />
-              {service.price}
-            </div>
+
+          {service.category?.name && (
+            <Badge className="absolute top-2 right-2 bg-background/90 backdrop-blur-md text-xs hover:bg-background text-foreground border-none shadow-sm">
+              {service.category.name}
+            </Badge>
           )}
         </div>
 
-        {service.rating && service.reviews && (
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center">
-              {Array.from({ length: 5 }, (_, i) => {
-                const starIndex = i + 1;
-                const isFullStar = starIndex <= Math.floor(service.rating);
-
-                return (
-                  <StarIcon
-                    key={i}
-                    className={cn("w-4 h-4 text-yellow-400", {
-                      "fill-current": isFullStar,
-                    })}
-                  />
-                );
-              })}
-            </div>
-            <span className="text-sm text-muted-foreground">
-              {service.rating} ({service.reviews} avaliações)
+        <div className="p-4 flex flex-col gap-3 flex-1">
+          <div className="flex justify-between items-start gap-3">
+            <h3 className="font-semibold leading-tight line-clamp-2 text-foreground text-sm md:text-base">
+              {service.name}
+            </h3>
+            <span className="font-bold text-primary whitespace-nowrap text-sm md:text-base">
+              {formatCurrency(service.price)}
             </span>
           </div>
-        )}
 
-        <div className="flex gap-2">
-          <Button className="flex-1" onClick={handleHireClick}>
-            Contratar Serviço
-          </Button>
-          <Button variant="outline" className="bg-transparent" size="icon">
-            <BookmarkIcon className="w-4 h-4" />
+          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-auto">
+            <StarIcon size={14} className="text-yellow-500 fill-yellow-500" />
+            <span className="font-medium text-foreground">{ratingValue.toFixed(1)}</span>
+            <span className="text-xs text-muted-foreground">
+              ({reviewCount} {reviewCount === 1 ? 'avaliação' : 'avaliações'})
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t mt-1 gap-2">
+
+            <div className="flex items-center gap-2 overflow-hidden max-w-[60%]">
+              <Avatar className="h-7 w-7 border shrink-0">
+                <AvatarImage src={providerAvatar} alt={providerName} />
+                <AvatarFallback className="text-[10px]">
+                  {providerName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-xs font-semibold truncate leading-none" title={providerName}>
+                  {providerName}
+                </span>
+                <span className="text-[10px] text-muted-foreground truncate mt-0.5">
+                  Prestador
+                </span>
+              </div>
+            </div>
+
+            {locationShort && (
+              <div 
+                className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 bg-secondary px-2 py-1 rounded-full max-w-[40%]"
+                title={locationFull}
+              >
+                <MapPinIcon size={10} />
+                <span className="font-medium truncate">{locationShort}</span>
+              </div>
+            )}
+          </div>
+
+          <Button className="w-full mt-1" size="sm" onClick={handleHire}>
+            Ver detalhes
           </Button>
         </div>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md md:max-w-lg overflow-y-auto max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{service.title}</DialogTitle>
-            <DialogDescription asChild>
-              <div className="flex items-center gap-3 mt-2">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage
-                    src={service.logo || "/placeholder.svg"}
-                    alt={service.company}
-                  />
-                  <AvatarFallback>{service.logoFallback}</AvatarFallback>
-                </Avatar>
-                <span className="text-base font-medium text-foreground">
-                  {service.company}
-                </span>
-              </div>
-            </DialogDescription>
+            <DialogTitle>{service.name}</DialogTitle>
+            {locationFull && (
+              <DialogDescription className="flex items-center gap-1 mt-1">
+                <MapPinIcon size={14} /> {locationFull}
+              </DialogDescription>
+            )}
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
-            <div>
-              <Badge
-                className="rounded-full px-3 py-1"
-                variant={
-                  service.type === "Urgente"
-                    ? "destructive"
-                    : service.type === "Padrão"
-                    ? "default"
-                    : "secondary"
-                }
-              >
-                {service.type}
-              </Badge>
+          <div className="space-y-5">
+            <div className="aspect-video w-full rounded-lg overflow-hidden bg-muted border">
+              {servicePhoto ? (
+                <img src={servicePhoto} alt={service.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <span className="flex items-center gap-2"><ImageIcon /> Sem imagem disponível</span>
+                </div>
+              )}
             </div>
 
-            {service.description && (
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">Descrição</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
+            </div>
+
+            <div className="flex items-center justify-between bg-secondary/20 p-4 rounded-lg border">
               <div>
-                <h4 className="font-semibold mb-3 text-foreground">
-                  Descrição do Serviço
-                </h4>
-                <div className="text-sm text-muted-foreground flex items-start">
-                  {service.description}
-                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase">Valor do serviço</span>
+                <p className="text-xl font-bold text-primary">{formatCurrency(service.price)}</p>
               </div>
-            )}
-
-            <div>
-              <h4 className="font-semibold mb-3 text-foreground">
-                Requisitos do Serviço
-              </h4>
-              <ul className="space-y-2">
-                {service.requirements.map((req, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-muted-foreground flex items-start"
-                  >
-                    <span className="w-2 h-2 bg-primary rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    {req}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              {service.location && (
-                <div className="flex items-center text-base text-foreground">
-                  <MapPinIcon className="w-5 h-5 mr-3 text-primary" />
-                  <span>{service.location.label}</span>
+              <div className="flex flex-col items-end">
+                <div className="flex items-center gap-1 bg-background px-2 py-1 rounded border shadow-sm">
+                  <StarIcon size={16} className="text-yellow-500 fill-yellow-500" />
+                  <span className="font-bold text-sm">{ratingValue.toFixed(1)}</span>
                 </div>
-              )}
-              {service.price && (
-                <div className="flex items-center text-base text-foreground">
-                  <DollarSignIcon className="w-5 h-5 mr-3 text-primary" />
-                  <span className="font-semibold">{service.price}</span>
-                </div>
-              )}
-              {service.whatsappContact && (
-                <div className="flex items-center text-base text-foreground">
-                  <FaWhatsapp className="w-5 h-5 mr-3 text-primary" />
-                  <span className="font-semibold">
-                    {service.whatsappContact}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {service.rating && service.reviews && (
-              <div className="flex items-center gap-3 p-4 bg-secondary/30 rounded-lg">
-                <div className="flex items-center">
-                  {Array.from({ length: 5 }, (_, i) => {
-                    const starIndex = i + 1;
-                    const isFullStar = starIndex <= Math.floor(service.rating);
-                    return (
-                      <StarIcon
-                        key={i}
-                        className={cn("w-5 h-5 text-yellow-400", {
-                          "fill-current": isFullStar,
-                        })}
-                      />
-                    );
-                  })}
-                </div>
-                <span className="text-base font-medium text-foreground">
-                  {service.rating} ({service.reviews} avaliações)
+                <span className="text-[10px] text-muted-foreground mt-1">
+                  Baseado em {reviewCount} avaliações
                 </span>
               </div>
-            )}
-          </div>
+            </div>
 
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={handleCloseModal}
-              className="bg-transparent"
-            >
-              Fechar
+            <div className="space-y-3 pt-2 border-t">
+              <h4 className="text-sm font-semibold">Sobre o profissional</h4>
+              <div className="flex items-start gap-3 p-3 rounded-lg border bg-card">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src={providerAvatar} />
+                  <AvatarFallback>{providerName.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 overflow-hidden">
+                  <p className="font-medium text-sm">{providerName}</p>
+                  
+                  {contactValue && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+                      <PhoneIcon size={12} />
+                      <span>{contactValue}</span>
+                    </div>
+                  )}
+                  
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                   {service.provider.user.individual ? "Pessoa Física" : "Empresa"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Button className="w-full" size="lg" onClick={() => router.push(`/services/${service.id}`)}>
+              Contratar agora
             </Button>
-            <Button onClick={handleHireClick}>Contratar Serviço</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </>
