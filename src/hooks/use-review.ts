@@ -11,9 +11,11 @@ export function useCreateReview() {
     mutationFn: async (request: CreateReviewRequest) => {
       return container.reviewService.createReview(request);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["appointment", variables.appointmentId] });
+      queryClient.invalidateQueries({
+        queryKey: ["appointment", variables.appointmentId],
+      });
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
   });

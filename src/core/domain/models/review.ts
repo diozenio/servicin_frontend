@@ -1,19 +1,25 @@
 export type CreateReviewRequest = {
-    appointmentId: string; 
-    rating: number;     
-    comment?: string;      
+  appointmentId: string;
+  rating: number;
+  comment?: string;
 };
 
 export type Review = {
   id: string;
   serviceId: string;
   clientId: string;
+  appointmentId: string;
   rating: number;
-  comment: string | null; 
-  createdAt: string;      
+  comment: string | null;
+  createdAt: string;
 };
 
 export type CreateReviewResponse = {
-  message: string;
-  review: Review;
+  id: string;
+  serviceId: string;
+  clientId: string;
+  appointmentId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
 };
