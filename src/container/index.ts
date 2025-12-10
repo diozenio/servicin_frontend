@@ -7,7 +7,7 @@ import { LocationAPI } from "@/infra/locations/LocationAPI";
 import { ScheduleLocalStorage } from "@/infra/schedule/ScheduleLocalStorage";
 import { ContractLocalStorage } from "@/infra/contract/ContractLocalStorage";
 import { AuthAPI } from "@/infra/auth/AuthAPI";
-import { NotificationAPI } from "@/infra/notifications/Notification";
+import { NotificationAPI } from "@/infra/notifications/NotificationAPI";
 import { NotificationService } from "@/core/services/NotificationService";
 import { ServiceApi } from "@/infra/services/ServiceApi";
 
@@ -31,5 +31,5 @@ export const container = {
   scheduleService,
   contractService,
   authService,
-  notificationService
+  notificationService,
 };
