@@ -59,7 +59,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     }
   }, [user, isAuthenticated]);
 
-  const providerId = service.providerId;
+  const providerId = service.provider[0].userId;
   const serviceId = service.id;
 
   const { data: schedule, isLoading: isLoadingSchedule } = useSchedule(
@@ -195,7 +195,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
           <h5 className="font-medium">Resumo do Serviço</h5>
           <p className="text-sm text-muted-foreground">
-            <strong>Serviço:</strong> {service.title}
+            <strong>Serviço:</strong> {service.name}
           </p>
           <p className="text-sm text-muted-foreground">
             <strong>Cliente:</strong> {customerName}
@@ -264,7 +264,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
           <h5 className="font-medium">Resumo do Contrato</h5>
           <p className="text-sm text-muted-foreground">
-            <strong>Serviço:</strong> {service.title}
+            <strong>Serviço:</strong> {service.name}
           </p>
           <p className="text-sm text-muted-foreground">
             <strong>Cliente:</strong> {customerName}
