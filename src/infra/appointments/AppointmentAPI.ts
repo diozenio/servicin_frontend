@@ -15,19 +15,13 @@ import { client } from "@/lib/client";
 
 export class AppointmentAPI implements AppointmentAdapter {
   async fetchAppointmentsForUser(): Promise<ApiResponse<Appointment[]>> {
-    const response = await client.get("/appointments/my-appointments");
-    return {
-      success: true,
-      data: response.data.appointments,
-    };
+    const { data } = await client.get("/appointments/my-appointments");
+    return data;
   }
 
   async fetchReceivedAppointments(): Promise<ApiResponse<Appointment[]>> {
-    const response = await client.get("/appointments/received");
-    return {
-      success: true,
-      data: response.data.appointments,
-    };
+    const { data } = await client.get("/appointments/received");
+    return data;
   }
 
   async fetchAppointmentById(
@@ -37,46 +31,15 @@ export class AppointmentAPI implements AppointmentAdapter {
       return { success: false, data: null };
     }
 
-    try {
-      const clientResponse = await client.get("/appointments/my-appointments");
-      const foundInClient = clientResponse.data.appointments?.find(
-        (a: Appointment) => a.id === id
-      );
-
-      if (foundInClient) {
-        return { success: true, data: foundInClient };
-      }
-
-      const providerResponse = await client.get("/appointments/received");
-
-      const foundInProvider = providerResponse.data.appointments?.find(
-        (a: Appointment) => a.id === id
-      );
-
-      if (foundInProvider) {
-        return { success: true, data: foundInProvider };
-      }
-
-      return {
-        success: false,
-        data: null,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        data: null,
-      };
-    }
+    const { data } = await client.get(`/appointments/${id}`);
+    return data;
   }
 
   async createAppointment(
     payload: CreateAppointmentPayload
   ): Promise<ApiResponse<CreateAppointmentResponse>> {
-    const response = await client.post("/appointments/", payload);
-    return {
-      success: true,
-      data: response.data,
-    };
+    const { data } = await client.post("/appointments/", payload);
+    return data;
   }
 
   async updateAppointmentStatus(
@@ -88,14 +51,11 @@ export class AppointmentAPI implements AppointmentAdapter {
     if (reason) {
       payload.reason = reason;
     }
-    const response = await client.patch(
+    const { data } = await client.patch(
       `/appointments/${appointmentId}/status`,
       payload
     );
-    return {
-      success: true,
-      data: response.data,
-    };
+    return data;
   }
 
   async cancelAppointment(
@@ -103,37 +63,28 @@ export class AppointmentAPI implements AppointmentAdapter {
     reason: string
   ): Promise<ApiResponse<CancelAppointmentResponse>> {
     const payload: CancelAppointmentPayload = { reason };
-    const response = await client.patch(
+    const { data } = await client.patch(
       `/appointments/${appointmentId}/cancel`,
       payload
     );
-    return {
-      success: true,
-      data: response.data,
-    };
+    return data;
   }
 
   async completeService(
     appointmentId: string
   ): Promise<ApiResponse<CompleteServiceResponse>> {
-    const response = await client.patch(
+    const { data } = await client.patch(
       `/appointments/${appointmentId}/complete-service`
     );
-    return {
-      success: true,
-      data: response.data,
-    };
+    return data;
   }
 
   async confirmPayment(
     appointmentId: string
   ): Promise<ApiResponse<ConfirmPaymentResponse>> {
-    const response = await client.patch(
+    const { data } = await client.patch(
       `/appointments/${appointmentId}/confirm-payment`
     );
-    return {
-      success: true,
-      data: response.data,
-    };
+    return data;
   }
 }

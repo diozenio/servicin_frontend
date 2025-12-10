@@ -7,15 +7,15 @@ import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton"
 import { useServices } from "@/hooks/use-services";
 import { SearchInput } from "@/components/search-input";
 import { useCallback } from "react";
-import { ServiceFilters } from "@/core/domain/models/filters";
+import { ServiceQueryParams } from "@/core/domain/models/service";
 
 export default function Home() {
   const router = useRouter();
 
-  const { services, isLoading } = useServices({ limit: 6 });
+  const { services, isLoading } = useServices({ page: 1, pageSize: 6 });
 
   const handleSearch = useCallback(
-    (filters: ServiceFilters) => {
+    (filters: ServiceQueryParams) => {
       const params = new URLSearchParams();
       if (filters.q?.trim()) {
         params.set("q", filters.q.trim());

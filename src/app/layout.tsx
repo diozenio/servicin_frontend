@@ -3,6 +3,7 @@ import { Playfair_Display, Work_Sans, Fira_Code } from "next/font/google";
 import "@/app/globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -43,6 +44,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <Toaster richColors closeButton position="top-right" />
             </ThemeProvider>
           </div>
         </QueryProvider>
@@ -50,4 +52,3 @@ export default function RootLayout({
     </html>
   );
 }
-

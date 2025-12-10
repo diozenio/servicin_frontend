@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PaymentMethod } from "@/core/domain/models/contract";
+import { PaymentMethod } from "@/core/domain/models/appointment";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CreditCardIcon, BanknoteIcon, QrCodeIcon } from "lucide-react";
@@ -14,25 +14,25 @@ interface PaymentMethodSelectorProps {
 
 const paymentMethods = [
   {
-    id: "pix" as PaymentMethod,
+    id: "PIX" as PaymentMethod,
     name: "PIX",
     description: "Pagamento instantâneo",
     icon: QrCodeIcon,
   },
   {
-    id: "credit_card" as PaymentMethod,
+    id: "CREDIT_CARD" as PaymentMethod,
     name: "Cartão de Crédito",
     description: "Visa, Mastercard, etc.",
     icon: CreditCardIcon,
   },
   {
-    id: "debit_card" as PaymentMethod,
+    id: "DEBIT_CARD" as PaymentMethod,
     name: "Cartão de Débito",
     description: "Débito direto na conta",
     icon: CreditCardIcon,
   },
   {
-    id: "cash" as PaymentMethod,
+    id: "CASH" as PaymentMethod,
     name: "Dinheiro",
     description: "Pagamento em espécie",
     icon: BanknoteIcon,

@@ -7,17 +7,25 @@ import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
 import { useServices } from "@/hooks/use-services";
 import { SearchInput } from "@/components/search-input";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ServiceFilters } from "@/core/domain/models/filters";
+import { ServiceQueryParams } from "@/core/domain/models/service";
 import { useStates, useCitiesByState } from "@/hooks/use-locations";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const defaultFilters = React.useMemo<ServiceFilters>(
+  const defaultFilters = React.useMemo<ServiceQueryParams>(
     () => ({
       page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
       pageSize: searchParams.get("pageSize")
@@ -52,9 +60,9 @@ export default function SearchPage() {
     ]
   );
 
-  const { services, isLoading, isFetching, loadMore, limit, total, hasMore } =
+  const { services, isLoading, isFetching, total, pageSize, currentPage } =
     useServices({
-      filters: defaultFilters,
+      ...defaultFilters,
     });
 
   const { data: states = [] } = useStates();
@@ -67,7 +75,7 @@ export default function SearchPage() {
 
   const activeFilters = React.useMemo(() => {
     const filters: Array<{
-      key: keyof ServiceFilters;
+      key: keyof ServiceQueryParams;
       label: string;
       value: string;
     }> = [];
@@ -128,7 +136,7 @@ export default function SearchPage() {
     return filters;
   }, [defaultFilters, selectedState, selectedCity]);
 
-  const handleSearch = (filters: ServiceFilters) => {
+  const buildQueryString = (filters: ServiceQueryParams) => {
     const params = new URLSearchParams();
     if (filters.q?.trim()) {
       params.set("q", filters.q.trim());
@@ -161,13 +169,60 @@ export default function SearchPage() {
       params.set("pageSize", filters.pageSize.toString());
     }
 
-    const queryString = params.toString();
+    return params.toString();
+  };
+
+  const handleSearch = (filters: ServiceQueryParams) => {
+    const queryString = buildQueryString(filters);
     router.push(`/search${queryString ? `?${queryString}` : ""}`);
   };
 
-  const handleLoadMore = () => {
-    loadMore();
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page === currentPage) return;
+    handleSearch({ ...defaultFilters, page });
   };
+
+  const totalPages = pageSize ? Math.max(1, Math.ceil(total / pageSize)) : 1;
+
+  const buildPageHref = (page: number) => {
+    const queryString = buildQueryString({ ...defaultFilters, page });
+    return `/search${queryString ? `?${queryString}` : ""}`;
+  };
+
+  const paginationItems = React.useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    const pages = new Set<number>([
+      1,
+      totalPages,
+      currentPage,
+      currentPage - 1,
+      currentPage + 1,
+      currentPage - 2,
+      currentPage + 2,
+    ]);
+
+    const validPages = Array.from(pages)
+      .filter((page) => page >= 1 && page <= totalPages)
+      .sort((a, b) => a - b);
+
+    const items: number[] = [];
+
+    for (let i = 0; i < validPages.length; i += 1) {
+      const page = validPages[i];
+      const prev = validPages[i - 1];
+
+      if (prev !== undefined && page - prev > 1) {
+        items.push(-1);
+      }
+
+      items.push(page);
+    }
+
+    return items;
+  }, [currentPage, totalPages]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -237,7 +292,7 @@ export default function SearchPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            Array.from({ length: limit }, (_, index) => (
+            Array.from({ length: pageSize }, (_, index) => (
               <ServiceCardSkeleton key={`skeleton-${index}`} />
             ))
           ) : services.length > 0 ? (
@@ -260,16 +315,89 @@ export default function SearchPage() {
           )}
         </div>
 
-        {services.length > 0 && hasMore && (
+        {services.length > 0 && totalPages > 1 && (
           <div className="flex justify-center mt-8">
-            <Button
-              variant="secondary"
-              onClick={handleLoadMore}
-              disabled={isLoading || isFetching}
-              className="px-8 py-2"
-            >
-              {isLoading || isFetching ? "Carregando..." : "Ver mais"}
-            </Button>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href={buildPageHref(currentPage - 1)}
+                    aria-disabled={currentPage === 1 || isLoading || isFetching}
+                    tabIndex={
+                      currentPage === 1 || isLoading || isFetching ? -1 : 0
+                    }
+                    className={
+                      currentPage === 1 || isLoading || isFetching
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      if (currentPage > 1 && !isLoading && !isFetching) {
+                        handlePageChange(currentPage - 1);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+                {paginationItems.map((page, index) =>
+                  page === -1 ? (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={page === currentPage}
+                        href={buildPageHref(page)}
+                        aria-disabled={isLoading || isFetching}
+                        tabIndex={isLoading || isFetching ? -1 : 0}
+                        className={
+                          isLoading || isFetching
+                            ? "pointer-events-none opacity-50"
+                            : undefined
+                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          if (!isLoading && !isFetching) {
+                            handlePageChange(page);
+                          }
+                        }}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    href={buildPageHref(currentPage + 1)}
+                    aria-disabled={
+                      currentPage === totalPages || isLoading || isFetching
+                    }
+                    tabIndex={
+                      currentPage === totalPages || isLoading || isFetching
+                        ? -1
+                        : 0
+                    }
+                    className={
+                      currentPage === totalPages || isLoading || isFetching
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      if (
+                        currentPage < totalPages &&
+                        !isLoading &&
+                        !isFetching
+                      ) {
+                        handlePageChange(currentPage + 1);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>

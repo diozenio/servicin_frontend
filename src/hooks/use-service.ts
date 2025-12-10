@@ -1,15 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/container";
-import { Service, CreateServicePayload } from "@/core/domain/models/service";
+import {
+  Service,
+  CreateServicePayload,
+  ServiceResponse,
+} from "@/core/domain/models/service";
 
 export function useService(serviceId: string | null) {
   const {
     data: service,
     isLoading,
     error,
-  } = useQuery<Service | null>({
+  } = useQuery<ServiceResponse | null>({
     queryKey: ["service", serviceId],
-    queryFn: async (): Promise<Service | null> => {
+    queryFn: async (): Promise<ServiceResponse | null> => {
       if (!serviceId) return null;
 
       const response = await container.serviceService.findById(serviceId);

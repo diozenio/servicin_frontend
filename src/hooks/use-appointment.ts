@@ -15,6 +15,8 @@ export function useAppointments() {
         await container.appointmentService.fetchAppointmentsForUser();
       return response.data;
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
@@ -26,6 +28,8 @@ export function useReceivedAppointments() {
         await container.appointmentService.fetchReceivedAppointments();
       return response.data;
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
@@ -40,6 +44,8 @@ export function useAppointmentDetails(appointmentId: string) {
       return response.data;
     },
     enabled: !!appointmentId && appointmentId !== "undefined",
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 

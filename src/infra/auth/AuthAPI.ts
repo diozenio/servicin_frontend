@@ -13,38 +13,22 @@ import { client } from "@/lib/client";
 export class AuthAPI implements AuthAdapter {
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     const { email, password } = credentials;
-    const response = await client.post("/auth/login", { email, password });
-    return {
-      success: response.data.success,
-      data: response.data.data,
-      message: response.data.message,
-    };
+    const { data } = await client.post("/auth/login", { email, password });
+    return data;
   }
 
   async signup(userData: SignupRequest): Promise<ApiResponse<SignupResponse>> {
-    const response = await client.post("/auth/signup", userData);
-    return {
-      success: response.data.success,
-      data: response.data.data,
-      message: response.data.message,
-    };
+    const { data } = await client.post("/auth/signup", userData);
+    return data;
   }
 
   async logout(): Promise<ApiResponse<LogoutResponse>> {
-    const response = await client.post("/auth/logout");
-    return {
-      success: response.data.success,
-      data: response.data.data,
-      message: response.data.message,
-    };
+    const { data } = await client.post("/auth/logout");
+    return data;
   }
 
   async getCurrentUser(): Promise<ApiResponse<GetCurrentUserResponse>> {
-    const response = await client.get("/auth/me");
-    return {
-      success: response.data.success,
-      data: response.data.data,
-      message: response.data.message,
-    };
+    const { data } = await client.get("/auth/me");
+    return data;
   }
 }

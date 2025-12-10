@@ -1,6 +1,5 @@
 import { ApiResponse } from "@/core/types/api";
-import { Address, User } from "./user";
-import { City, State } from "./location";
+import { User } from "./user";
 import { Category } from "./category";
 
 export type ServiceQueryParams = {
@@ -21,7 +20,7 @@ export type Service = {
   name: string;
   description?: string;
   price: string;
-  rating: number;
+  rating: string;
   photos: PhotoURL[];
   availabilities: Availability[];
   provider: Provider;

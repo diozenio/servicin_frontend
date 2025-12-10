@@ -51,7 +51,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
   const locationShort = city && state ? `${city}` : city;
   const locationFull = city && state ? `${city} - ${state}` : city;
 
-  const ratingValue = service.rating;
+  const ratingValue = parseFloat(service.rating);
   const reviewCount = service.reviews?.length || 0;
 
   const handleHire = (e: React.MouseEvent<HTMLButtonElement>) => {

@@ -10,6 +10,8 @@ export function useNotifications() {
       const response = await container.notificationService.fetchNotifications();
       return response.data || [];
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
@@ -21,6 +23,8 @@ export function useUnreadNotifications() {
         await container.notificationService.fetchUnreadNotifications();
       return response.data || [];
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
@@ -34,6 +38,8 @@ export function useNotification(id: string | undefined) {
       return response.data;
     },
     enabled: !!id,
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 

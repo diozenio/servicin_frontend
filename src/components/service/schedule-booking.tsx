@@ -13,15 +13,22 @@ import { PaymentMethodSelector } from "@/components/service/payment-method-selec
 import { PixPayment } from "@/components/service/pix-payment";
 import { CardPayment } from "@/components/service/card-payment";
 import { CashPayment } from "@/components/service/cash-payment";
-import { useSchedule } from "@/hooks/use-schedule";
-import { useCreateContract, useConfirmPayment } from "@/hooks/use-contract";
+import {
+  useCreateAppointment,
+  useConfirmPayment,
+} from "@/hooks/use-appointment";
 import { useAuth } from "@/hooks/use-auth";
 import { Service } from "@/core/domain/models/service";
-import { DaySchedule } from "@/core/domain/models/schedule";
-import { PaymentMethod } from "@/core/domain/models/contract";
+import { DaySchedule, TimeSlot } from "@/core/domain/models/schedule";
+import {
+  PaymentMethod,
+  CreateAppointmentPayload,
+} from "@/core/domain/models/appointment";
 import { cn } from "@/lib/utils";
 import { LoaderIcon, CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 import { getUserContactPhone, getUserDisplayName } from "@/utils/user";
+import { buildScheduleFromService } from "@/utils/schedule";
+import { Toaster, toast } from "sonner";
 
 interface ScheduleBookingProps {
   service: Service;
@@ -33,7 +40,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   const { user, isAuthenticated } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<
-    string | undefined
+    TimeSlot | undefined
   >();
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -44,7 +51,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   const [currentStep, setCurrentStep] = useState<
     "schedule" | "payment" | "confirmation"
   >("schedule");
-  const [contractId, setContractId] = useState<string | null>(null);
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
 
   const userName = getUserDisplayName(user!);
   const userContactPhone = getUserContactPhone(user!);
@@ -59,15 +66,15 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     }
   }, [user, isAuthenticated]);
 
-  const providerId = service.provider.user.id;
-  const serviceId = service.id;
-
-  const { data: schedule, isLoading: isLoadingSchedule } = useSchedule(
-    providerId,
-    serviceId
+  const schedule = React.useMemo(
+    () => buildScheduleFromService(service),
+    [service]
   );
-  const createContractMutation = useCreateContract();
+  const createAppointmentMutation = useCreateAppointment();
   const confirmPaymentMutation = useConfirmPayment();
+
+  const notifyError = (message: string) =>
+    toast.error(message, { position: "top-right" });
 
   const availableDates = React.useMemo(() => {
     if (!schedule) return [];
@@ -90,13 +97,55 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   };
 
   const handleTimeSlotSelect = (timeSlot: string) => {
-    setSelectedTimeSlot(timeSlot);
+    const slot = selectedDaySchedule?.timeSlots.find(
+      (s: TimeSlot) => s.time === timeSlot
+    );
+    setSelectedTimeSlot(slot);
+  };
+
+  const getSlotDuration = (): number => {
+    if (!selectedDate || !selectedDaySchedule) return 60;
+
+    const weekday = selectedDate.getDay();
+    const availability = service.availabilities?.find(
+      (av) => av.dayOfWeek === weekday
+    );
+
+    return availability?.slotDuration || 60;
+  };
+
+  const convertToISO = (
+    date: Date,
+    time: string
+  ): { start: string; end: string } => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const startDate = new Date(date);
+    startDate.setHours(hours, minutes, 0, 0);
+
+    const durationMinutes = getSlotDuration();
+    const endDate = new Date(startDate);
+    endDate.setMinutes(endDate.getMinutes() + durationMinutes);
+
+    return {
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+    };
   };
 
   const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedDate || !selectedTimeSlot || !customerName || !customerPhone) {
+    if (
+      !selectedDate ||
+      !selectedTimeSlot ||
+      !customerName ||
+      !customerPhone ||
+      !notes ||
+      notes.trim().length < 20
+    ) {
+      notifyError(
+        "Preencha todos os campos obrigatórios (mín. 20 caracteres nas observações)."
+      );
       return;
     }
 
@@ -107,47 +156,83 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     setSelectedPaymentMethod(method);
   };
 
-  const handleCreateContract = async () => {
+  const handleCreateAppointment = async () => {
     if (
       !selectedDate ||
       !selectedTimeSlot ||
-      !customerName ||
-      !customerPhone ||
       !selectedPaymentMethod ||
-      !isAuthenticated
+      !isAuthenticated ||
+      !notes ||
+      notes.trim().length < 20
     ) {
+      notifyError(
+        "Preencha todos os campos e selecione pagamento para continuar."
+      );
       return;
     }
 
-    const contract = {
-      serviceId,
-      providerId,
-      customerName,
-      customerPhone,
-      customerEmail: customerEmail || undefined,
-      date: selectedDate.toISOString().split("T")[0],
-      timeSlot: selectedTimeSlot,
-      notes: notes || undefined,
+    if (!selectedTimeSlot.isAvailable || selectedTimeSlot.isBooked) {
+      notifyError("Horário indisponível. Escolha outro.");
+      return;
+    }
+
+    const { start, end } = convertToISO(selectedDate, selectedTimeSlot.time);
+
+    const appointmentPayload: CreateAppointmentPayload = {
+      serviceId: service.id,
+      description:
+        notes.trim() || `Agendamento para ${customerName || "Cliente"}`,
       paymentMethod: selectedPaymentMethod,
+      scheduledStartTime: start,
+      scheduledEndTime: end,
     };
 
     try {
-      const result = await createContractMutation.mutateAsync(contract);
-      if (result.success && result.contractId) {
-        setContractId(result.contractId);
+      const result = await createAppointmentMutation.mutateAsync(
+        appointmentPayload
+      );
+      const appointmentId = result.data?.appointmentId;
+
+      if (appointmentId) {
+        setAppointmentId(appointmentId);
         setCurrentStep("confirmation");
       } else {
+        notifyError(
+          result?.message ||
+            "Agendamento criado, mas o ID não retornou. Verifique sua lista de agendamentos."
+        );
       }
-    } catch {}
+    } catch (error) {
+      console.error("Erro ao criar agendamento:", error);
+      const apiMessage =
+        (error as any)?.response?.data?.message ||
+        (error as any)?.message ||
+        "Erro ao criar agendamento. Tente novamente.";
+      notifyError(apiMessage);
+    }
   };
 
   const handlePaymentConfirmed = async () => {
-    if (!contractId) return;
+    if (!appointmentId) return;
 
     try {
-      await confirmPaymentMutation.mutateAsync(contractId);
-      router.push("/contracts");
-    } catch {}
+      const result = await confirmPaymentMutation.mutateAsync(appointmentId);
+      if (result?.success) {
+        router.push("/appointments");
+      } else {
+        notifyError(
+          result?.message ||
+            "Não foi possível confirmar o pagamento. Tente novamente."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao confirmar pagamento:", error);
+      const apiMessage =
+        (error as any)?.response?.data?.message ||
+        (error as any)?.message ||
+        "Erro ao confirmar pagamento. Tente novamente.";
+      notifyError(apiMessage);
+    }
   };
 
   const isFormValid =
@@ -155,20 +240,20 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     selectedTimeSlot &&
     customerName &&
     customerPhone &&
+    notes &&
+    notes.trim().length >= 20 &&
     isAuthenticated;
 
-  if (isLoadingSchedule) {
-    return (
-      <div className={cn("space-y-6", className)}>
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-2">
-            <LoaderIcon className="w-6 h-6 animate-spin" />
-            <span>Carregando horários disponíveis...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const getPaymentMethodLabel = (method: PaymentMethod | null) => {
+    if (!method) return "";
+    const labels: Record<PaymentMethod, string> = {
+      PIX: "PIX",
+      CREDIT_CARD: "Cartão de Crédito",
+      DEBIT_CARD: "Cartão de Débito",
+      CASH: "Dinheiro",
+    };
+    return labels[method];
+  };
 
   if (!schedule) {
     return (
@@ -186,9 +271,9 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
     return (
       <div className={cn("space-y-6", className)}>
         <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold">Contratar Serviço</h3>
+          <h3 className="text-2xl font-bold">Agendar Serviço</h3>
           <p className="text-muted-foreground">
-            Escolha a forma de pagamento para finalizar a contratação
+            Escolha a forma de pagamento para finalizar o agendamento
           </p>
         </div>
 
@@ -204,7 +289,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
             <strong>Data:</strong> {selectedDate?.toLocaleDateString("pt-BR")}
           </p>
           <p className="text-sm text-muted-foreground">
-            <strong>Horário:</strong> {selectedTimeSlot}
+            <strong>Horário:</strong> {selectedTimeSlot?.time}
           </p>
           <p className="text-sm text-muted-foreground">
             <strong>Valor:</strong> {service.price}
@@ -218,17 +303,22 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
 
         <div className="space-y-4">
           <Button
-            onClick={handleCreateContract}
+            onClick={handleCreateAppointment}
             disabled={
-              !selectedPaymentMethod || createContractMutation.isPending
+              !selectedPaymentMethod ||
+              createAppointmentMutation.isPending ||
+              !selectedDate ||
+              !selectedTimeSlot ||
+              !selectedTimeSlot.isAvailable ||
+              selectedTimeSlot.isBooked
             }
             className="w-full"
             size="lg"
           >
-            {createContractMutation.isPending ? (
+            {createAppointmentMutation.isPending ? (
               <>
                 <LoaderIcon className="w-4 h-4 mr-2 animate-spin" />
-                Criando Contrato...
+                Criando Agendamento...
               </>
             ) : (
               "Continuar para Pagamento"
@@ -248,9 +338,11 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
   }
 
   if (currentStep === "confirmation") {
-    const amount = parseFloat(
-      service.price.replace("R$ ", "").replace(",", ".")
-    );
+    const priceString = service.price
+      .replace("R$ ", "")
+      .replace(",", ".")
+      .trim();
+    const amount = parseFloat(priceString) || 0;
 
     return (
       <div className={cn("space-y-6", className)}>
@@ -262,7 +354,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
         </div>
 
         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-          <h5 className="font-medium">Resumo do Contrato</h5>
+          <h5 className="font-medium">Resumo do Agendamento</h5>
           <p className="text-sm text-muted-foreground">
             <strong>Serviço:</strong> {service.name}
           </p>
@@ -273,45 +365,39 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
             <strong>Data:</strong> {selectedDate?.toLocaleDateString("pt-BR")}
           </p>
           <p className="text-sm text-muted-foreground">
-            <strong>Horário:</strong> {selectedTimeSlot}
+            <strong>Horário:</strong> {selectedTimeSlot?.time}
           </p>
           <p className="text-sm text-muted-foreground">
             <strong>Forma de Pagamento:</strong>{" "}
-            {selectedPaymentMethod === "pix"
-              ? "PIX"
-              : selectedPaymentMethod === "credit_card"
-              ? "Cartão de Crédito"
-              : selectedPaymentMethod === "debit_card"
-              ? "Cartão de Débito"
-              : "Dinheiro"}
+            {getPaymentMethodLabel(selectedPaymentMethod)}
           </p>
           <p className="text-sm text-muted-foreground">
             <strong>Valor:</strong> {service.price}
           </p>
         </div>
 
-        {selectedPaymentMethod === "pix" && (
+        {selectedPaymentMethod === "PIX" && (
           <PixPayment
             amount={amount}
             onPaymentConfirmed={handlePaymentConfirmed}
           />
         )}
 
-        {selectedPaymentMethod === "credit_card" && (
+        {selectedPaymentMethod === "CREDIT_CARD" && (
           <CardPayment
             amount={amount}
             onPaymentConfirmed={handlePaymentConfirmed}
           />
         )}
 
-        {selectedPaymentMethod === "debit_card" && (
+        {selectedPaymentMethod === "DEBIT_CARD" && (
           <CardPayment
             amount={amount}
             onPaymentConfirmed={handlePaymentConfirmed}
           />
         )}
 
-        {selectedPaymentMethod === "cash" && (
+        {selectedPaymentMethod === "CASH" && (
           <CashPayment
             amount={amount}
             onPaymentConfirmed={handlePaymentConfirmed}
@@ -331,6 +417,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
 
   return (
     <div className={cn("space-y-6", className)}>
+      <Toaster richColors closeButton />
       <div className="text-center space-y-2">
         <h3 className="text-2xl font-bold">Agendar Serviço</h3>
         <p className="text-muted-foreground">
@@ -360,7 +447,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
               </div>
               <TimeSlotPicker
                 timeSlots={selectedDaySchedule?.timeSlots || []}
-                selectedTimeSlot={selectedTimeSlot}
+                selectedTimeSlot={selectedTimeSlot?.time}
                 onTimeSlotSelect={handleTimeSlotSelect}
               />
             </div>
@@ -433,14 +520,19 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Observações (opcional)</Label>
+              <Label htmlFor="notes">Observações *</Label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Alguma informação adicional sobre o serviço..."
                 rows={3}
+                minLength={20}
+                required
               />
+              <p className="text-xs text-muted-foreground">
+                Mínimo de 20 caracteres.
+              </p>
             </div>
 
             {(selectedDate || selectedTimeSlot) && (
@@ -454,7 +546,7 @@ export function ScheduleBooking({ service, className }: ScheduleBookingProps) {
                 )}
                 {selectedTimeSlot && (
                   <p className="text-sm text-muted-foreground">
-                    <strong>Horário:</strong> {selectedTimeSlot}
+                    <strong>Horário:</strong> {selectedTimeSlot.time}
                   </p>
                 )}
               </div>

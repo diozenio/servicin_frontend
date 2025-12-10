@@ -13,6 +13,7 @@ import { NotificationService } from "@/core/services/NotificationService";
 import { ServiceApi } from "@/infra/services/ServiceApi";
 import { CategoryAPI } from "@/infra/categories/CategoryAPI";
 import { CategoryService } from "@/core/services/CategoryService";
+import { ScheduleService } from "@/core/services/ScheduleService";
 
 const locationAdapter = new LocationAPI();
 const serviceAdapter = new ServiceApi();
@@ -31,6 +32,12 @@ const reviewService = new ReviewService(reviewAdapter);
 const appointmentService = new AppointmentService(appointmentAdapter);
 const notificationService = new NotificationService(notificationAdapter);
 const categoryService = new CategoryService(categoryAdapter);
+const scheduleService = new ScheduleService({
+  getProviderSchedule: async () => null,
+  createBooking: async () => ({ success: false, message: "not implemented" }),
+  checkAvailability: async () => false,
+  releaseTimeSlot: async () => false,
+});
 
 export const container = {
   locationService,
@@ -40,4 +47,5 @@ export const container = {
   appointmentService,
   notificationService,
   categoryService,
+  scheduleService,
 };

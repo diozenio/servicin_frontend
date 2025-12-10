@@ -5,11 +5,14 @@ import {
   CreateServicePayload,
   CreateServiceApiResponse,
 } from "@/core/domain/models/service";
+import { ApiResponse } from "@/core/types/api";
 
 export abstract class ServiceUseCase {
-  abstract findAll(params?: ServiceQueryParams): Promise<ServiceListResponse>;
-  abstract findById(id: string): Promise<ServiceResponse>;
+  abstract findAll(
+    params?: ServiceQueryParams
+  ): Promise<ApiResponse<ServiceListResponse>>;
+  abstract findById(id: string): Promise<ApiResponse<ServiceResponse>>;
   abstract create(
     payload: CreateServicePayload
-  ): Promise<CreateServiceApiResponse>;
+  ): Promise<ApiResponse<CreateServiceApiResponse>>;
 }

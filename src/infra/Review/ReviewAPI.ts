@@ -10,10 +10,7 @@ export class ReviewAPI implements ReviewAdapter {
   async createReview(
     request: CreateReviewRequest
   ): Promise<ApiResponse<CreateReviewResponse>> {
-    const response = await client.post("/reviews/", request);
-    return {
-      success: true,
-      data: response.data.data,
-    };
+    const { data } = await client.post("/reviews/", request);
+    return data;
   }
 }

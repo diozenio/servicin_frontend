@@ -55,10 +55,7 @@ export default function Navbar() {
               <Link href="/search">Serviços</Link>
             </Button>
             <Button variant="link" asChild className="text-sm">
-              <Link href="#">Profissionais</Link>
-            </Button>
-            <Button variant="link" asChild className="text-sm">
-              <Link href="/contracts">Contratos</Link>
+              <Link href="/appointments">Agendamentos</Link>
             </Button>
             <Button variant="link" asChild className="text-sm">
               <Link href="#">Sobre</Link>

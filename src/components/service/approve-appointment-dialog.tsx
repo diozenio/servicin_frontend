@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ApproveContractDialogProps {
+interface ApproveAppointmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onApprove: () => void;
@@ -28,14 +28,14 @@ interface ApproveContractDialogProps {
   className?: string;
 }
 
-export function ApproveContractDialog({
+export function ApproveAppointmentDialog({
   isOpen,
   onClose,
   onApprove,
   onReject,
   isLoading = false,
   className,
-}: ApproveContractDialogProps) {
+}: ApproveAppointmentDialogProps) {
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
 
   const handleApprove = () => {
@@ -65,10 +65,10 @@ export function ApproveContractDialog({
             </div>
             <div>
               <DialogTitle className="text-left">
-                Aprovar ou Recusar Contrato
+                Aprovar ou Recusar Agendamento
               </DialogTitle>
               <DialogDescription className="text-left">
-                Escolha uma ação para este contrato
+                Escolha uma ação para este agendamento
               </DialogDescription>
             </div>
           </div>
@@ -77,7 +77,7 @@ export function ApproveContractDialog({
         <div className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <p className="text-sm text-muted-foreground">
-              O cliente já realizou o pagamento. Você pode aprovar o contrato
+              O cliente já realizou o pagamento. Você pode aprovar o agendamento
               para que o serviço possa ser executado, ou recusá-lo (o pagamento
               será reembolsado automaticamente).
             </p>
@@ -90,7 +90,7 @@ export function ApproveContractDialog({
                 <p className="font-medium mb-1">Importante:</p>
                 <ul className="space-y-1 text-xs">
                   <li>
-                    • Ao aprovar, o contrato estará confirmado e o serviço
+                    • Ao aprovar, o agendamento estará confirmado e o serviço
                     poderá ser executado
                   </li>
                   <li>
@@ -156,3 +156,4 @@ export function ApproveContractDialog({
     </Dialog>
   );
 }
+
