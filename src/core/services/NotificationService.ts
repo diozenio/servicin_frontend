@@ -5,8 +5,8 @@ import { NotificationUseCase } from "../interfaces/usecases/NotificationUseCase"
 export class NotificationService implements NotificationUseCase {
     constructor(private notificationAdapter: NotificationAdapter) {}
 
-    getUnreadCount(): Promise<number> {
-        return this.notificationAdapter.getUnreadCount();
+    fetchUnreadNotifications(): Promise<NotificationListResponse> {
+        return this.notificationAdapter.fetchUnreadNotifications();
     }
 
     markAsRead(notificationId: string): Promise<boolean> {

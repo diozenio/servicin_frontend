@@ -1,7 +1,7 @@
 import { NotificationListResponse } from "@/core/domain/models/notification";
 
 export interface NotificationAdapter {
-    getUnreadCount(): Promise<number>;
+    fetchUnreadNotifications(): Promise<NotificationListResponse>;
     markAsRead(notificationId: string): Promise<boolean>;
     fetchNotifications(): Promise<NotificationListResponse>;
 }
