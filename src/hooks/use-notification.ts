@@ -9,17 +9,18 @@ export function useNotifications() {
     queryFn: async () => {
       const response = await container.notificationService.fetchNotifications();
       return response.notifications || [];
-    }
+    },
   });
 }
 
-export function useUnreadNotificationCount() {
+export function useUnreadNotifications() {
   return useQuery({
-    queryKey: ["notifications", "unreadCount"],
+    queryKey: ["notifications", "unread"],
     queryFn: async () => {
-      const count = await container.notificationService.getUnreadCount();
-      return count ?? 0;
-    }
+      const response =
+        await container.notificationService.fetchUnreadNotifications();
+      return response.notifications || [];
+    },
   });
 }
 
@@ -32,6 +33,7 @@ export function useMarkNotificationAsRead() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", "unread"] });
     },
   });
 }
