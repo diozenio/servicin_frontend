@@ -10,9 +10,9 @@ export class LocationAPI extends LocationAdapter {
     try {
       const response = await client.get("/locations/states");
       return {
-        data: response.data,
-        success: true,
-        message: "States fetched successfully",
+        success: response.data.success ?? true,
+        data: response.data.data || [],
+        message: response.data.message,
       };
     } catch (error) {
       return {
@@ -28,9 +28,9 @@ export class LocationAPI extends LocationAdapter {
     try {
       const response = await client.get(`/locations/states/${stateId}/cities`);
       return {
-        data: response.data,
-        success: true,
-        message: "Cities fetched successfully",
+        success: response.data.success ?? true,
+        data: response.data.data || [],
+        message: response.data.message,
       };
     } catch (error) {
       return {
@@ -42,4 +42,3 @@ export class LocationAPI extends LocationAdapter {
     }
   }
 }
-

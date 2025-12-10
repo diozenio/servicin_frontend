@@ -1,8 +1,9 @@
 import {
-  LocationListResponse,
-  LocationQueryParams,
+  StateListResponse,
+  CityListResponse,
 } from "@/core/domain/models/location";
 
-export abstract class LocationUseCase {
-  abstract findAll(params?: LocationQueryParams): Promise<LocationListResponse>;
+export interface LocationUseCase {
+  getStates(): Promise<StateListResponse>;
+  getCitiesByState(stateId: string): Promise<CityListResponse>;
 }
