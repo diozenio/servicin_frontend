@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Contract } from "@/core/domain/models/contract";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
   XIcon,
   EyeIcon,
   ThumbsUpIcon,
+  StarIcon,
 } from "lucide-react";
 import { CancelServiceDialog } from "./cancel-service-dialog";
 import { ApproveContractDialog } from "./approve-contract-dialog";
@@ -144,6 +146,9 @@ export function UserContracts({
   const canCancel = (contract: Contract) =>
     contract.serviceStatus === "not_started";
 
+  const canReview = (contract: Contract) =>
+    contract.serviceStatus === "completed" && contract.paymentStatus === "paid";
+
   const canApproveOrReject = (contract: Contract) =>
     isProvider &&
     contract.paymentStatus === "paid" &&
@@ -214,6 +219,7 @@ export function UserContracts({
           const approvalStatus = approvalStatusConfig[contract.approvalStatus];
           const canCancelContract = canCancel(contract);
           const canApproveReject = canApproveOrReject(contract);
+          const canReviewContract = canReview(contract);
 
           return (
             <div
@@ -298,6 +304,14 @@ export function UserContracts({
                     <EyeIcon className="w-4 h-4 mr-2" />
                     Ver Detalhes
                   </Button>
+                )}
+                {canReviewContract && (
+                  <Link href={`/appointments/${contract.id}/review`} className="flex-1">
+                    <Button variant="default" size="sm" className="w-full">
+                      <StarIcon className="w-4 h-4 mr-2" />
+                      Deixar Avaliação
+                    </Button>
+                  </Link>
                 )}
                 {canApproveReject && (
                   <>
