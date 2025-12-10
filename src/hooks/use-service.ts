@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/container";
-import { Service } from "@/core/domain/models/service";
+import { Service, CreateServicePayload } from "@/core/domain/models/service";
 
 export function useService(serviceId: string | null) {
   const {
@@ -28,4 +28,17 @@ export function useService(serviceId: string | null) {
     isLoading,
     error,
   };
+}
+
+export function useCreateService() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreateServicePayload) => {
+      return container.serviceService.create(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+    },
+  });
 }

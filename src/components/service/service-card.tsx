@@ -45,8 +45,8 @@ export function ServiceCard({ service }: ServiceCardProps) {
     providerUser?.contacts?.find((c) => c.type === "PHONE") ||
     providerUser?.contacts?.[0];
   const contactValue = contact?.value;
-  const city = service.adress?.city?.name;
-  const state = service.adress?.state?.name;
+  const city = service.address?.city?.name;
+  const state = service.address?.state?.name;
 
   const locationShort = city && state ? `${city}` : city;
   const locationFull = city && state ? `${city} - ${state}` : city;

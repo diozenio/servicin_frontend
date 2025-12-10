@@ -22,12 +22,12 @@ export type Service = {
   price: string;
   rating: number;
   photos: PhotoURL[];
-  avaliabilites: Avaliabilites[];
+  availabilities: Availability[];
   provider: Provider;
   category: Category;
-  unavaliableTimeSlots: UnavaliableTimeSlots[];
-  adress: AdressService;
-  reviews: Reviews[];
+  unavailableTimeSlots: UnavailableTimeSlot[];
+  address: AddressService;
+  reviews: Review[];
 };
 
 export type ServiceResponse = ApiResponse<Service | null>;
@@ -37,20 +37,22 @@ export type PhotoURL = {
   photoUrl: string;
 };
 
-export type Avaliabilites = {
+export type Availability = {
   id: string;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
-  breakStart: null;
-  breakEnd: null;
+  breakStart: string | null;
+  breakEnd: string | null;
   slotDuration: number;
-  serviceId: null;
+  serviceId: string | null;
 };
 
 export type Provider = {
   userId: string;
   averageRating: string;
+  autoAcceptAppointments: boolean;
+  showContactInfo: boolean;
   user: User;
   contacts: Contact[];
 };
@@ -66,13 +68,15 @@ export type Category = {
   description: string;
 };
 
-export type UnavaliableTimeSlots = {
+export type UnavailableTimeSlot = {
   start: string;
   end: string;
   date: string;
+  appointmentId?: string;
+  status?: string;
 };
 
-export type AdressService = {
+export type AddressService = {
   state: {
     id: string;
     name: string;
@@ -83,7 +87,7 @@ export type AdressService = {
   };
 };
 
-export type Reviews = {
+export type Review = {
   id: string;
   rating: string;
   comment: string | null;
@@ -91,12 +95,12 @@ export type Reviews = {
   client: {
     id: string;
     individual: {
-      fullname: string;
+      fullName: string;
     } | null;
     company: {
       corporateName: string;
     } | null;
-    photoUrl: null;
+    photoUrl: string | null;
   };
 };
 
@@ -107,3 +111,24 @@ export type ServiceListResponse = {
   pageSize: number;
   data: Service[];
 };
+
+export type CreateServicePayload = {
+  providerId: string;
+  categoryId: number;
+  addressId: string;
+  name: string;
+  description?: string;
+  price: number;
+  availability: {
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+    slotDuration: number;
+  }[];
+};
+
+export type CreateServiceResponse = {
+  id: string;
+};
+
+export type CreateServiceApiResponse = ApiResponse<CreateServiceResponse>;
