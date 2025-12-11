@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Upload, X } from "lucide-react";
 import { CreateServicePayload } from "@/core/domain/models/service";
 
 type AvailabilitySlot = {
@@ -60,6 +60,9 @@ export default function NewServicePage() {
       slotDuration: 60,
     },
   ]);
+
+  const [photos, setPhotos] = React.useState<string[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
@@ -133,9 +136,9 @@ export default function NewServicePage() {
       prev.map((slot, i) =>
         i === index
           ? {
-              ...slot,
-              [field]: newValue,
-            }
+            ...slot,
+            [field]: newValue,
+          }
           : slot
       )
     );
@@ -157,6 +160,53 @@ export default function NewServicePage() {
     if (availabilities.length > 1) {
       setAvailabilities((prev) => prev.filter((_, i) => i !== index));
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newPhotos: string[] = [];
+    let filesProcessed = 0;
+    const totalFiles = files.length;
+
+
+    Array.from(files).forEach((file, _) => {
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newPhotos.push(reader.result as string);
+          filesProcessed++;
+
+
+          if (filesProcessed === totalFiles) {
+            setPhotos((prev) => {
+              const updated = [...prev, ...newPhotos];
+              return updated;
+            });
+          }
+        };
+        reader.onerror = (error) => {
+          filesProcessed++;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        filesProcessed++;
+      }
+    });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   const validateForm = (): boolean => {
@@ -203,6 +253,7 @@ export default function NewServicePage() {
       name: formData.name,
       description: formData.description || undefined,
       price: Number(formData.price),
+      photos: photos.map((photoUrl) => ({ photoUrl })),
       availability: availabilities,
     };
 
@@ -335,6 +386,58 @@ export default function NewServicePage() {
                   )}
                 </Field>
               </div>
+            </div>
+          </div>
+
+          <div className="border rounded-lg p-6 bg-card">
+            <h2 className="text-xl font-semibold mb-4">Fotos do Serviço</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Adicione fotos do seu serviço (opcional). As imagens ajudam a atrair
+              mais clientes.
+            </p>
+
+            <div className="space-y-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              {photos.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {photos.map((photo, index) => (
+                    <div key={index} className="relative group aspect-square">
+                      <img
+                        src={photo}
+                        alt={`Foto ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleUploadClick}
+                className="w-full"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {photos.length > 0 ? "Adicionar Mais Fotos" : "Adicionar Fotos"}
+              </Button>
             </div>
           </div>
 

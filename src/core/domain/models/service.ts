@@ -113,6 +113,9 @@ export type CreateServicePayload = {
   name: string;
   description?: string;
   price: number;
+  photos: {
+    photoUrl: string;
+  }[];
   availability: {
     dayOfWeek: number;
     startTime: string;
