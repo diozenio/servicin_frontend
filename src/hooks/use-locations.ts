@@ -10,7 +10,7 @@ export function useStates() {
     queryKey: ["locations", "states"],
     queryFn: async () => {
       const response = await container.locationService.getStates();
-      return response.data;
+      return response?.data || [];
     },
   });
 }
@@ -20,8 +20,10 @@ export function useCitiesByState(stateId: string | null) {
     queryKey: ["locations", "cities", stateId],
     queryFn: async () => {
       if (!stateId) return [];
-      const response = await container.locationService.getCitiesByState(stateId);
-      return response.data;
+      const response = await container.locationService.getCitiesByState(
+        stateId
+      );
+      return response?.data || [];
     },
     enabled: !!stateId,
   });
@@ -29,10 +31,11 @@ export function useCitiesByState(stateId: string | null) {
 
 export function useLocations(options?: { limit?: number }) {
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const { data: states = [], isLoading: isLoadingStates } = useStates();
   const [selectedStateId, setSelectedStateId] = useState<string | null>(null);
-  const { data: cities = [], isLoading: isLoadingCities } = useCitiesByState(selectedStateId);
+  const { data: cities = [], isLoading: isLoadingCities } =
+    useCitiesByState(selectedStateId);
 
   const searchLocations = useCallback((query: string) => {
     setSearchQuery(query);

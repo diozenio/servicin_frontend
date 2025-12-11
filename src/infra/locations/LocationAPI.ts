@@ -7,12 +7,12 @@ import { client } from "@/lib/client";
 
 export class LocationAPI extends LocationAdapter {
   async getStates(): Promise<StateListResponse> {
-    const { data } = await client.get("/locations/states");
-    return data;
+    const response = await client.get("/locations/states");
+    return response.data || { data: [] };
   }
 
   async getCitiesByState(stateId: string): Promise<CityListResponse> {
-    const { data } = await client.get(`/locations/states/${stateId}/cities`);
-    return data;
+    const response = await client.get(`/locations/states/${stateId}/cities`);
+    return response.data || { data: [] };
   }
 }
