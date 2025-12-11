@@ -9,8 +9,11 @@ import { client } from "@/lib/client";
 
 export class CategoryAPI implements CategoryAdapter {
   async fetchAll(): Promise<CategoriesResponse> {
-    const { data } = await client.get("/categories/");
-    return data;
+    const response = await client.get("/categories/");
+    return {
+      data: response.data || [],
+      success: true,
+    };
   }
 
   async fetchById(id: number): Promise<CategoryResponse> {
@@ -18,14 +21,20 @@ export class CategoryAPI implements CategoryAdapter {
       return { success: false, data: null };
     }
 
-    const { data } = await client.get(`/categories/${id}`);
-    return data;
+    const response = await client.get(`/categories/${id}`);
+    return {
+      data: response.data || null,
+      success: true,
+    };
   }
 
   async create(
     payload: CreateCategoryPayload
   ): Promise<CreateCategoryApiResponse> {
-    const { data } = await client.post("/categories/", payload);
-    return data;
+    const response = await client.post("/categories/", payload);
+    return {
+      data: response.data,
+      success: true,
+    };
   }
 }

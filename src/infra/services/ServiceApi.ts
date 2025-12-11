@@ -34,18 +34,27 @@ export class ServiceApi extends ServiceAdapter {
       params: cleanParams,
     });
 
-    return data;
+    return {
+      data,
+      success: true,
+    };
   }
 
   async findById(id: string): Promise<ApiResponse<ServiceResponse>> {
     const { data } = await client.get(`/services/${id}`);
-    return data;
+    return {
+      data,
+      success: true,
+    };
   }
 
   async create(
     payload: CreateServicePayload
   ): Promise<ApiResponse<CreateServiceApiResponse>> {
     const { data } = await client.post("/services/", payload);
-    return data;
+    return {
+      data,
+      success: true,
+    };
   }
 }
