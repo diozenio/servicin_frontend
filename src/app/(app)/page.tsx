@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ServiceCard } from "@/components/service/service-card";
 import { ServiceCardSkeleton } from "@/components/service/service-card-skeleton";
@@ -66,7 +65,7 @@ export default function Home() {
             Receba orçamentos gratuitos em poucos minutos.
           </p>
 
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-4xl mx-auto mb-8">
             <SearchInput onSearch={handleSearch} />
           </div>
 
