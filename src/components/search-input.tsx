@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -25,6 +24,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { SearchIcon, FilterIcon } from "lucide-react";
 import { useStates, useCitiesByState } from "@/hooks/use-locations";
 import { ServiceFilters } from "@/core/domain/models/filters";
+import { useAuth } from "@/hooks/use-auth";
 
 interface SearchInputProps {
   onSearch: (filters: ServiceFilters) => void;
@@ -66,6 +66,8 @@ export function SearchInput({
   const [searchQuery, setSearchQuery] = React.useState(initialFilters.q);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<ServiceFilters>(initialFilters);
+
+  const { user } = useAuth();
 
   const { data: states = [], isLoading: isLoadingStates } = useStates();
   const { data: cities = [], isLoading: isLoadingCities } = useCitiesByState(
@@ -388,12 +390,23 @@ export function SearchInput({
         </div>
       </div>
 
-      <Button
-        onClick={handleSearch}
-        className="rounded-lg px-8 whitespace-nowrap h-12 w-full sm:w-auto"
-      >
-        Buscar
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto justify-center">
+        <Button
+          onClick={handleSearch}
+          className="rounded-lg px-8 whitespace-nowrap h-12 w-full sm:w-auto cursor-pointer"
+        >
+          Buscar
+        </Button>
+        {user?.role === "PROVIDER" && (
+          <Button
+            onClick={() => router.push("/services/new")}
+            variant="outline"
+            className="rounded-lg px-8 whitespace-nowrap h-12 w-full sm:w-auto cursor-pointer"
+          >
+            Novo Serviço
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

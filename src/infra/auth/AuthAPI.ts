@@ -28,10 +28,10 @@ export class AuthAPI implements AuthAdapter {
   }
 
   async getCurrentUser(): Promise<ApiResponse<GetCurrentUserResponse>> {
-    const { data } = await client.get("/auth/me");
+    const response = await client.get("/auth/me");
     return {
-      data,
-      success: true,
+      data: response.data?.data || null,
+      success: response.data?.success ?? true,
     };
   }
 }

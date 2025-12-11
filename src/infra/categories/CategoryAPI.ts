@@ -11,8 +11,8 @@ export class CategoryAPI implements CategoryAdapter {
   async fetchAll(): Promise<CategoriesResponse> {
     const response = await client.get("/categories/");
     return {
-      data: response.data || [],
-      success: true,
+      data: response.data.data || [],
+      success: response.data.success ?? true,
     };
   }
 
@@ -23,8 +23,8 @@ export class CategoryAPI implements CategoryAdapter {
 
     const response = await client.get(`/categories/${id}`);
     return {
-      data: response.data || null,
-      success: true,
+      data: response.data.data || null,
+      success: response.data.success ?? true,
     };
   }
 
@@ -33,8 +33,8 @@ export class CategoryAPI implements CategoryAdapter {
   ): Promise<CreateCategoryApiResponse> {
     const response = await client.post("/categories/", payload);
     return {
-      data: response.data,
-      success: true,
+      data: response.data.data || null,
+      success: response.data.success ?? true,
     };
   }
 }
