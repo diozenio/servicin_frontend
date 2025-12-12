@@ -13,7 +13,7 @@ export function useAuth() {
     queryKey: ["auth", "user"],
     queryFn: async () => {
       const response = await container.authService.getCurrentUser();
-      return response.data;
+      return response?.data || null;
     },
     staleTime: 5 * 60 * 1000,
   });
