@@ -25,6 +25,7 @@ import { SearchIcon, FilterIcon } from "lucide-react";
 import { useStates, useCitiesByState } from "@/hooks/use-locations";
 import { ServiceFilters } from "@/core/domain/models/filters";
 import { useAuth } from "@/hooks/use-auth";
+import { useCategories } from "@/hooks/use-categories";
 
 interface SearchInputProps {
   onSearch: (filters: ServiceFilters) => void;
@@ -68,7 +69,8 @@ export function SearchInput({
   const [filters, setFilters] = React.useState<ServiceFilters>(initialFilters);
 
   const { user } = useAuth();
-
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useCategories();
   const { data: states = [], isLoading: isLoadingStates } = useStates();
   const { data: cities = [], isLoading: isLoadingCities } = useCitiesByState(
     filters.stateId || null
@@ -262,15 +264,22 @@ export function SearchInput({
               </Field>
               <Field>
                 <FieldLabel htmlFor="category">Categoria</FieldLabel>
-                <Input
-                  id="category"
-                  type="text"
-                  placeholder="Nome da categoria"
+                <Select
                   value={filters.category || ""}
-                  onChange={(e) =>
-                    handleFilterChange("category", e.target.value)
-                  }
-                />
+                  onValueChange={(e) => handleFilterChange("category", e)}
+                  disabled={isLoadingCategories}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.name}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
               <Field>
                 <FieldLabel htmlFor="state">Estado</FieldLabel>

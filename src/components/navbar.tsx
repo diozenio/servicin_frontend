@@ -57,6 +57,11 @@ export default function Navbar() {
             <Button variant="link" asChild className="text-sm">
               <Link href="/appointments">Agendamentos</Link>
             </Button>
+            {user?.role === "PROVIDER" && (
+              <Button variant="link" asChild className="text-sm">
+                <Link href="/categories">Categorias</Link>
+              </Button>
+            )}
             <Button variant="link" asChild className="text-sm">
               <Link href="#">Sobre</Link>
             </Button>
