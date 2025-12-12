@@ -15,13 +15,15 @@ import clsx from "clsx";
 import Link from "next/link";
 import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Hammer } from "lucide-react";
 import { getUserDisplayName } from "@/utils/user";
+import { CreateProviderDialog } from "@/components/create-provider-dialog";
 
 import { NotificationInboxPopover } from "@/components/notification-inbox-popover";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
+  const [showBecomeProviderDialog, setShowBecomeProviderDialog] = React.useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const userName = getUserDisplayName(user!);
@@ -110,6 +112,15 @@ export default function Navbar() {
                         <span>Perfil</span>
                       </Link>
                     </DropdownMenuItem>
+                    {user.role === "CUSTOMER" && (
+                      <DropdownMenuItem
+                        onClick={() => setShowBecomeProviderDialog(true)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <Hammer className="mr-2 h-4 w-4" />
+                        <span>Torne-se provedor</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link href="/settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
@@ -136,6 +147,10 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <CreateProviderDialog
+        open={showBecomeProviderDialog}
+        onOpenChange={setShowBecomeProviderDialog}
+      />
     </header>
   );
 }

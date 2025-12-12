@@ -1,7 +1,19 @@
-import { ServiceProviderByIdResponseData, UpdateServiceProviderPayload } from "@/core/domain/models/user";
+import {
+  CreateServiceProviderPayload,
+  ServiceProviderByIdResponseData,
+  UpdateServiceProviderPayload,
+} from "@/core/domain/models/user";
 import { ApiResponse } from "@/core/types/api";
 
 export abstract class ServiceProviderAdapter {
-  abstract getById(id: string): Promise<ApiResponse<ServiceProviderByIdResponseData>>;
-  abstract updateSettings(id:String, payload: UpdateServiceProviderPayload):Promise<ApiResponse<null>>
+  abstract getById(
+    id: string
+  ): Promise<ApiResponse<ServiceProviderByIdResponseData>>;
+  abstract create(
+    payload: CreateServiceProviderPayload
+  ): Promise<ApiResponse<null>>;
+  abstract updateSettings(
+    id: String,
+    payload: UpdateServiceProviderPayload
+  ): Promise<ApiResponse<null>>;
 }
