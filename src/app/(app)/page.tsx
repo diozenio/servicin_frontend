@@ -77,9 +77,9 @@ export default function Home() {
             {popularCategories.map((category, index) => (
               <button
                 key={category.id}
-                onClick={useCallback(() => {
+                onClick={() => {
                   handleSearch({ category: category.name });
-                }, [handleSearch, category.name])}
+                }}
                 className="underline mr-2 hover:text-primary transition-colors"
               >
                 {category.name}
