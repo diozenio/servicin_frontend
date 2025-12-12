@@ -14,6 +14,11 @@ import { ServiceApi } from "@/infra/services/ServiceApi";
 import { CategoryAPI } from "@/infra/categories/CategoryAPI";
 import { CategoryService } from "@/core/services/CategoryService";
 import { ScheduleService } from "@/core/services/ScheduleService";
+import { ProfileAPI } from "@/infra/profile/ProfileAPI";
+import { ProfileService } from "@/core/services/UserService";
+import { ServiceProviderApi } from "@/infra/service-provider/ServiceProviderAPI";
+import { ServiceProviderService } from "@/core/services/ServiceProvider";
+import { DeleteAccountService } from "@/core/services/DeleteAccountService";
 
 const locationAdapter = new LocationAPI();
 const serviceAdapter = new ServiceApi();
@@ -23,6 +28,8 @@ const reviewAdapter = new ReviewAPI();
 const appointmentAdapter = new AppointmentAPI();
 const notificationAdapter = new NotificationAPI();
 const categoryAdapter = new CategoryAPI();
+const profileAdapter = new ProfileAPI();
+const serviceProviderAdapter = new ServiceProviderApi();
 
 const locationService = new LocationService(locationAdapter);
 const serviceService = new ServiceService(serviceAdapter);
@@ -38,6 +45,11 @@ const scheduleService = new ScheduleService({
   checkAvailability: async () => false,
   releaseTimeSlot: async () => false,
 });
+const profileService = new ProfileService(profileAdapter);
+const serviceProviderService = new ServiceProviderService(
+  serviceProviderAdapter
+);
+const deleteAccountUseCase = new DeleteAccountService(profileAdapter);
 
 export const container = {
   locationService,
@@ -48,4 +60,7 @@ export const container = {
   notificationService,
   categoryService,
   scheduleService,
+  profileService,
+  serviceProviderService,
+  deleteAccountUseCase,
 };
