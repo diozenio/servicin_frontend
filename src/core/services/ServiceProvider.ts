@@ -2,6 +2,7 @@ import { ServiceProviderUseCase } from "@/core/interfaces/usecases/ServiceProvid
 import { ApiResponse } from "@/core/types/api";
 import { ServiceProviderAdapter } from "../interfaces/adapters/ServiceProviderAdpter";
 import {
+  CreateServiceProviderPayload,
   ServiceProviderByIdResponseData,
   UpdateServiceProviderPayload,
 } from "../domain/models/user";
@@ -13,6 +14,12 @@ export class ServiceProviderService implements ServiceProviderUseCase {
     id: string
   ): Promise<ApiResponse<ServiceProviderByIdResponseData>> {
     return await this.providerAdapter.getById(id);
+  }
+
+  async create(
+    payload: CreateServiceProviderPayload
+  ): Promise<ApiResponse<null>> {
+    return await this.providerAdapter.create(payload);
   }
 
   async updateSettings(

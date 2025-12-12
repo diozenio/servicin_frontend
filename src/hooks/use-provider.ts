@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/container";
-import { ServiceProviderByIdResponseData } from "@/core/domain/models/user";
+import {
+  CreateServiceProviderPayload,
+  ServiceProviderByIdResponseData,
+} from "@/core/domain/models/user";
 
 export function useServiceProvider(providerId: string | null) {
   const {
@@ -61,6 +64,32 @@ export function useUpdateServiceProviderSettings() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["provider", variables.id],
+      });
+    },
+  });
+}
+
+export function useCreateServiceProvider() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreateServiceProviderPayload) => {
+      const response = await container.serviceProviderService.create(payload);
+
+      if (!response.success) {
+        throw new Error(response.message || "Erro ao criar provedor");
+      }
+
+      return response.data;
+    },
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "user"],
+        refetchType: "active",
+      });
+      await queryClient.refetchQueries({
+        queryKey: ["auth", "user"],
       });
     },
   });

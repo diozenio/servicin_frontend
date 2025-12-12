@@ -147,6 +147,10 @@ export type ServiceProviderByIdResponse = {
   message: string;
 };
 
+export type CreateServiceProviderPayload = {
+  userId: string;
+};
+
 export type UpdateServiceProviderPayload = {
   autoAcceptAppointments?: boolean;
   showContactInfo?: boolean;
