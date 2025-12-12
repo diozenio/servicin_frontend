@@ -7,11 +7,14 @@ import { useServices } from "@/hooks/use-services";
 import { SearchInput } from "@/components/search-input";
 import { useCallback } from "react";
 import { ServiceQueryParams } from "@/core/domain/models/service";
+import { useCategories } from "@/hooks/use-categories";
 
 export default function Home() {
   const router = useRouter();
 
   const { services, isLoading } = useServices({ page: 1, pageSize: 6 });
+  const { data: categories = [] } = useCategories();
+  const popularCategories = categories.slice(0, 4);
 
   const handleSearch = useCallback(
     (filters: ServiceQueryParams) => {
@@ -71,38 +74,18 @@ export default function Home() {
 
           <div className="text-sm">
             <span className="mr-2">Populares:</span>
-            <button
-              onClick={useCallback(() => {
-                handleSearch({ q: "Encanador" });
-              }, [handleSearch])}
-              className="underline mr-2 hover:text-primary transition-colors"
-            >
-              Encanador,
-            </button>
-            <button
-              onClick={useCallback(() => {
-                handleSearch({ q: "Eletricista" });
-              }, [handleSearch])}
-              className="underline mr-2 hover:text-primary transition-colors"
-            >
-              Eletricista,
-            </button>
-            <button
-              onClick={useCallback(() => {
-                handleSearch({ q: "Pintor" });
-              }, [handleSearch])}
-              className="underline mr-2 hover:text-primary transition-colors"
-            >
-              Pintor,
-            </button>
-            <button
-              onClick={useCallback(() => {
-                handleSearch({ q: "Pedreiro" });
-              }, [handleSearch])}
-              className="underline hover:text-primary transition-colors"
-            >
-              Pedreiro
-            </button>
+            {popularCategories.map((category, index) => (
+              <button
+                key={category.id}
+                onClick={useCallback(() => {
+                  handleSearch({ category: category.name });
+                }, [handleSearch, category.name])}
+                className="underline mr-2 hover:text-primary transition-colors"
+              >
+                {category.name}
+                {index < popularCategories.length - 1 && ","}
+              </button>
+            ))}
           </div>
         </div>
       </div>
