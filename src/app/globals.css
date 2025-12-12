@@ -150,3 +150,13 @@
     @apply font-serif;
   }
 }
+
+[data-nextjs-toast],
+[data-nextjs-dialog],
+[data-nextjs-toast] *,
+[data-nextjs-dialog] * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
