@@ -41,6 +41,39 @@ export type Individual = {
   birthDate: string | null;
 };
 
+export type ServicePhoto = {
+  id: string;
+  photoUrl: string;
+};
+
+export type ServiceAvailability = {
+  id: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  breakStart: string | null;
+  breakEnd: string | null;
+  slotDuration: number;
+  serviceId: string | null;
+};
+
+export type ServiceCategory = {
+  id: number;
+  name: string;
+  description: string | null;
+};
+
+export type ServiceEntity = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: string;
+  rating: string;
+  photos: ServicePhoto[];
+  availabilities: ServiceAvailability[];
+  category: ServiceCategory;
+};
+
 export type User = {
   id: string;
   email: string;
@@ -98,3 +131,23 @@ export type LogoutResponse = null;
 export type GetCurrentUserResponse = User | null;
 
 export type DeleteAccountResponse = null;
+
+export type ServiceProviderByIdResponseData = {
+  userId: string;
+  averageRating: string;
+  showContactInfo: boolean;
+  autoAcceptAppointments: boolean;
+  contacts: Contact[];
+  services: ServiceEntity[];
+};
+
+export type ServiceProviderByIdResponse = {
+  data: ServiceProviderByIdResponseData;
+  success: boolean;
+  message: string;
+};
+
+export type UpdateServiceProviderPayload = {
+  autoAcceptAppointments?: boolean;
+  showContactInfo?: boolean;
+};
