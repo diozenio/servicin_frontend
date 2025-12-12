@@ -18,6 +18,7 @@ import { ProfileAPI } from "@/infra/profile/ProfileAPI";
 import { ProfileService } from "@/core/services/UserService";
 import { ServiceProviderApi } from "@/infra/service-provider/ServiceProviderAPI";
 import { ServiceProviderService } from "@/core/services/ServiceProvider";
+import { DeleteAccountService } from "@/core/services/DeleteAccountService";
 
 const locationAdapter = new LocationAPI();
 const serviceAdapter = new ServiceApi();
@@ -45,7 +46,10 @@ const scheduleService = new ScheduleService({
   releaseTimeSlot: async () => false,
 });
 const profileService = new ProfileService(profileAdapter);
-const serviceProviderService = new ServiceProviderService(serviceProviderAdapter);
+const serviceProviderService = new ServiceProviderService(
+  serviceProviderAdapter
+);
+const deleteAccountUseCase = new DeleteAccountService(profileAdapter);
 
 export const container = {
   locationService,
@@ -58,4 +62,5 @@ export const container = {
   scheduleService,
   profileService,
   serviceProviderService,
+  deleteAccountUseCase,
 };

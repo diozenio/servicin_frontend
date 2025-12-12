@@ -9,6 +9,8 @@ import {
   useServiceProvider,
   useUpdateServiceProviderSettings,
 } from "@/hooks/use-provider";
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import DeleteAccountDialog from "./delete-account-dialog";
 
 export function UserProfile() {
   const { user } = useAuth();
@@ -261,12 +263,20 @@ export function UserProfile() {
               )}
 
               <div className="flex items-center gap-3">
-                <Button
-                  variant="destructive"
-                  onClick={() => console.log("Delete account")}
-                >
-                  Excluir conta
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        className="hover:bg-destructive/40!"
+                      >
+                        Excluir conta
+                      </Button>
+                    </DialogTrigger>
+
+                    <DeleteAccountDialog />
+                  </Dialog>
+                </div>
               </div>
             </div>
           </div>
