@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import clsx from "clsx";
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
 import Logo from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, User, Settings } from "lucide-react";
@@ -68,8 +67,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <ThemeToggle />
-
             {isAuthenticated && user && <NotificationInboxPopover />}
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
