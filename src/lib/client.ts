@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 export const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -18,6 +19,20 @@ client.interceptors.response.use(
         (errorWithMessage as any).response = error.response;
         return Promise.reject(errorWithMessage);
       }
+    }
+
+    if (
+      !error.response &&
+      (error.code === "ERR_NETWORK" || error.message === "Network Error")
+    ) {
+      if (typeof window !== "undefined") {
+        toast.error(
+          "Erro de conexão. Verifique sua internet e tente novamente."
+        );
+      }
+      const networkError = new Error("Erro de conexão");
+      (networkError as any).code = error.code;
+      return Promise.reject(networkError);
     }
 
     return Promise.reject(error);
